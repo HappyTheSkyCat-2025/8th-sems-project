@@ -1,14 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS import
-// Optionally import Bootstrap JS bundle if you use components requiring JS
-// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import './index.css';  
+import './styles/Navbar.css';
 
 import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <React.StrictMode><App /></React.StrictMode>
 );
