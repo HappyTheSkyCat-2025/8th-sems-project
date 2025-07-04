@@ -6,8 +6,8 @@
   --highlight-color: #ddb148;
 
   --font-family: 'Segoe UI', sans-serif;
-  --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.1);
-  --radius: 4px;
+  --shadow-light: 0 4px 20px rgba(28, 24, 24, 0.1);
+  --radius: 8px;
   --spacing: 12px;
   --transition: 0.3s ease-in-out;
 }

@@ -1,4 +1,3 @@
-// TripSection.jsx
 import React, { useState } from "react";
 import "../styles/journey.css";
 import { FaHeart } from "react-icons/fa";
@@ -9,30 +8,27 @@ export default function TripSection() {
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [signatureRemoved, setSignatureRemoved] = useState(false);
 
-  const handleRemoveBadge = () => {
-    setSignatureRemoved(true);
-  };
-
   return (
     <section className="trip-section">
       <div className="trip-header-bar">
-        <span className="section-label">EXCLUSIVE JOURNEYS</span>
-        <span className="explore-link">Explore all trips &rarr;</span>
-      </div>
-
-      <div className="trip-tabs">
-        {tabs.map((tab) => (
-          <span
-            key={tab}
-            className={`tab ${activeTab === tab ? "active" : ""}`}
-            onClick={() => {
-              setActiveTab(tab);
-              setSignatureRemoved(false);
-            }}
-          >
-            {tab}
-          </span>
-        ))}
+        <h2 className="section-label">EXCLUSIVE JOURNEYS</h2>
+        <div className="trip-subheader">
+          <div className="trip-tabs">
+            {tabs.map((tab) => (
+              <span
+                key={tab}
+                className={`tab ${activeTab === tab ? "active" : ""}`}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setSignatureRemoved(false);
+                }}
+              >
+                {tab}
+              </span>
+            ))}
+          </div>
+          <span className="explore-link">Explore all trips →</span>
+        </div>
       </div>
 
       <div className="trip-card-grid">
@@ -48,7 +44,9 @@ export default function TripSection() {
                   <div className="trip-badge">Signature Trip</div>
                 </div>
               )}
-              <FaHeart className="trip-heart-icon" />
+              <div className="trip-heart-circle">
+                <FaHeart className="trip-heart-icon" />
+              </div>
             </div>
 
             <div className="trip-card-content">
