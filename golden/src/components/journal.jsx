@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import journal from "../data/journal";
-import { FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaCommentDots } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 import "../styles/journal.css";
 
 export default function Journal() {
+  const [chatOpen, setChatOpen] = useState(false);
+
+  const toggleChat = () => setChatOpen((prev) => !prev);
+
   return (
-    <section className="journal-section">
+    <section className="journal-section" style={{ position: "relative" }}>
       <h2 className="journal-title">Travel journal</h2>
       <div className="underline" />
       <p className="journal-description">
@@ -32,6 +36,25 @@ export default function Journal() {
           View all articles <IoIosArrowForward />
         </button>
       </div>
+
+      {/* Chatbot icon button */}
+      <button className="chatbot-button" onClick={toggleChat} aria-label="Chat with us">
+        <FaCommentDots size={24} />
+      </button>
+
+      {/* Optional: simple chat box popup */}
+      {chatOpen && (
+        <div className="chatbox">
+          <div className="chatbox-header">
+            <h4>Chat with us</h4>
+            <button className="chatbox-close" onClick={toggleChat}>×</button>
+          </div>
+          <div className="chatbox-body">
+            <p>Hi! How can we help you today?</p>
+            {/* You can add input & send button here later */}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
