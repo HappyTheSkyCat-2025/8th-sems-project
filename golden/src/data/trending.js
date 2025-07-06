@@ -26,6 +26,15 @@ const trending = [
     duration: "7 days",
     price: "$999",
   },
+   {
+    id: 3,
+    title: "Bhutan Cultural Escape",
+    description: "Experience the serenity of Bhutanese culture, monasteries, and mountain views.",
+    image: img2,
+    duration: "7 days",
+    price: "$999",
+  },
 ];
 
 export default trending;
+ 

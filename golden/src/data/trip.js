@@ -1,30 +1,32 @@
-import img2 from "../assets/img2.jpg";
-import bali from "../assets/bali.jpg";
+import img1 from "../assets/img2.jpg";
+import img2 from "../assets/bali.jpg";
+import img3 from "../assets/bali.jpg";
+import img4 from "../assets/img2.jpg";
 
 const trips = [
   {
     id: 1,
-    title: "Adventure Escapes",
-    description: "Experience thrilling adventures in breathtaking locations.",
-    image: img2,
+    title: "Cultural Tours",
+    description: "Immerse yourself in local traditions, art, and history.",
+    image: img1,
   },
   {
     id: 2,
-    title: "Cultural Journeys",
-    description: "Immerse yourself in rich traditions and local heritage.",
-    image: bali,
-  },
-  {
-    id: 3,
-    title: "Nature Retreats",
-    description: "Relax in the tranquility of pristine natural settings.",
+    title: "Trekking Adventures",
+    description: "Challenge yourself and explore the most stunning landscapes.",
     image: img2,
   },
   {
+    id: 3,
+    title: "Culinary Journeys",
+    description: "Savor authentic flavors and cooking traditions from around the world.",
+    image: img3,
+  },
+  {
     id: 4,
-    title: "Luxury Getaways",
-    description: "Indulge in exclusive and luxurious travel experiences.",
-    image: bali,
+    title: "Wildlife Expeditions",
+    description: "Observe magnificent creatures in their natural habitats.",
+    image: img4,
   },
 ];
 

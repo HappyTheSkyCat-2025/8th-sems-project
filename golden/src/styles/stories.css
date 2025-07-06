@@ -1,79 +1,118 @@
 .story-section {
   text-align: center;
   padding: 60px 20px;
-  background-color: #fdfdfd;
+  background-color: #fff;
 }
 
 .story-title {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-  color: #333;
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: #000;
+  margin-bottom: 5px;
 }
 
 .underline {
-  width: 80px;
-  height: 4px;
-  background-color: #0077cc;
-  margin: 0 auto 20px;
+  width: 60px;
+  height: 3px;
+  background-color: #ccc;
+  margin: 0 auto 15px;
   border-radius: 2px;
 }
 
+.underline.gold {
+  background-color: var(--highlight-color);
+}
+
 .story-subtitle {
-  font-size: 1.1rem;
-  color: #555;
-  margin-bottom: 40px;
+  font-size: 0.75rem;
+  color: #000;
+  margin-bottom: 50px;
+  font-weight: 200;
 }
 
 .story-slider {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
 }
 
 .story-card {
-  max-width: 500px;
-  background: white;
-  padding: 30px 20px;
+  background: #fff;
+  padding: 30px;
+  max-width: 600px;
+  border-left: 2px solid #aca7a7;
+  border-right: 2px solid #aca7a7;
+  border-top: none;
+  border-bottom: none;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  text-align: left;
+  position: relative;
 }
 
-.story-photo {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
+
+.stars {
+  display: flex;
+  gap: 5px;
   margin-bottom: 20px;
 }
 
 .story-message {
-  font-style: italic;
-  font-size: 1rem;
-  color: #444;
-  margin-bottom: 20px;
+  font-style: normal;
+  font-size: 0.75rem;
+  color: #000;
+  margin-bottom: 30px;
+  line-height: 1.9;
+  quotes: "“" "”" "‘" "’";
+  font-weight: 200;
+}
+
+.story-user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.story-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .story-name {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #222;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #111;
+  margin-bottom: 4px;
 }
 
 .story-location {
-  font-size: 0.95rem;
-  color: #777;
+  font-size: 0.9rem;
+  color: var(--highlight-color);
 }
 
 .arrow-btn {
-  font-size: 2rem;
+  font-size: 1.3rem;
   background: none;
   border: none;
   cursor: pointer;
-  color: #0077cc;
+  color: #777;
+  transition: 0.2s;
 }
 
 .arrow-btn:hover {
-  color: #005fa3;
+  color: #b88900;
+}
+
+.circle {
+  background-color: #f7f7f7;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }

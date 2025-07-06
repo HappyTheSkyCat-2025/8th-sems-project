@@ -11,9 +11,11 @@ export default function Roof() {
         <div className="roof-text">
           <h2>Journey to the Roof of the World</h2>
           <p>
-            Embark on a soul-stirring adventure through sacred mountains,
-            hidden trails, and ancient cultures nestled in the Himalayas.
+            Embark on extraordinary journeys<br/> through Nepal’s awe-inspiring
+            mountainscapes and untouched<br/> trails, immersing yourself in the
+          majesty of nature’s grandeur and creating unforgettable memories.
           </p>
+          <button className="roof-btn">See Details</button>
         </div>
 
         <div className="roof-img-wrapper">

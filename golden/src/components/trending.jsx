@@ -1,26 +1,35 @@
 import React from "react";
 import "../styles/trending.css";
-import trending from "../data/trending"; // ✅ Your trending.js file
+import trending from "../data/trending";
 import { IoIosArrowForward } from "react-icons/io";
 
 export default function Trending() {
   return (
     <section className="trending-section">
       <h2 className="trending-title">Trending Group Tours</h2>
-      <div className="underline" />
+      <div className="underline gold" />
       <p className="trending-subtitle">
-        Discover our most popular group adventures handpicked for you.
+        Discover our carefully selected destinations that promise unforgettable
+        experiences and breathtaking landscapes.
       </p>
 
       <div className="trip-card-grid">
-        {trending.map((trip) => (
+        {trending.map((trip, index) => (
           <div
             key={trip.id}
             className="trip-card"
             style={{ backgroundImage: `url(${trip.image})` }}
           >
+            {index === 0 && (
+              <div className="ribbon">
+                <span>Signature Trip</span>
+              </div> 
+            )}
+
+            <div className="trip-overlay" />
+
             <div className="trip-card-top">
-              <div className="trip-heart-circle">❤️</div>
+              <div className="trip-heart-circle">♡</div>
             </div>
 
             <div className="trip-card-content">
@@ -40,7 +49,7 @@ export default function Trending() {
 
       <div className="view-all-btn-wrapper">
         <button className="view-all-btn">
-          View all destinations <IoIosArrowForward />
+          View All Destinations <IoIosArrowForward />
         </button>
       </div>
     </section>

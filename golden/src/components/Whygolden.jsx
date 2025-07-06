@@ -9,59 +9,100 @@ import { LuLeaf } from "react-icons/lu";
 export default function WhyGolden() {
   return (
     <section className="why-golden-section">
-      <h2 className="why-golden-title">Why Choose Golden Travels?</h2>
+      {/* ─── Heading ─── */}
+      <h2 className="why-golden-title">Why Golden Leaf Travels?</h2>
+      <div className="why-golden-underline" />
 
+      {/* ─── Text & Image Row ─── */}
       <div className="why-golden-container">
-        <div className="text-wrapper">
+        <div className="why-golden-text">
+          <h3 className="why-golden-subtitle">
+            Crafting Unforgettable Journeys Since 2003
+          </h3>
+
           <p className="why-golden-description">
-            At Golden Travels, we provide exclusive journeys with personalized
-            experiences, unmatched hospitality, and unforgettable memories.
-            Our expert guides and custom itineraries ensure you explore the
-            world in comfort and style.
+            For over two decades, we’ve crafted immersive journeys that connect
+            travelers with authentic experiences and extraordinary destinations.
+            Our passion for travel and deep local connections allow us to create
+            unique itineraries that go beyond typical tourist routes.
           </p>
-          <button className="read-more-btn">Read more about our story</button>
+          <p className="why-golden-description">
+            We believe travel should transform, inspire, and connect. Every
+            journey with us is designed to provide meaningful experiences that
+            create lasting memories while respecting local cultures and
+            environments.
+          </p>
+
+          <button className="read-more-btn">Read More About Our Story</button>
         </div>
 
-        <div className="image-wrapper">
-          <img src={img2} alt="Why Golden Travels" />
+        <div className="why-golden-image">
+          <img src={img2} alt="Why Golden" />
         </div>
       </div>
 
-      <div className="info-boxes">
-        <div className="info-box">
-          <GoPeople className="info-icon" />
-          <h3 className="info-title">Small Group Travel</h3>
-          <p className="info-description">
-            Travel in intimate groups to enjoy personalized experiences.  
-            Build lasting memories with like-minded travelers.
-          </p>
-        </div>
+      {/* ─── Feature Cards with Decorative Lines ─── */}
+      <div className="feature-wrapper">
+        <div className="why-golden-features">
+          <div className="feature-box">
+            <div className="feature-header">
+              <span className="icon-box">
+                <GoPeople className="feature-icon" />
+              </span>
+              <h4 className="feature-title">
+                Small‑Group <br /> Travel
+              </h4>
+            </div>
+            <p className="feature-desc">
+              Intimate experiences with like‑minded travelers, never exceeding
+              16 people per group.
+            </p>
+          </div>
 
-        <div className="info-box">
-          <CiMap className="info-icon" />
-          <h3 className="info-title">Expert Local Guides</h3>
-          <p className="info-description">
-            Discover hidden gems with knowledgeable guides.  
-            Experience authentic culture and stories firsthand.
-          </p>
-        </div>
+          <div className="feature-box">
+            <div className="feature-header">
+              <span className="icon-box">
+                <CiMap className="feature-icon" />
+              </span>
+              <h4 className="feature-title">
+                Expert Local <br /> Guides
+              </h4>
+            </div>
+            <p className="feature-desc">
+              Passionate, knowledgeable locals who share authentic insights into
+              their homeland.
+            </p>
+          </div>
 
-        <div className="info-box">
-          <CiStar className="info-icon" />
-          <h3 className="info-title">Unique Experience</h3>
-          <p className="info-description">
-            Explore tailor-made itineraries crafted just for you.  
-            Enjoy unforgettable adventures off the beaten path.
-          </p>
-        </div>
+          <div className="feature-box">
+            <div className="feature-header">
+              <span className="icon-box">
+                <CiStar className="feature-icon" />
+              </span>
+              <h4 className="feature-title">
+                Unique <br /> Experiences
+              </h4>
+            </div>
+            <p className="feature-desc">
+              Access to off‑the‑beaten‑path locations and authentic cultural
+              exchanges.
+            </p>
+          </div>
 
-        <div className="info-box">
-          <LuLeaf className="info-icon" />
-          <h3 className="info-title">Sustainable Tourism</h3>
-          <p className="info-description">
-            Travel responsibly with eco-friendly practices.  
-            Support local communities and preserve nature.
-          </p>
+          <div className="feature-box">
+            <div className="feature-header">
+              <span className="icon-box">
+                <LuLeaf className="feature-icon" />
+              </span>
+              <h4 className="feature-title">
+                Sustainable <br /> Tourism
+              </h4>
+            </div>
+            <p className="feature-desc">
+              Responsible travel practices that respect local communities and
+              environments.
+            </p>
+          </div>
         </div>
       </div>
     </section>

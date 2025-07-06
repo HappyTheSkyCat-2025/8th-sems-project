@@ -1,33 +1,44 @@
-
 import React from 'react';
-import Home from './components/Home';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import './styles/global.css';
-import Readsection3rd from './components/readsection3rd'
-import Journey from './components/journey'
-import Whygolden from './components/Whygolden'
-import Stories from './components/stories'
-import Trending from './components/trending'
-import Roof from './components/roof'
-import Trip from './components/trip'
-import Journal from './components/journal'
-import Footer from './components/footer'
+import Home from './components/Home';
+import Readsection3rd from './components/readsection3rd';
+import Journey from './components/journey';
+import Whygolden from './components/Whygolden';
+import Stories from './components/stories';
+import Trending from './components/trending';
+import Roof from './components/roof';
+import Trip from './components/trip';
+import Journal from './components/journal';
+import Footer from './components/footer';
+import DestinationPage from './pages/DestinationPage';
+
 
 function App() {
   return (
-    <>
+    <Router>
       <Navbar />
-      <Home />
-      <Readsection3rd />
-      <Journey />
-      <Whygolden />
-      <Stories />
-      <Trending />
-      <Roof />
-      <Trip />
-      <Journal />
-      <Footer />
-    </>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Home />
+              <Readsection3rd />
+              <Journey />
+              <Whygolden />
+              <Stories />
+              <Trending />
+              <Roof />
+              <Trip />
+              <Journal />
+              <Footer />
+            </>
+          }
+        />
+        <Route path="/destinations/:country" element={<DestinationPage />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -1,55 +1,228 @@
 .trending-section {
+
   padding: 60px 20px;
   text-align: center;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
 }
 
 .trending-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
+  font-weight: 500;
   color: #222;
   margin-bottom: 10px;
 }
 
-.underline {
+.underline.gold {
   width: 80px;
-  height: 4px;
-  background-color: #0077cc;
+  height: 3px;
+  color: var(--highlight-color);
   margin: 0 auto 20px;
   border-radius: 2px;
 }
 
 .trending-subtitle {
-  font-size: 1.1rem;
-  color: #555;
+  font-size: .90rem;
+  color: #000; 
   margin-bottom: 40px;
+  font-weight: 200;
 }
 
-.trip-card-grid {
+/* ---------- Grid ---------- */
+.trip-card-grid.fixed-four {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 25px;
   margin-bottom: 40px;
 }
 
-.view-all-btn-wrapper {
-  text-align: center;
+/* ---------- Card Style ---------- */
+.trip-card {
+  height: 440px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+  transition: transform 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-.view-all-btn {
-  background-color: #0077cc;
+.trip-card:hover {
+  transform: translateY(-6px);
+}
+
+/* Overlay for image cards */
+.card-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 60%);
+  z-index: 1;
+}
+
+/* Content on top of overlay */
+.trip-card-content {
+  position: relative;
+  z-index: 2;
+  padding: 20px;
   color: white;
+  text-align: left;
+}
+
+.trip-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-weight: 300;
+}
+
+.trip-description {
+  font-size: 0.9rem;
+  opacity: 0.85;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  font-weight: 200;
+}
+
+.trip-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  font-weight: 300;
+}
+
+.trip-duration{
+  font-size: 0.8rem;
+  font-weight: 100;
+}
+.trip-price {
+  font-size: 0.8rem;
+  font-weight: 100;
+}
+.details-btn {
+  background: rgba(255, 255, 255, 0.2); /* semi-transparent white */
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  backdrop-filter: blur(8px); /* glass blur effect */
+  -webkit-backdrop-filter: blur(8px); /* for Safari */
+  transition: all 0.3s ease;
+}
+
+.details-btn:hover {
+  background: white;
+  color: #000;
+}
+
+
+/* ---------- Ribbon ---------- */
+.ribbon {
+  width: 160px;
+  height: 32px;
+  background: #f4b400;
+  position: absolute;
+  top: 20px;
+  left: -45px;
+  transform: rotate(-45deg);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ribbon span {
+  font-family: cursive;
+  font-size: 0.7rem;
+  color: #fff;
+  font-weight: 200;
+}
+
+/* ---------- See More Card ---------- */
+.see-more-card {
+  background: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 16px;
+  overflow: hidden;
+  height: 440px;
+  transition: all 0.3s ease;
+}
+
+.see-more-blur {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(8px);
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.see-more-card:hover .see-more-blur {
+  backdrop-filter: none;
+  background-color: white;
+}
+
+.see-more-content {
+  z-index: 2;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #000;
+  text-align: center;
+  padding: 20px;
+}
+.trip-card-top {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  z-index: 3;
+}
+
+.trip-heart-circle {
+  background-color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  font-size: 1.5rem; 
+  color: #212020eb; 
+  transition: all 0.3s ease;
+}
+
+
+/* ---------- View All Button ---------- */
+.view-all-btn {
+  background-color: white;
+  color: black;
   font-size: 1rem;
   padding: 12px 24px;
-  border: none;
+  border: 1px solid #dcdcdc;
   border-radius: 6px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06); /* subtle shadow */
+  transition: none;
 }
 
 .view-all-btn:hover {
-  background-color: #005fa3;
+  background-color: white; /* no hover effect */
+  color: black;
+  border: 1px solid #dcdcdc;
 }
+

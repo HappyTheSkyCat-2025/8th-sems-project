@@ -5,10 +5,10 @@ import "../styles/trip.css";
 export default function TripStyles() {
   return (
     <section className="tripstyles-section">
-      <h2 className="tripstyles-title">Trip styles</h2>
+      <h2 className="tripstyles-title">Trip Styles</h2>
       <div className="underline" />
       <p className="tripstyles-description">
-        Explore different ways to travel with our curated trip styles.
+        Whatever your passion, we have a journey tailored to your interests. Each trip style offers a unique way to experience the world.
       </p>
 
       <div className="tripstyles-grid">
@@ -17,6 +17,7 @@ export default function TripStyles() {
             <img src={trip.image} alt={trip.title} className="tripstyles-img" />
             <h3 className="tripstyles-card-title">{trip.title}</h3>
             <p className="tripstyles-card-description">{trip.description}</p>
+            
           </div>
         ))}
       </div>

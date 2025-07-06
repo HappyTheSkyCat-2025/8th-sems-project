@@ -44,9 +44,9 @@ export default function TripSection() {
                   <div className="trip-badge">Signature Trip</div>
                 </div>
               )}
-              <div className="trip-heart-circle">
-                <FaHeart className="trip-heart-icon" />
-              </div>
+              <div className="trip-card-top">
+              <div className="trip-heart-circle">♡</div>
+            </div>
             </div>
 
             <div className="trip-card-content">

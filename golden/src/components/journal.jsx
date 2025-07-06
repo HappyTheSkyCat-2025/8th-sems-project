@@ -12,7 +12,7 @@ export default function Journal() {
   return (
     <section className="journal-section" style={{ position: "relative" }}>
       <h2 className="journal-title">Travel journal</h2>
-      <div className="underline" />
+      <div className="underline journal" />
       <p className="journal-description">
         Read inspiring stories and insights from our seasoned travelers.
       </p>
@@ -27,6 +27,9 @@ export default function Journal() {
             </div>
             <h3 className="journal-card-title">{title}</h3>
             <p className="journal-card-description">{description}</p>
+            <div className="read-more">
+              Read more <IoIosArrowForward />
+            </div>
           </article>
         ))}
       </div>
@@ -37,12 +40,11 @@ export default function Journal() {
         </button>
       </div>
 
-      {/* Chatbot icon button */}
+      {/* Optional Chatbot Button (can remove if not needed) */}
       <button className="chatbot-button" onClick={toggleChat} aria-label="Chat with us">
         <FaCommentDots size={24} />
       </button>
 
-      {/* Optional: simple chat box popup */}
       {chatOpen && (
         <div className="chatbox">
           <div className="chatbox-header">
@@ -51,7 +53,6 @@ export default function Journal() {
           </div>
           <div className="chatbox-body">
             <p>Hi! How can we help you today?</p>
-            {/* You can add input & send button here later */}
           </div>
         </div>
       )}

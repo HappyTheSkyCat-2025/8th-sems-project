@@ -1,0 +1,184 @@
+.section-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+  color: #333;
+  position: relative;
+}
+.section-title::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: goldenrod;
+  margin-top: 6px;
+}
+
+/* Inspired Section */
+.inspired-section {
+  background: #fff;
+  padding: 2rem;
+}
+.inspired-cards {
+  display: flex;
+  gap: 1.5rem;
+}
+.inspired-card {
+  width: 300px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+.inspired-card:hover {
+  transform: scale(1.02);
+}
+.inspired-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+.inspired-overlay {
+  position: absolute;
+  margin-top: -160px;
+  padding: 0.8rem 1rem;
+  color: white;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+}
+.inspired-overlay .location {
+  font-weight: bold;
+}
+.inspired-overlay .country {
+  display: block;
+  font-size: 0.9rem;
+}
+.inspired-overlay .explore-link {
+  display: inline-block;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+.inspired-footer {
+  padding: 1rem;
+}
+.inspired-footer .tag {
+  color: gray;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+.inspired-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* You might also like */
+.article-section {
+  padding: 2rem;
+  background: #fff;
+}
+.article-cards {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+}
+.article-card {
+  flex: 0 0 auto;
+  width: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+.article-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+.article-card:hover {
+  transform: scale(1.05);
+}
+.card-overlay {
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  color: white;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+/* Vietnam at a glance */
+.glance-section {
+  background-color: #f9f7f4;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+.glance-section h2 {
+  margin-bottom: 1rem;
+}
+.glance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
+.glance-grid h4 {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 0.3rem;
+}
+.glance-grid p {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #222;
+}
+.full-width {
+  grid-column: span 2;
+}
+/* Learn More About Vietnam */
+/* Learn More About Vietnam */
+.learn-section {
+  padding: 2.5rem 2rem;
+  background-color: #fff;
+}
+.learn-title {
+  font-size: 2rem;
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+.learn-title span {
+  color: goldenrod;
+}
+.learn-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4rem;
+}
+.learn-block.img-left {
+  flex-direction: row;
+}
+.learn-block.img-right {
+  flex-direction: row-reverse;
+}
+.learn-img img {
+  width: 100%;
+  max-width: 450px;
+  border-radius: 10px;
+}
+.learn-text {
+  flex: 1;
+  min-width: 280px;
+}
+.learn-text h3 {
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid goldenrod;
+  display: inline-block;
+  padding-bottom: 0.4rem;
+}
+.learn-text p {
+  font-size: 1rem;
+  color: #333;
+  line-height: 1.6;
+}

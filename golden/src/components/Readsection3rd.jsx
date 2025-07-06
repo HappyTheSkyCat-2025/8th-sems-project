@@ -4,7 +4,7 @@ import '../styles/read.css';
 export default function Readsection3rd() {
   return (
     <section className="read-more-section">
-      <h2 className="read-more-title">
+      <h2 className="read-more-title"><br/>
         Real and Remarkable Small Group Trips Worldwide
       </h2>
 
