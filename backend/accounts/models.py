@@ -1,7 +1,19 @@
-from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 from datetime import timedelta
+
+class User(AbstractUser):
+    email = models.EmailField(unique=True)
+    profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    preferences = models.JSONField(default=dict, blank=True)
+    travel_history = models.JSONField(default=list, blank=True)
+    nationality = models.CharField(max_length=2, blank=True, null=True)
+    REQUIRED_FIELDS = ['email']
+
+    def __str__(self):
+        return self.username
 
 class UserOTP(models.Model):
     OTP_TYPE_CHOICES = (
@@ -9,11 +21,7 @@ class UserOTP(models.Model):
         ('password_reset', 'Password Reset'),
     )
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='user_otps'
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_otps')
     otp = models.CharField(max_length=6)
     otp_type = models.CharField(max_length=20, choices=OTP_TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -28,4 +36,13 @@ class UserOTP(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.otp_type} OTP for {self.user.email}: {self.otp} (expires {self.expires_at})"
+        return f"{self.otp_type} OTP for {self.user.email}: {self.otp}"
+
+class EmergencyContact(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"Emergency Contact for {self.user.username}"
