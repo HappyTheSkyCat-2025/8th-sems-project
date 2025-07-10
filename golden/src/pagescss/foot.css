@@ -1,0 +1,47 @@
+.purpose-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color);
+  padding: 40px 20px;
+  gap: 40px;
+}
+
+.purpose-icon img {
+  width: 140px;
+  height: auto;
+}
+
+.purpose-text {
+  max-width: 600px;
+}
+
+.purpose-subheading {
+  font-size: 0.75rem;
+  color: var(--text-color);
+  margin-bottom: 10px;
+}
+
+.purpose-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.purpose-button {
+  padding: 8px 20px;
+  background-color: white;
+  border: 1px solid var(--text-color);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.purpose-button:hover {
+  background-color: var(--primary-dark);
+  color: white;
+  border-color: var(--primary-dark);
+}

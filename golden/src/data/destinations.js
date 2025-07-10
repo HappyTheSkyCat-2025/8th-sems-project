@@ -55,7 +55,7 @@ countryList.forEach((country) => {
   // Full Travel Deals for Kyrgyzstan
   if (country === "Kyrgyzstan") {
     destinations[key].deals = [
-      {
+      { 
         title: "Nomadic Kyrgyzstan",
         days: 12,
         price: "$2,799",
