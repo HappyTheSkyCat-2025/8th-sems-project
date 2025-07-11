@@ -5,14 +5,19 @@ import {
   FaRegHeart,
   FaHeart,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "../../pagescss/deals.css";
 
 const INITIAL_VISIBLE = 3;
 
+// Utility to slugify titles
+const slugify = (str) =>
+  str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
 export default function DealsSection({ data = {} }) {
   const dealsArr = Array.isArray(data.deals) ? data.deals : [];
 
-  // ✅ Always declare hooks first
+  const navigate = useNavigate();
   const [openGrp, setOpenGrp] = useState({ styles: true, themes: true });
   const [liked, setLiked] = useState({});
   const [showAll, setShowAll] = useState(false);
@@ -36,8 +41,7 @@ export default function DealsSection({ data = {} }) {
   const norm = (v = "") => v.toLowerCase().trim();
 
   const { styleList, styleCount, themeList, themeCount } = useMemo(() => {
-    const sC = {},
-      tC = {};
+    const sC = {}, tC = {};
     dealsArr.forEach((d) => {
       const sk = norm(d.style || d.Styles);
       if (sk) sC[sk] = (sC[sk] || 0) + 1;
@@ -102,15 +106,13 @@ export default function DealsSection({ data = {} }) {
 
   const display = showAll ? filtered : filtered.slice(0, INITIAL_VISIBLE);
 
-  // ✅ Safe early return AFTER hooks
   if (!dealsArr.length) return null;
 
   return (
     <section className="deals-section" id="travel-deals">
       <h2>Top {data.title?.split(" ")[0]} Travel Deals</h2>
-
       <div className="deals-layout">
-        {/* === Filter Sidebar === */}
+        {/* Filter Sidebar */}
         <aside className="filters">
           <h5 className="filters__title">Duration</h5>
           <div className="range-row">
@@ -158,7 +160,7 @@ export default function DealsSection({ data = {} }) {
               type="checkbox"
               checked={filters.deals.onSale}
               onChange={() => handleCheck("deals", "onSale")}
-            />{" "}
+            />
             Trips on sale
           </label>
           <label>
@@ -166,11 +168,10 @@ export default function DealsSection({ data = {} }) {
               type="checkbox"
               checked={filters.deals.lastMinute}
               onChange={() => handleCheck("deals", "lastMinute")}
-            />{" "}
+            />
             Last minute deals
           </label>
 
-          {/* Styles */}
           <div className="collapsible">
             <button
               className="collapsible__header"
@@ -198,7 +199,6 @@ export default function DealsSection({ data = {} }) {
             </div>
           </div>
 
-          {/* Themes */}
           <div className="collapsible">
             <button
               className="collapsible__header"
@@ -227,7 +227,7 @@ export default function DealsSection({ data = {} }) {
           </div>
         </aside>
 
-        {/* === Cards Grid === */}
+        {/* Deals Cards Grid */}
         <div className={`deals-grid ${animate ? "reveal" : ""}`}>
           {display.map((d, i) => {
             const priceNum = parseInt(d.price.replace(/[^0-9]/g, "") || 0, 10);
@@ -253,17 +253,29 @@ export default function DealsSection({ data = {} }) {
                   <div className="deal-overlay sc">
                     <h3>{d.title}</h3>
                     <p className="excerpt">
-                      10 days of cultural immersion and relaxation in
-                      Indonesia's paradise
+                      10 days of cultural immersion and relaxation in paradise
                     </p>
                     <div className="badge-row">
                       <span className="info-badge">{d.days} days</span>
                       {d.themes?.[0] && (
-                        <span className="info-badge second">{d.themes[0]}</span>
+                        <span className="info-badge second">
+                          {d.themes[0]}
+                        </span>
                       )}
                     </div>
                     <div className="bottom-row">
-                      <button className="deal-btn small">See Details</button>
+                      <button
+                        className="deal-btn small"
+                        onClick={() =>
+                          navigate(
+                            `/destinations/${data.title
+                              ?.split(" ")[0]
+                              .toLowerCase()}/deal/${slugify(d.title)}`
+                          )
+                        }
+                      >
+                        See Details
+                      </button>
                       <div className="price-wrap">
                         <span className="old-price">{oldPrice}</span>
                         <span className="new-price">{d.price}</span>
@@ -278,7 +290,7 @@ export default function DealsSection({ data = {} }) {
         </div>
       </div>
 
-      {/* View More / Less Button */}
+      {/* View More Button */}
       {filtered.length > INITIAL_VISIBLE && (
         <div className="view-more-wrapper">
           <button
@@ -290,7 +302,10 @@ export default function DealsSection({ data = {} }) {
                   setTimeout(() => {
                     const el = document.getElementById("travel-deals");
                     if (el)
-                      el.scrollIntoView({ behavior: "smooth", block: "start" });
+                      el.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
                   }, 100);
                 }
                 return next;

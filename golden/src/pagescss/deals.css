@@ -1,4 +1,3 @@
-
 .deals-section {
   padding: 40px 0;
   margin: 0 auto;
@@ -189,7 +188,6 @@ label .count {
   justify-content: flex-end;
 }
 
-/* Ribbon */
 .ribbon {
   position: absolute;
   top: 16px;
@@ -205,10 +203,9 @@ label .count {
   transform: rotate(-45deg);
   pointer-events: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-font-family: 'Brush Script MT', cursive;
+  font-family: 'Brush Script MT', cursive;
 }
 
-/* Favorite button */
 .fav-btn {
   position: absolute;
   top: 14px;
@@ -222,19 +219,16 @@ font-family: 'Brush Script MT', cursive;
   align-items: center;
   justify-content: center;
   font-size: 1.1rem;
-  color: #000; /* default unliked color */
+  color: #000;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
 .fav-btn.liked {
-  color: #e53e3e; /* red color when liked */
-  background: rgba(255, 255, 255, 1); /* optional stronger bg */
+  color: #e53e3e;
+  background: rgba(255, 255, 255, 1);
 }
 
-
-
-/* Overlay */
 .deal-overlay.sc {
   background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent 60%);
   padding: 22px 20px 20px;
@@ -257,7 +251,6 @@ font-family: 'Brush Script MT', cursive;
   font-weight: 200;
 }
 
-/* Badges */
 .badge-row {
   display: flex;
   flex-wrap: wrap;
@@ -279,11 +272,13 @@ font-family: 'Brush Script MT', cursive;
   color: #fff;
 }
 
-/* Bottom Row */
 .bottom-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 10px;
 }
 
 .deal-btn.small {
@@ -296,6 +291,8 @@ font-family: 'Brush Script MT', cursive;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .deal-btn.small:hover {
@@ -304,8 +301,10 @@ font-family: 'Brush Script MT', cursive;
 
 .price-wrap {
   display: flex;
-  gap: 6px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  white-space: nowrap;
 }
 
 .old-price {
@@ -320,7 +319,6 @@ font-family: 'Brush Script MT', cursive;
   color: #fff;
 }
 
-/* View More */
 .view-more-wrapper {
   margin-top: 40px;
   text-align: center;
@@ -345,7 +343,6 @@ font-family: 'Brush Script MT', cursive;
   box-shadow: 0 4px 20px rgba(251, 251, 251, 0.6);
 }
 
-
 .deals-grid > p {
   grid-column: 1 / -1;
   text-align: center;
@@ -354,7 +351,6 @@ font-family: 'Brush Script MT', cursive;
   padding: 40px 0;
 }
 
-/* Responsive */
 @media (max-width: 1200px) {
   .deals-grid {
     grid-template-columns: repeat(2, 1fr);

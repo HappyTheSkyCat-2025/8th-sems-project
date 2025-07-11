@@ -10,6 +10,7 @@ import TripReviewsSection from "./destinations/TripReviewsSection";
 import ArticlesSection from "./destinations/ArticlesSection";
 import FaqsSection from "./destinations/FaqsSection";
 import VideoSection from "./destinations/VideoSection";
+import Foot from "../pages/foot";
 
 export default function DestinationPage() {
   const { country } = useParams();
@@ -21,13 +22,8 @@ export default function DestinationPage() {
       <div className="destination-wrapper">
         <div className="destination-content">
           <h2>Destination Not Found</h2>
-          <p>
-            Sorry, the destination you're looking for does not exist in our
-            records.
-          </p>
-          <Link to="/" className="back-home">
-            ← Back to Home
-          </Link>
+          <p>Sorry, this destination is not in our records.</p>
+          <Link to="/" className="back-home">← Back to Home</Link>
         </div>
       </div>
     );
@@ -42,7 +38,7 @@ export default function DestinationPage() {
         <span>{data.title.split(" ")[0]}</span>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <div
         className="hero-section"
         style={{ backgroundImage: `url(${data.image})` }}
@@ -53,55 +49,26 @@ export default function DestinationPage() {
         </div>
       </div>
 
-      {/* Overview Section with anchor */}
-      <div id="overview">
-        <OverviewSection data={data} />
-      </div>
-
       {/* Top Tabs */}
       <nav className="top-tabs">
         <ul>
-          <li>
-            <a href="#overview">Overview</a>
-          </li>
-          <li>
-            <a href="#deals">Travel Deals</a>
-          </li>
-          <li>
-            <a href="#trip-reviews">Trip Reviews</a>
-          </li>
-          <li>
-            <a href="#articles">Articles</a>
-          </li>
-          <li>
-            <a href="#faqs">FAQs</a>
-          </li>
-          <li>
-            <a href="#video">Video</a>
-          </li>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#deals">Travel Deals</a></li>
+          <li><a href="#trip-reviews">Trip Reviews</a></li>
+          <li><a href="#articles">Articles</a></li>
+          <li><a href="#faqs">FAQs</a></li>
+          <li><a href="#video">Video</a></li>
         </ul>
       </nav>
 
-      {/* All Sections with IDs for Anchor Links */}
-      <div id="deals">
-        <DealsSection data={data} />
-      </div>
-
-      <div id="trip-reviews">
-        <TripReviewsSection />
-      </div>
-
-      <div id="articles">
-        <ArticlesSection country={country} />
-      </div>
-
-      <div id="faqs">
-        <FaqsSection />
-      </div>
-
-      <div id="video">
-        <VideoSection country={country} />
-      </div>
+      {/* Sections */}
+      <div id="overview"><OverviewSection data={data} /></div>
+      <div id="deals"><DealsSection data={data} /></div>
+      <div id="trip-reviews"><TripReviewsSection /></div>
+      <div id="articles"><ArticlesSection country={country} /></div>
+      <div id="faqs"><FaqsSection /></div>
+      <div id="video"><VideoSection country={country} /></div>
+      <div id="foot"><Foot country={country} /></div>
     </div>
   );
 }
