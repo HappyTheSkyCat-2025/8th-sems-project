@@ -3,20 +3,19 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import Region, Country, TravelDeal, Review, Article, FAQ
+from .models import (
+    Region, Country, TravelDeal, Review, Article, FAQ,
+    TravelType, DealCategory
+)
 from .serializers import (
-    RegionSerializer,
-    CountrySerializer,
-    CountryDetailSerializer,  # Import the detailed serializer
-    TravelDealSerializer,
-    ReviewSerializer,
-    ArticleSerializer,
-    FAQSerializer,
+    RegionSerializer, CountrySerializer, CountryDetailSerializer,
+    TravelDealSerializer, ReviewSerializer, ArticleSerializer,
+    FAQSerializer, TravelTypeSerializer, DealCategorySerializer
 )
 from .permissions import IsSuperUserOrReadOnly
 
 
-# Regions
+# ====== Regions ======
 class RegionListCreateAPIView(generics.ListCreateAPIView):
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
@@ -29,7 +28,7 @@ class RegionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSuperUserOrReadOnly]
 
 
-# Countries
+# ====== Countries ======
 class CountryListCreateAPIView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
@@ -38,12 +37,12 @@ class CountryListCreateAPIView(generics.ListCreateAPIView):
 
 class CountryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Country.objects.all()
-    serializer_class = CountryDetailSerializer  # Use detailed serializer here
+    serializer_class = CountryDetailSerializer
     permission_classes = [IsSuperUserOrReadOnly]
-    lookup_field = 'slug'  # Using slug for lookups
+    lookup_field = 'slug'
 
 
-# Travel Deals
+# ====== Travel Deals ======
 class TravelDealListCreateAPIView(generics.ListCreateAPIView):
     queryset = TravelDeal.objects.all()
     serializer_class = TravelDealSerializer
@@ -56,7 +55,7 @@ class TravelDealRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
     permission_classes = [IsSuperUserOrReadOnly]
 
 
-# Reviews
+# ====== Reviews ======
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -69,7 +68,7 @@ class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSuperUserOrReadOnly]
 
 
-# Articles
+# ====== Articles ======
 class ArticleListCreateAPIView(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -82,7 +81,7 @@ class ArticleRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
     permission_classes = [IsSuperUserOrReadOnly]
 
 
-# FAQs
+# ====== FAQs ======
 class FAQListCreateAPIView(generics.ListCreateAPIView):
     queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
@@ -95,15 +94,13 @@ class FAQRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsSuperUserOrReadOnly]
 
 
-# Public read-only API to get regions and countries grouped
+# ====== Public Read-only Destinations API ======
 class DestinationsAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         regions = Region.objects.prefetch_related('countries').all()
-        data = {
-            "regions": []
-        }
+        data = {"regions": []}
         for region in regions:
             countries = CountrySerializer(region.countries.all(), many=True).data
             data["regions"].append({
@@ -111,3 +108,43 @@ class DestinationsAPIView(APIView):
                 "countries": countries
             })
         return Response(data)
+
+
+# ====== Travel Types ======
+class TravelTypeListCreateAPIView(generics.ListCreateAPIView):
+    queryset = TravelType.objects.prefetch_related('options').all()
+    serializer_class = TravelTypeSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        types = [t['name'] for t in serializer.data]
+        options = {t['name']: [opt['name'] for opt in t['options']] for t in serializer.data}
+        return Response({"types": types, "options": options})
+
+
+class TravelTypeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = TravelType.objects.prefetch_related('options').all()
+    serializer_class = TravelTypeSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+
+# ====== Deal Categories (Deals) ======
+class DealCategoryListCreateAPIView(generics.ListCreateAPIView):
+    queryset = DealCategory.objects.prefetch_related('offers').all()
+    serializer_class = DealCategorySerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        categories = [c['name'] for c in serializer.data]
+        offers = {c['name']: [offer['name'] for offer in c['offers']] for c in serializer.data}
+        return Response({"categories": categories, "offers": offers})
+
+
+class DealCategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = DealCategory.objects.prefetch_related('offers').all()
+    serializer_class = DealCategorySerializer
+    permission_classes = [IsSuperUserOrReadOnly]

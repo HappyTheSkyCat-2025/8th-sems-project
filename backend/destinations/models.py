@@ -27,6 +27,35 @@ class Country(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.region.name})"
+    
+
+
+class TravelType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class TravelOption(models.Model):
+    travel_type = models.ForeignKey(TravelType, related_name="options", on_delete=models.CASCADE)
+    name = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.name
+
+
+class DealCategory(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class DealOffer(models.Model):
+    category = models.ForeignKey(DealCategory, related_name="offers", on_delete=models.CASCADE)
+    name = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.name
 
 class TravelDeal(models.Model):
     country = models.ForeignKey(Country, related_name="deals", on_delete=models.CASCADE)
