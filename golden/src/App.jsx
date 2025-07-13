@@ -14,6 +14,10 @@ import ScrollToTop from "./components/ScrollToTop";
 
 // Auth pages
 import Login from "./Auth/login";
+import Register from "./Auth/Register";
+import VerifyOTP from "./Auth/VerifyOTP";
+import ForgotPassword from "./Auth/ForgotPassword";
+import ResetPassword from "./Auth/ResetPassword";
 import Profile from "./Auth/profile";
 
 // Home page sections
@@ -41,11 +45,21 @@ import Payment3 from "./payment/payment3";
 function Layout() {
   const location = useLocation();
 
-  // Define routes where Navbar and Footer should be hidden
-  const noLayoutRoutes = ["/login", "/payment", "/payment/payment2", "/payment/payment3"];
+  // Add forgot/reset password to routes without layout
+  const noLayoutRoutes = [
+    "/login",
+    "/register",
+    "/verify-otp",
+    "/forgot-password",
+    "/reset-password",
+    "/payment",
+    "/payment/payment2",
+    "/payment/payment3",
+  ];
 
-  // Check if current route matches any of the above
-  const hideLayout = noLayoutRoutes.some((path) => matchPath({ path, end: true }, location.pathname));
+  const hideLayout = noLayoutRoutes.some((path) =>
+    matchPath({ path, end: true }, location.pathname)
+  );
 
   return (
     <>
@@ -73,10 +87,17 @@ function Layout() {
         {/* Destination Pages */}
         <Route path="/alldestinations" element={<AllDestinations />} />
         <Route path="/destinations/:country" element={<DestinationPage />} />
-        <Route path="/destinations/:country/deal/:dealId" element={<DestDescription />} />
+        <Route
+          path="/destinations/:country/deal/:dealId"
+          element={<DestDescription />}
+        />
 
-        {/* Auth */}
+        {/* Auth Pages */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
 
         {/* Static Pages */}

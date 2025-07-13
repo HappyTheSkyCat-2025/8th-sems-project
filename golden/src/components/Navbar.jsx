@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronDown, Globe, Heart, User, Search } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import logo from "../assets/logo1.png";
 import baliImage from "../assets/bali.jpg";
@@ -8,13 +8,16 @@ import "../styles/Navbar.css";
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Destinations
   const [regions, setRegions] = useState([]);
   const [countriesByRegion, setCountriesByRegion] = useState({});
   const [activeRegion, setActiveRegion] = useState(null);
 
-  // Dynamic Travel Types & Deals
+  // Travel Types & Deals
   const [travelTypes, setTravelTypes] = useState([]);
   const [travelOptions, setTravelOptions] = useState({});
   const [activeTravelType, setActiveTravelType] = useState(null);
@@ -31,6 +34,19 @@ export default function Navbar() {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [showSearchIcon, setShowSearchIcon] = useState(false);
 
+  // Auth check
+  useEffect(() => {
+    setIsAuthenticated(!!localStorage.getItem("access_token"));
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    setIsAuthenticated(false);
+    setShowProfile(false);
+    navigate("/login");
+  };
+
   // Fetch destinations
   useEffect(() => {
     axios.get("/api/destinations/")
@@ -43,7 +59,6 @@ export default function Navbar() {
             slug: c.slug
           }));
         });
-
         setRegions(regionList);
         setCountriesByRegion(countriesMap);
         setActiveRegion(regionList[0] || null);
@@ -51,7 +66,7 @@ export default function Navbar() {
       .catch(err => console.error("Failed to load destinations:", err));
   }, []);
 
-  // Fetch travel types and options
+  // Fetch travel types
   useEffect(() => {
     axios.get("/api/destinations/travel-types/")
       .then(res => {
@@ -64,7 +79,7 @@ export default function Navbar() {
       .catch(err => console.error("Failed to load travel types:", err));
   }, []);
 
-  // Fetch deal categories and offers
+  // Fetch deals
   useEffect(() => {
     axios.get("/api/destinations/deals/")
       .then(res => {
@@ -77,25 +92,21 @@ export default function Navbar() {
       .catch(err => console.error("Failed to load deals:", err));
   }, []);
 
-  // Scroll tracking for search icon
+  // Scroll logic for search icon
   useEffect(() => {
     const handleScroll = () => {
       setShowSearchIcon(window.scrollY > 100);
     };
-
     if (location.pathname !== "/") {
       setShowSearchIcon(true);
     } else {
       window.addEventListener("scroll", handleScroll);
     }
-
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
 
   useEffect(() => {
-    if (location.pathname === "/") {
-      setShowSearchBar(false);
-    }
+    if (location.pathname === "/") setShowSearchBar(false);
   }, [location.pathname]);
 
   const handleLogoClick = () => {
@@ -109,6 +120,7 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-container">
+        {/* Logo */}
         <div className="navbar-logo" onClick={handleLogoClick} style={{ cursor: "pointer" }}>
           <img src={logo} alt="Golden Leaf Travels" />
           <span>
@@ -129,51 +141,49 @@ export default function Navbar() {
             <span className="link-item">
               Destinations <ChevronDown size={14} />
             </span>
-{showDestinations && activeRegion && (
-  <div className="mega-menu no-search">
-    <div className="mega-columns">
-      <div className="column">
-        <h4>Destinations</h4>
-        <ul>
-          {regions.map((region, idx) => (
-            <li
-              key={idx}
-              onClick={() => setActiveRegion(region)}
-              className={activeRegion === region ? "active" : ""}
-            >
-              {region}
-            </li>
-          ))}
-        </ul>
-      </div>
+            {showDestinations && activeRegion && (
+              <div className="mega-menu no-search">
+                <div className="mega-columns">
+                  <div className="column">
+                    <h4>Destinations</h4>
+                    <ul>
+                      {regions.map((region, idx) => (
+                        <li
+                          key={idx}
+                          onClick={() => setActiveRegion(region)}
+                          className={activeRegion === region ? "active" : ""}
+                        >
+                          {region}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-      <div className="column">
-        <h4>Popular Destinations</h4>
-        <ul>
-          {(countriesByRegion[activeRegion] || []).map((country, idx) => (
-            <li key={idx}>
-              <Link to={`/destinations/${country.slug}`} className="plain-link">
-                {country.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+                  <div className="column">
+                    <h4>Popular Destinations</h4>
+                    <ul>
+                      {(countriesByRegion[activeRegion] || []).map((country, idx) => (
+                        <li key={idx}>
+                          <Link to={`/destinations/${country.slug}`} className="plain-link">
+                            {country.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-      {/* ✅ Image + Description + Learn More Button */}
-      <div className="column image-column">
-        <img src={baliImage} alt={activeRegion} />
-        <p className="image-description">
-          Discover unforgettable journeys in <strong>{activeRegion}</strong>. Whether you love beaches, mountains, or cities, we’ve got something magical waiting for you.
-        </p>
-        <Link to={`/destinations/${activeRegion.toLowerCase()}`} className="read-more-btn">
-          Learn More
-        </Link>
-      </div>
-    </div>
-  </div>
-)}
-
+                  <div className="column image-column">
+                    <img src={baliImage} alt={activeRegion} />
+                    <p className="image-description">
+                      Discover unforgettable journeys in <strong>{activeRegion}</strong>. Whether you love beaches, mountains, or cities, we’ve got something magical waiting for you.
+                    </p>
+                    <Link to={`/destinations/${activeRegion.toLowerCase()}`} className="read-more-btn">
+                      Learn More
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Ways to Travel */}
@@ -202,7 +212,6 @@ export default function Navbar() {
                       ))}
                     </ul>
                   </div>
-
                   <div className="column">
                     <h4>Top Options</h4>
                     <ul>
@@ -278,15 +287,28 @@ export default function Navbar() {
             <span>EN</span>
           </div>
           <Heart size={18} />
+
+          {/* ✅ Profile Dropdown */}
           <div className="profile-dropdown">
-            <User size={18} onClick={() => setShowProfile(!showProfile)} style={{ cursor: "pointer" }} />
-            {showProfile && (
-              <div className="profile-menu">
-                <Link to="/profile" className="profile-item">My Profile</Link>
-                <Link to="/login" className="profile-item">Log In</Link>
-              </div>
-            )}
+          <User
+            size={18}
+            style={{ cursor: "pointer" }}
+            onClick={() => {
+              if (isAuthenticated) {
+                setShowProfile(!showProfile);
+              } else {
+                navigate("/login");
+              }
+            }}
+          />
+          {isAuthenticated && showProfile && (
+            <div className="profile-menu">
+              <Link to="/profile" className="profile-item">My Profile</Link>
+              <span onClick={handleLogout} className="profile-item">Logout</span>
+            </div>
+          )}
           </div>
+
           <button className="contact-btn">Contact Us</button>
         </div>
       </div>

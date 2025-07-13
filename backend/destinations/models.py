@@ -14,7 +14,7 @@ class Country(models.Model):
     subtitle = models.CharField(max_length=200, blank=True)
     section_title = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
-    image = models.URLField(blank=True)
+    image = models.ImageField(upload_to='countries/', blank=True, null=True)
     video_url = models.URLField(blank=True)
 
     class Meta:
@@ -27,8 +27,6 @@ class Country(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.region.name})"
-    
-
 
 class TravelType(models.Model):
     name = models.CharField(max_length=100)
@@ -42,7 +40,6 @@ class TravelOption(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class DealCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -62,10 +59,13 @@ class TravelDeal(models.Model):
     title = models.CharField(max_length=200)
     days = models.PositiveIntegerField()
     price = models.CharField(max_length=20)
-    image = models.URLField(blank=True)
+    image = models.ImageField(upload_to='deals/', blank=True, null=True)
     themes = models.JSONField(default=list, blank=True)
     tag = models.CharField(max_length=50, blank=True)
     style = models.CharField(max_length=50, blank=True)
+    description = models.TextField(blank=True, null=True)
+    on_sale = models.BooleanField(default=False)
+    last_minute = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.title} - {self.country.name}"
@@ -87,7 +87,7 @@ class Article(models.Model):
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     description = models.TextField()
-    image = models.URLField(blank=True)
+    image = models.ImageField(upload_to='articles/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} ({self.country.name})"

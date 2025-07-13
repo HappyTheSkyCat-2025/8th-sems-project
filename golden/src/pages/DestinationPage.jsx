@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import destinations from "../data/destinations";
+import axios from "axios";
 import "../pagescss/destination.css";
 
 // Section components
@@ -14,8 +14,25 @@ import Foot from "../pages/foot";
 
 export default function DestinationPage() {
   const { country } = useParams();
-  const key = country?.toLowerCase().replace(/\s|\(|\)|[^a-z]/gi, "");
-  const data = destinations[key];
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios.get(`/api/destinations/countries/${country}/`)
+      .then((res) => {
+        setData(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch country data:", err);
+        setData(null);
+        setLoading(false);
+      });
+  }, [country]);
+
+  if (loading) {
+    return <div className="destination-wrapper">Loading...</div>;
+  }
 
   if (!data) {
     return (
@@ -23,9 +40,7 @@ export default function DestinationPage() {
         <div className="destination-content">
           <h2>Destination Not Found</h2>
           <p>Sorry, this destination is not in our records.</p>
-          <Link to="/" className="back-home">
-            ← Back to Home
-          </Link>
+          <Link to="/" className="back-home">← Back to Home</Link>
         </div>
       </div>
     );
@@ -36,66 +51,57 @@ export default function DestinationPage() {
       {/* Breadcrumb */}
       <nav className="breadcrumb">
         <Link to="/">Home</Link> &gt;{" "}
-        <Link to="/alldestinations">Destinations</Link>
-        &gt; <span>{data.title.split(" ")[0]}</span>
+        <Link to="/alldestinations">Destinations</Link> &gt;{" "}
+        <span>{data.name}</span>
       </nav>
 
       {/* Hero */}
-      <div
-        className="hero-section"
-        style={{ backgroundImage: `url(${data.image})` }}
-      >
+      <div className="hero-section" style={{ backgroundImage: `url(${data.image})` }}>
         <div className="hero-text">
-          <h1>{data.title}</h1>
+          <h1>{data.name}</h1>
           <h3>{data.subtitle}</h3>
         </div>
       </div>
-      <div id="overview">
-        <OverviewSection data={data} />
-      </div>
+
       {/* Top Tabs */}
       <nav className="top-tabs">
         <ul>
-          <li>
-            <a href="#overview">Overview</a>
-          </li>
-          <li>
-            <a href="#deals">Travel Deals</a>
-          </li>
-          <li>
-            <a href="#trip-reviews">Trip Reviews</a>
-          </li>
-          <li>
-            <a href="#articles">Articles</a>
-          </li>
-          <li>
-            <a href="#faqs">FAQs</a>
-          </li>
-          <li>
-            <a href="#video">Video</a>
-          </li>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#travel-deals">Travel Deals</a></li>
+          <li><a href="#trip-reviews">Trip Reviews</a></li>
+          <li><a href="#articles">Articles</a></li>
+          <li><a href="#faqs">FAQs</a></li>
+          <li><a href="#video">Video</a></li>
         </ul>
       </nav>
 
       {/* Sections */}
+      <div id="overview">
+        <OverviewSection data={data} />
+      </div>
 
-      <div id="deals">
-        <DealsSection data={data} />
+      <div id="travel-deals">
+        <DealsSection data={{ deals: data.deals, title: data.name }} />
       </div>
+
       <div id="trip-reviews">
-        <TripReviewsSection />
+        <TripReviewsSection reviews={data.reviews} />
       </div>
+
       <div id="articles">
-        <ArticlesSection country={country} />
+        <ArticlesSection articles={data.articles} country={data.name} />
       </div>
+
       <div id="faqs">
-        <FaqsSection />
+        <FaqsSection faqs={data.faqs} />
       </div>
+
       <div id="video">
-        <VideoSection country={country} />
+        <VideoSection videoUrl={data.video_url} country={data.name} />
       </div>
+
       <div id="foot">
-        <Foot country={country} />
+        <Foot country={data.name} />
       </div>
     </div>
   );

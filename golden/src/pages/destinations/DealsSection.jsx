@@ -10,7 +10,7 @@ import "../../pagescss/deals.css";
 
 const INITIAL_VISIBLE = 3;
 
-// Utility to slugify titles
+// Utility to slugify titles for URLs
 const slugify = (str) =>
   str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -41,7 +41,8 @@ export default function DealsSection({ data = {} }) {
   const norm = (v = "") => v.toLowerCase().trim();
 
   const { styleList, styleCount, themeList, themeCount } = useMemo(() => {
-    const sC = {}, tC = {};
+    const sC = {},
+      tC = {};
     dealsArr.forEach((d) => {
       const sk = norm(d.style || d.Styles);
       if (sk) sC[sk] = (sC[sk] || 0) + 1;
@@ -59,7 +60,7 @@ export default function DealsSection({ data = {} }) {
   }, [dealsArr]);
 
   const toggleColl = (g) => setOpenGrp((p) => ({ ...p, [g]: !p[g] }));
-  const toggleLike = (i) => setLiked((p) => ({ ...p, [i]: !p[i] }));
+  const toggleLike = (id) => setLiked((p) => ({ ...p, [id]: !p[id] }));
   const handleCheck = (group, value) =>
     setFilters((p) => {
       if (group === "styles" || group === "themes") {
@@ -97,9 +98,8 @@ export default function DealsSection({ data = {} }) {
       const themeOK =
         themes.length === 0 ||
         (d.themes || []).map(norm).some((t) => themes.includes(t));
-      const tag = (d.tag || "").toLowerCase();
-      const saleOK = !flags.onSale || tag.includes("sale");
-      const lmOK = !flags.lastMinute || tag.includes("last minute");
+      const saleOK = !flags.onSale || d.on_sale === true;
+      const lmOK = !flags.lastMinute || d.last_minute === true;
       return priceOK && daysOK && styleOK && themeOK && saleOK && lmOK;
     });
   }, [filters, dealsArr]);
@@ -232,43 +232,49 @@ export default function DealsSection({ data = {} }) {
           {display.map((d, i) => {
             const priceNum = parseInt(d.price.replace(/[^0-9]/g, "") || 0, 10);
             const oldPrice = `$${(priceNum + 500).toLocaleString()}`;
+
             return (
               <article
                 className="deal-card screenshot"
-                key={i}
+                key={d.id || i}
                 style={{ "--i": i }}
               >
                 <div
                   className="deal-image"
-                  style={{ backgroundImage: `url(${d.image})` }}
+                  style={{
+                    backgroundImage: `url(${d.image || "https://via.placeholder.com/300"})`,
+                  }}
                 >
                   {d.tag && <span className="ribbon">{d.tag}</span>}
                   <button
-                    className={`fav-btn ${liked[i] ? "liked" : ""}`}
-                    onClick={() => toggleLike(i)}
+                    className={`fav-btn ${liked[d.id] ? "liked" : ""}`}
+                    onClick={() => toggleLike(d.id)}
+                    aria-label={liked[d.id] ? "Unlike" : "Like"}
                   >
-                    {liked[i] ? <FaHeart /> : <FaRegHeart />}
+                    {liked[d.id] ? <FaHeart /> : <FaRegHeart />}
                   </button>
 
                   <div className="deal-overlay sc">
                     <h3>{d.title}</h3>
                     <p className="excerpt">
-                      10 days of cultural immersion and relaxation in paradise
+                      {(d.description && d.description.length > 100
+                        ? d.description.slice(0, 100) + "..."
+                        : d.description) || "Explore this amazing travel deal."}
                     </p>
                     <div className="badge-row">
                       <span className="info-badge">{d.days} days</span>
-                      {d.themes?.[0] && (
-                        <span className="info-badge second">
-                          {d.themes[0]}
+                      {(d.themes || []).map((theme, idx) => (
+                        <span key={idx} className="info-badge second">
+                          {theme}
                         </span>
-                      )}
+                      ))}
                     </div>
                     <div className="bottom-row">
                       <button
                         className="deal-btn small"
                         onClick={() =>
                           navigate(
-                            `/destinations/${data.title
+                            `/destinations/${data.slug || data.title
                               ?.split(" ")[0]
                               .toLowerCase()}/deal/${slugify(d.title)}`
                           )
