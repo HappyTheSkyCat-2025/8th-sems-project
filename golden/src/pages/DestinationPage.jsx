@@ -23,7 +23,9 @@ export default function DestinationPage() {
         <div className="destination-content">
           <h2>Destination Not Found</h2>
           <p>Sorry, this destination is not in our records.</p>
-          <Link to="/" className="back-home">← Back to Home</Link>
+          <Link to="/" className="back-home">
+            ← Back to Home
+          </Link>
         </div>
       </div>
     );
@@ -34,8 +36,8 @@ export default function DestinationPage() {
       {/* Breadcrumb */}
       <nav className="breadcrumb">
         <Link to="/">Home</Link> &gt;{" "}
-        <Link to="/destinations">Destinations</Link> &gt;{" "}
-        <span>{data.title.split(" ")[0]}</span>
+        <Link to="/alldestinations">Destinations</Link>
+        &gt; <span>{data.title.split(" ")[0]}</span>
       </nav>
 
       {/* Hero */}
@@ -48,27 +50,53 @@ export default function DestinationPage() {
           <h3>{data.subtitle}</h3>
         </div>
       </div>
-
+      <div id="overview">
+        <OverviewSection data={data} />
+      </div>
       {/* Top Tabs */}
       <nav className="top-tabs">
         <ul>
-          <li><a href="#overview">Overview</a></li>
-          <li><a href="#deals">Travel Deals</a></li>
-          <li><a href="#trip-reviews">Trip Reviews</a></li>
-          <li><a href="#articles">Articles</a></li>
-          <li><a href="#faqs">FAQs</a></li>
-          <li><a href="#video">Video</a></li>
+          <li>
+            <a href="#overview">Overview</a>
+          </li>
+          <li>
+            <a href="#deals">Travel Deals</a>
+          </li>
+          <li>
+            <a href="#trip-reviews">Trip Reviews</a>
+          </li>
+          <li>
+            <a href="#articles">Articles</a>
+          </li>
+          <li>
+            <a href="#faqs">FAQs</a>
+          </li>
+          <li>
+            <a href="#video">Video</a>
+          </li>
         </ul>
       </nav>
 
       {/* Sections */}
-      <div id="overview"><OverviewSection data={data} /></div>
-      <div id="deals"><DealsSection data={data} /></div>
-      <div id="trip-reviews"><TripReviewsSection /></div>
-      <div id="articles"><ArticlesSection country={country} /></div>
-      <div id="faqs"><FaqsSection /></div>
-      <div id="video"><VideoSection country={country} /></div>
-      <div id="foot"><Foot country={country} /></div>
+
+      <div id="deals">
+        <DealsSection data={data} />
+      </div>
+      <div id="trip-reviews">
+        <TripReviewsSection />
+      </div>
+      <div id="articles">
+        <ArticlesSection country={country} />
+      </div>
+      <div id="faqs">
+        <FaqsSection />
+      </div>
+      <div id="video">
+        <VideoSection country={country} />
+      </div>
+      <div id="foot">
+        <Foot country={country} />
+      </div>
     </div>
   );
 }

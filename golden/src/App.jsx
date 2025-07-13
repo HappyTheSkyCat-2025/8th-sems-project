@@ -1,11 +1,22 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  matchPath,
+} from "react-router-dom";
 
-// Main layout
+// Layout components
 import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
+import ScrollToTop from "./components/ScrollToTop";
 
-// Home page components
+// Auth pages
+import Login from "./Auth/login";
+import Profile from "./Auth/profile";
+
+// Home page sections
 import Home from "./components/Home";
 import Readsection3rd from "./components/readsection3rd";
 import Journey from "./components/journey";
@@ -17,14 +28,31 @@ import Trip from "./components/trip";
 import Journal from "./components/journal";
 
 // Pages
+import AboutUs from "./pages/Aboutus";
+import AllDestinations from "./pages/AllDestinations";
 import DestinationPage from "./pages/DestinationPage";
 import DestDescription from "./pages/destdescription";
 
-function App() {
+// Payment pages
+import Payment1 from "./payment/payment1";
+import Payment2 from "./payment/payment2";
+import Payment3 from "./payment/payment3";
+
+function Layout() {
+  const location = useLocation();
+
+  // Define routes where Navbar and Footer should be hidden
+  const noLayoutRoutes = ["/login", "/payment", "/payment/payment2", "/payment/payment3"];
+
+  // Check if current route matches any of the above
+  const hideLayout = noLayoutRoutes.some((path) => matchPath({ path, end: true }, location.pathname));
+
   return (
-    <Router>
-      <Navbar />
+    <>
+      {!hideLayout && <Navbar />}
+
       <Routes>
+        {/* Home Page */}
         <Route
           path="/"
           element={
@@ -41,13 +69,35 @@ function App() {
             </>
           }
         />
+
+        {/* Destination Pages */}
+        <Route path="/alldestinations" element={<AllDestinations />} />
         <Route path="/destinations/:country" element={<DestinationPage />} />
-        <Route
-          path="/destinations/:country/deal/:dealId"
-          element={<DestDescription />}
-        />
+        <Route path="/destinations/:country/deal/:dealId" element={<DestDescription />} />
+
+        {/* Auth */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
+
+        {/* Static Pages */}
+        <Route path="/about" element={<AboutUs />} />
+
+        {/* Payment Pages */}
+        <Route path="/payment" element={<Payment1 />} />
+        <Route path="/payment/payment2" element={<Payment2 />} />
+        <Route path="/payment/payment3" element={<Payment3 />} />
       </Routes>
-      <Footer />
+
+      {!hideLayout && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <ScrollToTop />
+      <Layout />
     </Router>
   );
 }

@@ -14,7 +14,7 @@ import img2 from "../../assets/img2.jpg";
 import bali from "../../assets/bali.jpg";
 import "../../pagescss/desc.css";
 
-export default function Desc() {
+export default function Desc({ onViewDatesClick }) {
   return (
     <section className="trip-section">
       <div className="trip-header">
@@ -62,7 +62,11 @@ export default function Desc() {
           <button className="wishlist-btn">
             Add to my wishlist <CiHeart />
           </button>
-          <button className="book-btn">View Dates And Book</button>
+
+          {/* Scroll to DatesSection on click */}
+          <button className="book-btn" onClick={onViewDatesClick}>
+            View Dates And Book
+          </button>
 
           <div className="trip-actions">
             <p className="plan-title">Plan your adventure:</p>
