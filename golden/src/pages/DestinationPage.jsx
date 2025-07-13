@@ -89,7 +89,12 @@ export default function DestinationPage() {
       </div>
 
       <div id="articles">
-        <ArticlesSection articles={data.articles} country={data.name} />
+        <ArticlesSection
+          articles={data.articles}
+          country={data.name}
+          learnMoreTopics={data.learn_more_topics || []}
+          glanceData={{ countryName: data.name, ...data.overview }}
+        />
       </div>
 
       <div id="faqs">

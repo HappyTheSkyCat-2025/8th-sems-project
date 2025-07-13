@@ -1,14 +1,23 @@
 import React, { useState } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import faqs from "../../data/questions";
 import "../../pagescss/questions.css";
 
-export default function FaqsSection() {
+export default function FaqsSection({ faqs = [] }) {
   const [openIndex, setOpenIndex] = useState(null);
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
+
+  if (!faqs.length) {
+    return (
+      <div id="faqs" className="section-block">
+        <h2>FAQs</h2>
+        <div className="underline gold3" />
+        <p>No FAQs available at the moment.</p>
+      </div>
+    );
+  }
 
   return (
     <div id="faqs" className="section-block">

@@ -96,12 +96,16 @@ export default function TripReviewsSection({ reviews = [] }) {
                 </p>
                 <p>{content}</p>
                 {r.content.length > 150 && (
-                  <button
+                  <a
+                    href="#"
                     className="read-more"
-                    onClick={() => toggleReadMore(r.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleReadMore(r.id);
+                    }}
                   >
                     {isExpanded ? "Show less" : "Read more"}
-                  </button>
+                  </a>
                 )}
                 <p className="review-date">
                   Review submitted on {r.submitted_on}

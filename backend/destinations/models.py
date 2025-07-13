@@ -99,3 +99,29 @@ class FAQ(models.Model):
 
     def __str__(self):
         return f"FAQ for {self.country.name}: {self.question[:50]}{'...' if len(self.question) > 50 else ''}"
+
+class CountryOverview(models.Model):
+    country = models.OneToOneField(Country, related_name="overview", on_delete=models.CASCADE)
+    capital = models.CharField(max_length=100)
+    population = models.CharField(max_length=100)
+    currency = models.CharField(max_length=50)
+    language = models.CharField(max_length=100)
+    timezone = models.CharField(max_length=50)
+    calling_code = models.CharField(max_length=20)
+    electricity = models.TextField()
+
+    def __str__(self):
+        return f"Overview of {self.country.name}"
+
+class CountryLearnMoreTopic(models.Model):
+    country = models.ForeignKey(Country, related_name="learn_more_topics", on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    image = models.ImageField(upload_to="learn_more_images/", blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)  # for ordering topics
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.title} - {self.country.name}"

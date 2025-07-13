@@ -1,8 +1,69 @@
 from rest_framework import serializers
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,
-    TravelOption, TravelType, DealCategory, DealOffer
+    TravelOption, TravelType, DealCategory, DealOffer,
+    CountryOverview, CountryLearnMoreTopic
 )
+
+
+# -------------------------
+# TravelDeal, Review, Article, FAQ Serializers
+# -------------------------
+
+class TravelDealSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelDeal
+        fields = "__all__"
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = "__all__"
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Article
+        fields = "__all__"
+
+
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = "__all__"
+
+
+# -------------------------
+# Country Overview and Learn More Topic Serializers
+# -------------------------
+
+class CountryOverviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CountryOverview
+        fields = [
+            'capital', 'population', 'currency', 'language',
+            'timezone', 'calling_code', 'electricity'
+        ]
+
+
+class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CountryLearnMoreTopic
+        fields = ['id', 'title', 'description', 'image_url', 'order']
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.image and request:
+            return request.build_absolute_uri(obj.image.url)
+        return None
+    
+
+# -------------------------
+# Region and Country Serializers
+# -------------------------
 
 class RegionSerializer(serializers.ModelSerializer):
     countries = serializers.StringRelatedField(many=True, read_only=True)
@@ -17,6 +78,28 @@ class CountrySerializer(serializers.ModelSerializer):
         model = Country
         fields = ['id', 'name', 'slug', 'region']
 
+
+class CountryDetailSerializer(serializers.ModelSerializer):
+    deals = TravelDealSerializer(many=True, read_only=True)
+    reviews = ReviewSerializer(many=True, read_only=True)
+    articles = ArticleSerializer(many=True, read_only=True)
+    faqs = FAQSerializer(many=True, read_only=True)
+    overview = CountryOverviewSerializer(read_only=True)
+    learn_more_topics = CountryLearnMoreTopicSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Country
+        fields = [
+            "id", "name", "slug", "subtitle", "section_title",
+            "description", "image", "video_url",
+            "deals", "reviews", "articles", "faqs",
+            "overview", "learn_more_topics",
+        ]
+
+
+# -------------------------
+# TravelOption and TravelType Serializers
+# -------------------------
 
 class TravelOptionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,6 +134,10 @@ class TravelTypeSerializer(serializers.ModelSerializer):
         return instance
 
 
+# -------------------------
+# DealOffer and DealCategory Serializers
+# -------------------------
+
 class DealOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = DealOffer
@@ -82,42 +169,4 @@ class DealCategorySerializer(serializers.ModelSerializer):
                 DealOffer.objects.create(category=instance, **offer_data)
 
         return instance
-
-
-class TravelDealSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TravelDeal
-        fields = "__all__"
-
-
-class ReviewSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Review
-        fields = "__all__"
-
-
-class ArticleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Article
-        fields = "__all__"
-
-
-class FAQSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = FAQ
-        fields = "__all__"
-
-
-class CountryDetailSerializer(serializers.ModelSerializer):
-    deals = TravelDealSerializer(many=True, read_only=True)
-    reviews = ReviewSerializer(many=True, read_only=True)
-    articles = ArticleSerializer(many=True, read_only=True)
-    faqs = FAQSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Country
-        fields = [
-            "id", "name", "slug", "subtitle", "section_title",
-            "description", "image", "video_url",
-            "deals", "reviews", "articles", "faqs"
-        ]
+    

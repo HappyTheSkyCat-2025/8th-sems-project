@@ -36,4 +36,11 @@ urlpatterns = [
 
     # === Public Read-Only Destinations API ===
     path("", views.DestinationsAPIView.as_view(), name="destinations-api"),
+
+    
+    path('country-overview/', views.CountryOverviewListCreateAPIView.as_view(), name='countryoverview-listcreate'),
+    path('country-overview/<int:pk>/', views.CountryOverviewRetrieveUpdateDestroyAPIView.as_view(), name='countryoverview-detail'),
+
+    path('learn-more-topic/', views.CountryLearnMoreTopicListCreateAPIView.as_view(), name='learnmoretopic-listcreate'),
+    path('learn-more-topic/<int:pk>/', views.CountryLearnMoreTopicRetrieveUpdateDestroyAPIView.as_view(), name='learnmoretopic-detail'),
 ]
