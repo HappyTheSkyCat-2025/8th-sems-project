@@ -155,19 +155,27 @@
 .image-column img {
   width: 100%;
   border-radius: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.image-description {
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 10px;
+  line-height: 1.4;
 }
 
 .read-more-btn {
   padding: 6px 12px;
   background-color: var(--primary-color);
-  border: none;
   color: white;
   font-size: 13px;
+  border: none;
   border-radius: var(--radius);
   cursor: pointer;
   align-self: flex-start;
   transition: background-color 0.3s ease;
+  text-decoration: none;
 }
 
 .read-more-btn:hover {

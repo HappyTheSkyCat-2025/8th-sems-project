@@ -128,39 +128,51 @@ export default function Navbar() {
             <span className="link-item">
               Destinations <ChevronDown size={14} />
             </span>
-            {showDestinations && activeRegion && (
-              <div className="mega-menu no-search">
-                <div className="mega-columns">
-                  <div className="column">
-                    <h4>Destinations</h4>
-                    <ul>
-                      {regions.map((region, idx) => (
-                        <li
-                          key={idx}
-                          onClick={() => setActiveRegion(region)}
-                          className={activeRegion === region ? "active" : ""}
-                        >
-                          {region}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+{showDestinations && activeRegion && (
+  <div className="mega-menu no-search">
+    <div className="mega-columns">
+      <div className="column">
+        <h4>Destinations</h4>
+        <ul>
+          {regions.map((region, idx) => (
+            <li
+              key={idx}
+              onClick={() => setActiveRegion(region)}
+              className={activeRegion === region ? "active" : ""}
+            >
+              {region}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-                  <div className="column">
-                    <h4>Popular Destinations</h4>
-                    <ul>
-                      {(countriesByRegion[activeRegion] || []).map((country, idx) => (
-                        <li key={idx}>
-                          <Link to={`/destinations/${country.slug}`} className="plain-link">
-                            {country.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
+      <div className="column">
+        <h4>Popular Destinations</h4>
+        <ul>
+          {(countriesByRegion[activeRegion] || []).map((country, idx) => (
+            <li key={idx}>
+              <Link to={`/destinations/${country.slug}`} className="plain-link">
+                {country.name}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* ✅ Image + Description + Learn More Button */}
+      <div className="column image-column">
+        <img src="/images/sample-region.jpg" alt={activeRegion} />
+        <p className="image-description">
+          Discover unforgettable journeys in <strong>{activeRegion}</strong>. Whether you love beaches, mountains, or cities, we’ve got something magical waiting for you.
+        </p>
+        <Link to={`/destinations/${activeRegion.toLowerCase()}`} className="read-more-btn">
+          Learn More
+        </Link>
+      </div>
+    </div>
+  </div>
+)}
+
           </div>
 
           {/* Ways to Travel */}
