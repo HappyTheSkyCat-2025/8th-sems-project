@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { ChevronDown, Globe, Heart, User, Search } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/logo1.png";
+import destinationImage from "../assets/bali.jpg";
 import { navData } from "../data/navData";
 import "../styles/Navbar.css";
 
 export default function Navbar() {
   const location = useLocation();
 
-  // Dropdown states
   const [activeRegion, setActiveRegion] = useState(navData.destinations.regions[0]);
   const [activeTravelType, setActiveTravelType] = useState(navData.waysToTravel.types[0]);
   const [activeDealCategory, setActiveDealCategory] = useState(navData.deals.categories[0]);
@@ -17,18 +17,13 @@ export default function Navbar() {
   const [showWaysToTravel, setShowWaysToTravel] = useState(false);
   const [showDeals, setShowDeals] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-
-  // Search bar toggle state
   const [showSearchBar, setShowSearchBar] = useState(false);
-
-  // Track if scrolled past home top
   const [showSearchIcon, setShowSearchIcon] = useState(false);
 
   const countries = navData.destinations.countriesByRegion[activeRegion] || [];
   const travelOptions = navData.waysToTravel.options[activeTravelType] || [];
   const dealItems = navData.deals.offers[activeDealCategory] || [];
 
-  // Show search icon only after scrolling past home or on pages other than home
   useEffect(() => {
     function handleScroll() {
       setShowSearchIcon(window.scrollY > 100);
@@ -45,14 +40,12 @@ export default function Navbar() {
     };
   }, [location.pathname]);
 
-  // Hide search bar if navigating back to home top
   useEffect(() => {
     if (location.pathname === "/") {
       setShowSearchBar(false);
     }
   }, [location.pathname]);
 
-  // Navigate to home on logo/title click (scroll to top)
   const handleLogoClick = () => {
     if (location.pathname === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -64,7 +57,6 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-container">
-        {/* Logo */}
         <div className="navbar-logo" onClick={handleLogoClick} style={{ cursor: "pointer" }}>
           <img src={logo} alt="Golden Leaf Travels" />
           <span>
@@ -74,9 +66,8 @@ export default function Navbar() {
           </span>
         </div>
 
-        {/* Nav Links */}
         <nav className="navbar-links">
-          {/* Destinations Dropdown */}
+          {/* Destinations */}
           <div
             className="dropdown"
             onMouseEnter={() => setShowDestinations(true)}
@@ -102,6 +93,7 @@ export default function Navbar() {
                       ))}
                     </ul>
                   </div>
+
                   <div className="column">
                     <h4>Popular Destinations</h4>
                     <ul>
@@ -114,13 +106,23 @@ export default function Navbar() {
                       ))}
                     </ul>
                   </div>
-                  {/* Removed image-column here */}
+
+                  {/* ✅ Image + Description + Learn More */}
+                  <div className="column image-column">
+                    <img src={destinationImage} alt="Featured Destination" />
+                    <p className="image-description">
+                      Explore breathtaking locations in {activeRegion}. From culture to coastlines, discover the best travel experiences handpicked just for you.
+                    </p>
+                    <Link to={`/destinations/${activeRegion.toLowerCase()}`} className="read-more-btn">
+                      Learn More
+                    </Link>
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Ways to Travel Dropdown */}
+          {/* Ways to Travel */}
           <div
             className="dropdown"
             onMouseEnter={() => setShowWaysToTravel(true)}
@@ -146,6 +148,7 @@ export default function Navbar() {
                       ))}
                     </ul>
                   </div>
+
                   <div className="column">
                     <h4>Top Options</h4>
                     <ul>
@@ -154,13 +157,12 @@ export default function Navbar() {
                       ))}
                     </ul>
                   </div>
-                  {/* Removed image-column here */}
                 </div>
               </div>
             )}
           </div>
 
-          {/* Deals Dropdown */}
+          {/* Deals */}
           <div
             className="dropdown"
             onMouseEnter={() => setShowDeals(true)}
@@ -186,6 +188,7 @@ export default function Navbar() {
                       ))}
                     </ul>
                   </div>
+
                   <div className="column">
                     <h4>Top Offers</h4>
                     <ul>
@@ -194,21 +197,17 @@ export default function Navbar() {
                       ))}
                     </ul>
                   </div>
-                  {/* Removed image-column here */}
                 </div>
               </div>
             )}
           </div>
 
-          {/* About Us */}
           <Link to="/about" className="link-item plain-link">
             About Us
           </Link>
         </nav>
 
-        {/* Icons and Profile Dropdown */}
         <div className="navbar-icons">
-          {/* Show search icon only if showSearchIcon is true */}
           {showSearchIcon && (
             <button
               aria-label="Toggle Search"
@@ -225,7 +224,6 @@ export default function Navbar() {
           </div>
           <Heart size={18} />
 
-          {/* Profile Dropdown */}
           <div className="profile-dropdown">
             <User size={18} onClick={() => setShowProfile(!showProfile)} style={{ cursor: "pointer" }} />
             {showProfile && (
@@ -244,7 +242,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Search bar pops down below navbar */}
       {showSearchBar && (
         <div className="search-bar-wrapper">
           <input type="text" placeholder="Search destinations, deals..." autoFocus />

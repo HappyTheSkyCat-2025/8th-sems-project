@@ -1,288 +1,240 @@
 .payment3-container {
   max-width: 1200px;
   margin: auto;
-  padding: 2.5rem 1.25rem;
-  font-family: var(--font-family);
-  color: var(--text-color);
+  padding: 2.5rem 1rem;
+  font-family: sans-serif;
+  color: #111;
 }
 
-/* ---------------  Step indicator --------------- */
-.step-indicator {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-bottom: 2rem;
-}
-
-.step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-weight: 500;
-  color: #999;
-}
-
-.step::after {
-  content: "";
-  width: 20px;
-  height: 20px;
-  border: 2px solid currentColor;
-  border-radius: 50%;
-  margin-bottom: 0.5rem;
-}
-
-.step.done {
-  color: var(--primary-color);
-}
-
-.step.done::after {
-  background: var(--primary-color);
-}
-
-.step.current {
-  color: var(--primary-dark);
-  font-weight: 600;
-}
-
-.step.current::after {
-  background: var(--primary-dark);
-  border-color: var(--primary-dark);
-}
-
-/* ---------------  Page title --------------- */
 .payment-title {
   font-size: 2rem;
-  font-weight: 700;
+  font-weight: bold;
   margin-bottom: 1.5rem;
 }
 
-/* ---------------  Alert / notice box --------------- */
 .notice-box {
   display: flex;
-  gap: 1rem;
-  background: #fff3cd;
-  border-left: 6px solid var(--primary-dark);
+  background: #fff6e5;
+  border-left: 8px solid #e0b03b;
   padding: 1rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-light);
+  border-radius: 6px;
   margin-bottom: 2rem;
 }
 
-.notice-box .icon {
-  font-weight: 700;
-  font-size: 1.2rem;
-  color: #856404;
-  background: #ffeeba;
+.notice-icon {
+  background: #f4d35e;
   border-radius: 50%;
-  padding: 4px 10px;
+  padding: 6px 10px;
+  font-weight: bold;
+  margin-right: 1rem;
 }
 
-/* ---------------  Two‑column layout --------------- */
 .payment-main {
   display: flex;
   flex-wrap: wrap;
   gap: 2rem;
+  align-items: flex-start;
 }
 
-/* ----- Left column (form) ----- */
 .payment-left {
   flex: 1 1 350px;
+  min-width: 320px;
 }
 
 .review-box {
   background: #fff;
   border: 1px solid #ddd;
-  border-radius: var(--radius);
-  padding: 1.5rem;
+  padding: 1rem;
+  border-radius: 6px;
   margin-bottom: 2rem;
-  box-shadow: var(--shadow-light);
 }
 
-.subheading {
-  font-size: 1.25rem;
-  margin: 2rem 0 1rem;
+.section-heading {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 1.5rem 0 0.8rem;
 }
 
 .radio-option {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 1rem;
   margin-bottom: 2rem;
+  font-size: 1rem;
 }
 
-/* Card logos */
 .card-logos {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--primary-color);
+  display: flex;
+  gap: 1rem;
   margin-bottom: 1rem;
+  align-items: center;
 }
 
-.dot {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin: 0 8px;
-  background: var(--text-color);
-  border-radius: 50%;
+.mastercard {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #eb001b;
 }
 
-/* Card form */
 .card-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .card-form label {
+  font-size: 0.95rem;
   display: flex;
   flex-direction: column;
-  font-size: 0.95rem;
 }
 
 .card-form input {
-  padding: 0.6rem 0;
   border: none;
   border-bottom: 2px solid #ccc;
-  background: transparent;
+  padding: 8px 0;
   font-size: 1rem;
+  background: transparent;
   outline: none;
-  transition: border-color var(--transition);
 }
+
 .card-form input:focus {
-  border-color: var(--primary-color);
+  border-color: #1a1f71;
 }
 
 .card-row {
   display: flex;
   gap: 1rem;
 }
-.card-row label {
-  flex: 1;
-}
 
-/* Promo code button */
 .promo-code-btn {
-  margin-top: 1rem;
-  padding: 0.4rem 1.1rem;
-  border: 1px solid #222;
+  margin-top: 0.5rem;
+  padding: 6px 12px;
+  border: 1px solid #000;
   background: #fff;
-  font-size: 0.9rem;
   cursor: pointer;
-  border-radius: var(--radius);
-  transition: var(--transition);
-}
-.promo-code-btn:hover {
-  background: #f5f5f5;
+  font-size: 0.9rem;
+  border-radius: 4px;
 }
 
-/* Agreement checkboxes */
 .checkboxes {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  gap: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 2;
 }
-.checkboxes input {
-  margin-right: 0.5rem;
+
+.checkboxes label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
 }
+
+.checkboxes input[type="checkbox"] {
+  margin-top: 4px;
+}
+
 .checkboxes a {
   color: #d6006d;
   text-decoration: none;
 }
+
 .checkboxes a:hover {
   text-decoration: underline;
 }
 
-/* ----- Right column (summary) ----- */
+.required {
+  color: red;
+  font-weight: bold;
+}
+
 .booking-summary {
-  flex: 0 0 400px;
-  max-width: 400px;
+  flex: 0 0 350px;
+  min-width: 300px;
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-light);
+  border: 1px solid #ccc;
+  border-radius: 6px;
   padding: 1.5rem;
+  align-self: flex-start;
 }
 
 .booking-summary h3 {
-  font-size: 1.5rem;
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .trip-name {
-  font-weight: 600;
+  font-weight: bold;
   font-size: 1.2rem;
   margin-bottom: 4px;
 }
 
 .duration {
-  color: #666;
+  color: #555;
   margin-bottom: 1rem;
 }
 
 .details p {
   margin-bottom: 1rem;
-  line-height: 1.4;
+}
+
+.summary-dropdown {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  cursor: pointer;
+  border-top: 1px solid #ddd;
+}
+
+.dropdown-content {
+  padding: 0.6rem 0;
+  font-size: 0.95rem;
+  color: #333;
 }
 
 .total.breakdown {
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  padding: 1rem 0;
   display: flex;
   justify-content: space-between;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  padding: 0.8rem 0;
+  font-weight: bold;
   font-size: 0.95rem;
-  color: #555;
 }
 
 .final-total {
   display: flex;
   justify-content: space-between;
-  font-size: 1.1rem;
-  font-weight: 700;
   margin-top: 1rem;
+  font-weight: 700;
 }
 
-.final-total.pay-now {
-  color: var(--primary-color);
+.pay-now {
+  color: #1a1f71;
 }
 
 .how-to-credit {
-  font-size: 0.9rem;
-  color: #555;
   margin-top: 1rem;
-  cursor: pointer;
+  font-size: 0.85rem;
+  color: #555;
 }
 
-/* ---------------  Info boxes (deposit & price lock) --------------- */
 .info-boxes {
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
-  margin-top: 2.5rem;
-  font-size: 0.9rem;
-  color: #444;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
 .info-boxes div {
   flex: 1 1 300px;
   background: #f9f9f9;
+  padding: 1rem;
   border: 1px solid #ddd;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-light);
-  padding: 1rem 1.25rem;
+  border-radius: 6px;
 }
 
-.info-boxes strong {
-  display: block;
-  margin-bottom: 0.6rem;
-}
-
-/* ---------------  Form action buttons --------------- */
 .form-actions {
   display: flex;
   justify-content: flex-end;
@@ -292,31 +244,22 @@
 
 .btn-back,
 .btn-paynow {
-  padding: 0.6rem 1.3rem;
+  padding: 0.7rem 1.3rem;
   font-size: 1rem;
-  border-radius: var(--radius);
   border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: var(--transition);
 }
 
 .btn-back {
   background: #e0e0e0;
-  color: #000;
-}
-.btn-back:hover {
-  background: #cacaca;
 }
 
 .btn-paynow {
   background: #000;
   color: #fff;
 }
-.btn-paynow:hover {
-  background: #222;
-}
 
-/* ---------------  Footer links --------------- */
 .footer-links {
   display: flex;
   justify-content: center;
@@ -325,27 +268,25 @@
   font-size: 0.85rem;
   color: #666;
 }
+
 .footer-links a {
   color: inherit;
   text-decoration: none;
 }
+
 .footer-links a:hover {
   text-decoration: underline;
 }
 
-/* ---------------  Responsive tweaks --------------- */
 @media (max-width: 768px) {
   .payment-main {
     flex-direction: column;
   }
-  .booking-summary {
-    max-width: 100%;
-  }
   .form-actions {
-    justify-content: stretch;
+    flex-direction: column;
   }
   .btn-back,
   .btn-paynow {
-    flex: 1;
+    width: 100%;
   }
 }
