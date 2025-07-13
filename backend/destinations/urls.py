@@ -2,30 +2,38 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Region CRUD
+    # === Regions CRUD ===
     path('regions/', views.RegionListCreateAPIView.as_view(), name='region-list'),
     path('regions/<int:pk>/', views.RegionRetrieveUpdateDestroyAPIView.as_view(), name='region-detail'),
 
-    # Country CRUD
+    # === Countries CRUD ===
     path('countries/', views.CountryListCreateAPIView.as_view(), name='country-list'),
     path('countries/<slug:slug>/', views.CountryRetrieveUpdateDestroyAPIView.as_view(), name='country-detail'),
 
-    # Travel Deal CRUD
-    path('deals/', views.TravelDealListCreateAPIView.as_view(), name='deal-list'),
-    path('deals/<int:pk>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='deal-detail'),
+    # === Travel Types CRUD ===
+    path('travel-types/', views.TravelTypeListCreateAPIView.as_view(), name='travel-type-list'),
+    path('travel-types/<int:pk>/', views.TravelTypeRetrieveUpdateDestroyAPIView.as_view(), name='travel-type-detail'),
 
-    # Review CRUD
+    # === Deal Categories (Deals) CRUD ===
+    path('deals/', views.DealCategoryListCreateAPIView.as_view(), name='deal-category-list'),
+    path('deals/<int:pk>/', views.DealCategoryRetrieveUpdateDestroyAPIView.as_view(), name='deal-category-detail'),
+
+    # === Travel Deals CRUD ===
+    path('travel-deals/', views.TravelDealListCreateAPIView.as_view(), name='travel-deal-list'),
+    path('travel-deals/<int:pk>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
+
+    # === Reviews CRUD ===
     path('reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
     path('reviews/<int:pk>/', views.ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
 
-    # Article CRUD
+    # === Articles CRUD ===
     path('articles/', views.ArticleListCreateAPIView.as_view(), name='article-list'),
     path('articles/<int:pk>/', views.ArticleRetrieveUpdateDestroyAPIView.as_view(), name='article-detail'),
 
-    # FAQ CRUD
+    # === FAQs CRUD ===
     path('faqs/', views.FAQListCreateAPIView.as_view(), name='faq-list'),
     path('faqs/<int:pk>/', views.FAQRetrieveUpdateDestroyAPIView.as_view(), name='faq-detail'),
 
-    # Public read-only destinations API
+    # === Public Read-Only Destinations API ===
     path("", views.DestinationsAPIView.as_view(), name="destinations-api"),
 ]
