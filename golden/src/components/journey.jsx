@@ -1,23 +1,22 @@
 import React, { useState } from "react";
 import "../styles/journey.css";
-import { FaHeart } from "react-icons/fa";
 import tripsData from "../data/journey";
 
-export default function TripSection() {
+export default function ExclusiveTrips() {
   const tabs = Object.keys(tripsData);
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const [signatureRemoved, setSignatureRemoved] = useState(false);
 
   return (
-    <section className="trip-section">
-      <div className="trip-header-bar">
-        <h2 className="section-label">EXCLUSIVE JOURNEYS</h2>
-        <div className="trip-subheader">
-          <div className="trip-tabs">
+    <section className="exclusive-section">
+      <div className="exclusive-header">
+        <h2 className="exclusive-title">EXCLUSIVE JOURNEYS</h2>
+        <div className="exclusive-subheader">
+          <div className="exclusive-tabs">
             {tabs.map((tab) => (
               <span
                 key={tab}
-                className={`tab ${activeTab === tab ? "active" : ""}`}
+                className={`exclusive-tab ${activeTab === tab ? "active" : ""}`}
                 onClick={() => {
                   setActiveTab(tab);
                   setSignatureRemoved(false);
@@ -27,37 +26,36 @@ export default function TripSection() {
               </span>
             ))}
           </div>
-          <span className="explore-link">Explore all trips →</span>
+          <span className="exclusive-explore-link">Explore all trips →</span>
         </div>
       </div>
 
-      <div className="trip-card-grid">
+      <div className="exclusive-card-container">
         {tripsData[activeTab].map((trip, idx) => (
           <div
             key={trip.id}
-            className="trip-card"
+            className="exclusive-card"
             style={{ backgroundImage: `url(${trip.image})` }}
           >
-            <div className="trip-card-top">
+            <div className="exclusive-top">
               {trip.signature && idx === 0 && !signatureRemoved && (
-                <div className="trip-badge-wrapper">
-                  <div className="trip-badge">Signature Trip</div>
+                <div className="exclusive-badge-wrapper">
+                  <div className="exclusive-badge">Signature Trip</div>
                 </div>
               )}
-              <div className="trip-card-top">
-              <div className="trip-heart-circle">♡</div>
-            </div>
+              <div className="exclusive-heart">♡</div>
             </div>
 
-            <div className="trip-card-content">
-              <h3 className="trip-title">{trip.title}</h3>
-              <p className="trip-description">{trip.description}</p>
-              <div className="trip-info-row">
-                <span className="trip-duration">{trip.duration}</span>
-              </div>
-              <div className="trip-actions">
-                <button className="details-btn">See Details</button>
-                <div className="trip-price">{trip.price}</div>
+            <div className="exclusive-content">
+              <h3 className="exclusive-trip-title">{trip.title}</h3>
+              <p className="exclusive-trip-desc">{trip.description}</p>
+              <div className="exclusive-trip-days">{trip.duration}</div>
+              <div className="exclusive-action-row">
+                <button className="exclusive-details-btn">See Details</button>
+                <div className="exclusive-price">
+                  <span className="exclusive-original">{trip.originalPrice}</span>
+                  <span className="exclusive-discounted">{trip.discountedPrice}</span>
+                </div>
               </div>
             </div>
           </div>

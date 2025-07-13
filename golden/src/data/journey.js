@@ -4,7 +4,7 @@ import tokyoImg from "../assets/img2.jpg";
 import maldivesImg from "../assets/img2.jpg";
 import icelandImg from "../assets/bali.jpg";
 import newyorkImg from "../assets/bali.jpg";
-import peruImg from "../assets/img2.jpg"; // extra box image
+import peruImg from "../assets/img2.jpg";
 
 const tripsData = {
   "Recently viewed": [
@@ -13,7 +13,8 @@ const tripsData = {
       title: "Serene Bali Retreat",
       description: "10 days of cultural immersion and relaxation in Indonesia’s paradise",
       duration: "10 days",
-      price: "$2,899",
+      originalPrice: "$2,500",
+      discountedPrice: "$2,899",
       image: baliImg,
       signature: true,
     },
@@ -22,7 +23,8 @@ const tripsData = {
       title: "Paris Getaway",
       description: "Explore the romantic city of lights with art and cuisine",
       duration: "7 days",
-      price: "$3,200",
+      originalPrice: "$3,500",
+      discountedPrice: "$3,200",
       image: parisImg,
       signature: false,
     },
@@ -31,7 +33,8 @@ const tripsData = {
       title: "Tokyo Experience",
       description: "Discover the blend of tradition and modern life in Japan",
       duration: "8 days",
-      price: "$3,500",
+      originalPrice: "$3,800",
+      discountedPrice: "$3,500",
       image: tokyoImg,
       signature: false,
     },
@@ -40,18 +43,21 @@ const tripsData = {
       title: "Peruvian Highlights",
       description: "Discover Machu Picchu, Sacred Valley and vibrant Lima",
       duration: "11 days",
-      price: "$2,999",
+      originalPrice: "$3,300",
+      discountedPrice: "$2,999",
       image: peruImg,
       signature: false,
     },
   ],
+
   "New trips": [
     {
       id: 5,
       title: "Maldives Escape",
       description: "Relax on stunning beaches with crystal clear waters",
       duration: "6 days",
-      price: "$4,000",
+      originalPrice: "$4,200",
+      discountedPrice: "$4,000",
       image: maldivesImg,
       signature: false,
     },
@@ -60,7 +66,8 @@ const tripsData = {
       title: "Iceland Adventure",
       description: "Experience glaciers, geysers, and northern lights",
       duration: "9 days",
-      price: "$4,500",
+      originalPrice: "$4,800",
+      discountedPrice: "$4,500",
       image: icelandImg,
       signature: false,
     },
@@ -69,18 +76,21 @@ const tripsData = {
       title: "New York Highlights",
       description: "Explore the iconic sights of the Big Apple",
       duration: "5 days",
-      price: "$2,300",
+      originalPrice: "$2,500",
+      discountedPrice: "$2,300",
       image: newyorkImg,
       signature: false,
     },
   ],
+
   "Popular Trips": [
     {
       id: 8,
       title: "Maldives Escape",
       description: "Relax on stunning beaches with crystal clear waters",
       duration: "6 days",
-      price: "$4,000",
+      originalPrice: "$4,200",
+      discountedPrice: "$4,000",
       image: maldivesImg,
       signature: false,
     },
@@ -89,7 +99,8 @@ const tripsData = {
       title: "Paris Getaway",
       description: "Explore the romantic city of lights with art and cuisine",
       duration: "7 days",
-      price: "$3,200",
+      originalPrice: "$3,500",
+      discountedPrice: "$3,200",
       image: parisImg,
       signature: false,
     },
@@ -98,7 +109,8 @@ const tripsData = {
       title: "Tokyo Experience",
       description: "Discover the blend of tradition and modern life in Japan",
       duration: "8 days",
-      price: "$3,500",
+      originalPrice: "$3,800",
+      discountedPrice: "$3,500",
       image: tokyoImg,
       signature: false,
     },
