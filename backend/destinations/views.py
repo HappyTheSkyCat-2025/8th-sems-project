@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from .models import (
@@ -16,6 +16,18 @@ from .serializers import (
 )
 from .permissions import IsSuperUserOrReadOnly
 
+# ====== Admin Stats View ======
+class AdminStatsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        data = {
+            "regions": Region.objects.count(),
+            "countries": Country.objects.count(),
+            "travel_deals": TravelDeal.objects.count(),
+            "reviews": Review.objects.count(),
+        }
+        return Response(data)
 
 # ====== Regions ======
 class RegionListCreateAPIView(generics.ListCreateAPIView):
@@ -55,6 +67,7 @@ class TravelDealRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
     queryset = TravelDeal.objects.all()
     serializer_class = TravelDealSerializer
     permission_classes = [IsSuperUserOrReadOnly]
+    lookup_field = 'slug'
 
 
 # ====== Reviews ======

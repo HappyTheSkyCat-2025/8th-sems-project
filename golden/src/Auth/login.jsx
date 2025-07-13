@@ -11,33 +11,55 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
-  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // 1. Login and get tokens
       const response = await fetch("http://127.0.0.1:8000/api/token/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData), // { email, password }
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem("access_token", data.access);
-        localStorage.setItem("refresh_token", data.refresh);
-        toast.success("Login successful!");
-        setFormData({ email: "", password: "" });
-        setTimeout(() => navigate("/"), 1500);
-      } else {
+      if (!response.ok) {
         toast.error(data.detail || "Invalid credentials.");
+        setLoading(false);
+        return;
+      }
+
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
+
+      // 2. Fetch user profile with access token
+      const profileResponse = await fetch("http://127.0.0.1:8000/api/accounts/profile/", {
+        headers: {
+          Authorization: `Bearer ${data.access}`,
+        },
+      });
+
+      const profileData = await profileResponse.json();
+
+      if (!profileResponse.ok) {
+        toast.error("Failed to fetch user profile.");
+        setLoading(false);
+        return;
+      }
+
+      // 3. Redirect based on superuser status
+      if (profileData.is_superuser) {
+        toast.success("Welcome Admin! Redirecting...");
+        setTimeout(() => navigate("/admin"), 1500);
+      } else {
+        toast.success("Login successful! Redirecting...");
+        setTimeout(() => navigate("/"), 1500);
       }
     } catch (error) {
       toast.error("An error occurred during login.");
@@ -90,8 +112,13 @@ const Login = () => {
                 <span
                   className="toggle-password"
                   onClick={() => setShowPassword(!showPassword)}
+                  style={{ cursor: "pointer" }}
                 >
-                  <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
+                  <i
+                    className={`fas ${
+                      showPassword ? "fa-eye-slash" : "fa-eye"
+                    }`}
+                  ></i>
                 </span>
               </div>
 

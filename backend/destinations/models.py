@@ -57,6 +57,7 @@ class DealOffer(models.Model):
 class TravelDeal(models.Model):
     country = models.ForeignKey(Country, related_name="deals", on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     days = models.PositiveIntegerField()
     price = models.CharField(max_length=20)
     image = models.ImageField(upload_to='deals/', blank=True, null=True)
@@ -66,6 +67,11 @@ class TravelDeal(models.Model):
     description = models.TextField(blank=True, null=True)
     on_sale = models.BooleanField(default=False)
     last_minute = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} - {self.country.name}"
