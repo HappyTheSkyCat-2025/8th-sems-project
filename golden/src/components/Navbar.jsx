@@ -3,6 +3,7 @@ import { ChevronDown, Globe, Heart, User, Search } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import logo from "../assets/logo1.png";
+import baliImage from "../assets/bali.jpg";
 import "../styles/Navbar.css";
 
 export default function Navbar() {
@@ -161,7 +162,7 @@ export default function Navbar() {
 
       {/* ✅ Image + Description + Learn More Button */}
       <div className="column image-column">
-        <img src="/images/sample-region.jpg" alt={activeRegion} />
+        <img src={baliImage} alt={activeRegion} />
         <p className="image-description">
           Discover unforgettable journeys in <strong>{activeRegion}</strong>. Whether you love beaches, mountains, or cities, we’ve got something magical waiting for you.
         </p>
