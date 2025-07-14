@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, CalendarDays, Search } from 'lucide-react';
+import { MapPin, Search } from 'lucide-react';
 import '../styles/Home.css';
 import homevid1 from '../assets/homevid1.mp4';
 
@@ -28,9 +28,8 @@ export default function Home() {
               <input type="text" placeholder="Search" />
             </div>
 
-            {/* Date range */}
+            {/* Date range without calendar icon */}
             <div className="date-box">
-              <CalendarDays size={18} className="icon" />
               <input
                 type="text"
                 placeholder="Start date"
