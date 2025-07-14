@@ -42,17 +42,21 @@ import Payment1 from "./payment/payment1";
 import Payment2 from "./payment/payment2";
 import Payment3 from "./payment/payment3";
 
-// Admin Pages
+// Admin Pages and utilities
 import RequireAdmin from "./utils/RequireAdmin";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import RegionList from "./components/admin/regions/RegionList";
 import RegionForm from "./components/admin/regions/RegionForm";
+import CountryList from "./components/admin/countries/CountryList";
+import CountryForm from "./components/admin/countries/CountryForm";
+import TravelDealList from "./components/admin/travel-deals/TravelDealList";
+import TravelDealForm from "./components/admin/travel-deals/TravelDealForm";
 
 function Layout() {
   const location = useLocation();
 
-  // Auth and payment routes that shouldn't show Navbar/Footer
+  // Routes where Navbar/Footer should NOT be shown
   const noLayoutRoutes = [
     "/login",
     "/register",
@@ -64,7 +68,7 @@ function Layout() {
     "/payment/payment3",
   ];
 
-  // Admin routes that also shouldn't show Navbar/Footer
+  // Admin routes where Navbar/Footer should also NOT be shown
   const adminRoutes = [
     "/admin",
     "/admin/regions",
@@ -72,9 +76,14 @@ function Layout() {
     "/admin/regions/:id/edit",
   ];
 
+  // Determine if current path matches any of the no-layout routes
   const hideLayout =
-    noLayoutRoutes.some((path) => matchPath({ path, end: true }, location.pathname)) ||
-    adminRoutes.some((path) => location.pathname.startsWith(path.replace(":id", "")));
+    noLayoutRoutes.some((path) =>
+      matchPath({ path, end: true }, location.pathname)
+    ) ||
+    adminRoutes.some((path) =>
+      location.pathname.startsWith(path.replace(":id", ""))
+    );
 
   return (
     <>
@@ -100,7 +109,10 @@ function Layout() {
         />
         <Route path="/alldestinations" element={<AllDestinations />} />
         <Route path="/destinations/:country" element={<DestinationPage />} />
-        <Route path="/destinations/:country/deal/:dealId" element={<DestDescription />} />
+        <Route
+          path="/destinations/:country/deal/:dealId"
+          element={<DestDescription />}
+        />
         <Route path="/about" element={<AboutUs />} />
 
         {/* === Auth Routes === */}
@@ -116,26 +128,33 @@ function Layout() {
         <Route path="/payment/payment2" element={<Payment2 />} />
         <Route path="/payment/payment3" element={<Payment3 />} />
 
-        {/* === Admin Routes (Region CRUD) === */}
-          <Route
-            path="/admin"
-            element={
-              <RequireAdmin>
-                <AdminLayout />
-              </RequireAdmin>
+        {/* === Admin Routes (Region & Country CRUD) === */}
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminLayout />
+            </RequireAdmin>
           }
-          >
-          {/* Nested routes for admin dashboard */}
+        >
           <Route index element={<AdminDashboard />} />
+          {/* Region CRUD */}
           <Route path="regions" element={<RegionList />} />
           <Route path="regions/create" element={<RegionForm />} />
           <Route path="regions/:id/edit" element={<RegionForm />} />
-          {/* <Route path="countries" element={<CountryList />} />
+
+          {/* Country CRUD */}
+          <Route path="countries" element={<CountryList />} />
           <Route path="countries/create" element={<CountryForm />} />
-          <Route path="countries/:id/edit" element={<CountryForm />} />
-          <Route path="travel-deals" element={<TravelDealList />} />
-          <Route path="travel-deals/create" element={<TravelDealForm />} />
-          <Route path="travel-deals/:id/edit" element={<TravelDealForm />} />
+          <Route path="countries/:slug/edit" element={<CountryForm />} />
+          
+          {/* Travel Deal CRUD */}
+          <Route path="countries/:country_slug/travel-deals" element={<TravelDealList />} />
+          <Route path="countries/:country_slug/travel-deals/create" element={<TravelDealForm />} />
+          <Route path="countries/:country_slug/travel-deals/:slug/edit" element={<TravelDealForm />} />
+
+          {/* Additional Admin Routes can be added here */}
+          {/*
           <Route path="articles" element={<ArticleList />} />
           <Route path="articles/create" element={<ArticleForm />} />
           <Route path="articles/:id/edit" element={<ArticleForm />} />
@@ -150,7 +169,8 @@ function Layout() {
           <Route path="travel-types/:id/edit" element={<TravelTypeForm />} />
           <Route path="deal-categories" element={<DealCategoryList />} />
           <Route path="deal-categories/create" element={<DealCategoryForm />} />
-          <Route path="deal-categories/:id/edit" element={<DealCategoryForm />} /> */}
+          <Route path="deal-categories/:id/edit" element={<DealCategoryForm />} />
+          */}
         </Route>
       </Routes>
 

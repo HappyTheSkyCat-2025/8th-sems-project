@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import json
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,
     TravelOption, TravelType, DealCategory, DealOffer,
@@ -10,7 +11,29 @@ from .models import (
 # TravelDeal, Review, Article, FAQ Serializers
 # -------------------------
 
+class JSONListField(serializers.Field):
+    def to_internal_value(self, data):
+        if isinstance(data, list):
+            # Already a list, good
+            return data
+        if isinstance(data, str):
+            try:
+                parsed = json.loads(data)
+                if isinstance(parsed, list):
+                    return parsed
+                else:
+                    raise serializers.ValidationError("Expected a list of values.")
+            except json.JSONDecodeError:
+                raise serializers.ValidationError("Invalid JSON format.")
+        raise serializers.ValidationError("Invalid data type.")
+
+    def to_representation(self, value):
+        # Return the list as is (JSONField serializes correctly)
+        return value
+
 class TravelDealSerializer(serializers.ModelSerializer):
+    themes = JSONListField()
+
     class Meta:
         model = TravelDeal
         fields = "__all__"

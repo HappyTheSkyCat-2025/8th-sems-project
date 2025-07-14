@@ -1,13 +1,13 @@
 // src/components/admin/AdminLayout.jsx
 import React from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { FaGlobe, FaMapMarkedAlt, FaSignOutAlt } from "react-icons/fa";
+import { FaGlobe, FaMapMarkedAlt, FaSignOutAlt, FaSuitcase } from "react-icons/fa";
 
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: <FaGlobe /> },
   { to: "regions", label: "Regions", icon: <FaMapMarkedAlt /> },
+  { to: "countries", label: "Countries", icon: <FaSuitcase /> },
   // Add more links as needed:
-  // { to: "countries", label: "Countries", icon: <FaSuitcase /> },
   // { to: "travel-deals", label: "Travel Deals", icon: <FaStar /> },
 ];
 
