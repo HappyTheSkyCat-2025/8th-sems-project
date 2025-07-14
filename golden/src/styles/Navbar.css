@@ -1,8 +1,3 @@
-/* ==========================================================================
-   NAVBAR  – original styles (unchanged) + new hamburger / drawer styles
-   ========================================================================== */
-
-/* ================= ORIGINAL SECTION (from your file) =================== */
 
 .navbar {
   background-color: var(--bg-color);
@@ -75,7 +70,6 @@
   box-shadow: var(--shadow-light);
   display: flex;
   flex-direction: column;
-  border-top: 2px solid var(--primary-color);
   animation: fadeIn var(--transition);
   z-index: 1000;
 }
@@ -203,12 +197,17 @@
   user-select: none;
 }
 
-.language-btn {
+.language-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: transparent;
   border: none;
   cursor: pointer;
   color: var(--text-color);
+  padding: 4px;
 }
+
 
 /* Profile */
 .profile-dropdown {

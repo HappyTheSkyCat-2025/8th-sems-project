@@ -3,7 +3,7 @@ import {
   ChevronDown, ChevronRight, ChevronLeft,
   Heart, User, Search, Phone, Globe
 } from "lucide-react";
-import { IoLanguage } from "react-icons/io5";
+import { IoLanguageOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Divide as Hamburger } from "hamburger-react";
 import axios from "axios";
@@ -11,7 +11,7 @@ import logo from "../assets/logo1.png";
 import baliImage from "../assets/bali.jpg";
 import "../styles/Navbar.css";
 
-export default function Navbar() {
+export default function Navbar() { 
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -228,7 +228,10 @@ export default function Navbar() {
                 <Search size={20} />
               </button>
             )}
-            <div className="language-switch"><Globe size={18} /><span>EN</span></div>
+            <div className="language-switch">
+  <IoLanguageOutline size={20} />
+</div>
+
             <Heart size={18} />
             <div className="profile-dropdown">
               <User size={18} style={{ cursor: "pointer" }} onClick={() => {
