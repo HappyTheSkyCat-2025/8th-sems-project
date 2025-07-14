@@ -43,6 +43,7 @@ import Payment2 from "./payment/payment2";
 import Payment3 from "./payment/payment3";
 
 // Admin Pages
+import RequireAdmin from "./utils/RequireAdmin";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import RegionList from "./components/admin/regions/RegionList";
@@ -116,7 +117,14 @@ function Layout() {
         <Route path="/payment/payment3" element={<Payment3 />} />
 
         {/* === Admin Routes (Region CRUD) === */}
-        <Route path="/admin" element={<AdminLayout />}>
+          <Route
+            path="/admin"
+            element={
+              <RequireAdmin>
+                <AdminLayout />
+              </RequireAdmin>
+          }
+          >
           {/* Nested routes for admin dashboard */}
           <Route index element={<AdminDashboard />} />
           <Route path="regions" element={<RegionList />} />
