@@ -35,6 +35,6 @@ const trending = [
     price: "$999",
   },
 ];
-
+ 
 export default trending;
  
