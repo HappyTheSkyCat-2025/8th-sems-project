@@ -11,11 +11,9 @@ export default function Home() {
   const [endDate, setEndDate] = useState(null);
   const [endDateError, setEndDateError] = useState('');
 
-  // Refs for each date field to mount calendar popup inside them
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
 
-  // Popper container to keep calendar inside given container ref
   const PopperContainer = ({ children, containerRef }) => {
     return containerRef?.current
       ? ReactDOM.createPortal(children, containerRef.current)
