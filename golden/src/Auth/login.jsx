@@ -1,90 +1,147 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/login.css";
-import img2 from "../assets/img2.jpg"; // ✅ Use your custom image
+import loginBg from "../assets/login.jpg";
 
-export default function Login() {
+const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Login button clicked!\n(Frontend only)");
+    setLoading(true);
+
+    try {
+      // 1. Login and get tokens
+      const response = await fetch("http://127.0.0.1:8000/api/token/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        toast.error(data.detail || "Invalid credentials.");
+        setLoading(false);
+        return;
+      }
+
+      localStorage.setItem("access_token", data.access);
+      localStorage.setItem("refresh_token", data.refresh);
+
+      // 2. Fetch user profile with access token
+      const profileResponse = await fetch("http://127.0.0.1:8000/api/accounts/profile/", {
+        headers: {
+          Authorization: `Bearer ${data.access}`,
+        },
+      });
+
+      const profileData = await profileResponse.json();
+
+      if (!profileResponse.ok) {
+        toast.error("Failed to fetch user profile.");
+        setLoading(false);
+        return;
+      }
+
+      // 3. Redirect based on superuser status
+      if (profileData.is_superuser) {
+        toast.success("Welcome Admin! Redirecting...");
+        setTimeout(() => navigate("/admin"), 1500);
+      } else {
+        toast.success("Login successful! Redirecting...");
+        setTimeout(() => navigate("/"), 1500);
+      }
+    } catch (error) {
+      toast.error("An error occurred during login.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="login-full-wrapper">
-      <div className="background-angle"></div>
+    <>
+      <ToastContainer autoClose={3000} position="top-center" />
 
-      <div className="login-box">
-        {/* Left: Image Side */}
-        <div
-          className="login-image"
-          style={{ backgroundImage: `url(${img2})` }}
-        >
-          <div className="quote">
-            TRAVEL IS THE ONLY THING<br />YOU BUY THAT MAKES YOU RICHER
-          </div>
-        </div>
+      <div className="login-full-wrapper">
+        <div className="background-angle"></div>
 
-        {/* Right: Login Form */}
-        <div className="login-form">
-          <h2 className="brand-title">TRAVEL BLOGGER</h2>
-
-          <div className="social-icons">
-            <i className="fab fa-facebook-f"></i>
-            <i className="fab fa-google"></i>
-            <i className="fab fa-linkedin-in"></i>
+        <div className="login-box">
+          {/* Left: Background image with quote */}
+          <div
+            className="login-image"
+            style={{ backgroundImage: `url(${loginBg})` }}
+          >
+            <div className="quote">
+              DISCOVER THE WORLD <br /> WITH GOLDEN LEAF TRAVELS
+            </div>
           </div>
 
-          <p className="or-text">or use your email account</p>
+          {/* Right: Login form */}
+          <div className="login-form">
+            <h2 className="brand-title">GOLDEN LEAF TRAVELS</h2>
 
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              name="username"
-              placeholder="Email"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-
-            <div className="password-field">
+            <form onSubmit={handleSubmit}>
               <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={formData.password}
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
                 onChange={handleChange}
                 required
               />
-              <span
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
-              </span>
+
+              <div className="password-field">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <span
+                  className="toggle-password"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <i
+                    className={`fas ${
+                      showPassword ? "fa-eye-slash" : "fa-eye"
+                    }`}
+                  ></i>
+                </span>
+              </div>
+
+              <Link to="/forgot-password" className="forgot-link">
+                Forgot Your Password?
+              </Link>
+
+              <button type="submit" disabled={loading}>
+                {loading ? "Logging in..." : "LOG IN"}
+              </button>
+            </form>
+
+            <div className="register-text">
+              Don’t have an account?{" "}
+              <Link to="/register" className="register-link">
+                Register
+              </Link>
             </div>
-
-            <Link to="/forgot-password" className="forgot-link">
-              Forgot Your Password?
-            </Link>
-
-            <button type="submit">LOG IN</button>
-          </form>
-
-          <div className="register-text">
-            Don’t have an account?{" "}
-            <Link to="/register" className="register-link">
-              Register
-            </Link>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-}
+};
+
+export default Login;

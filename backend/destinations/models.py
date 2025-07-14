@@ -14,7 +14,7 @@ class Country(models.Model):
     subtitle = models.CharField(max_length=200, blank=True)
     section_title = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
-    image = models.URLField(blank=True)
+    image = models.ImageField(upload_to='countries/', blank=True, null=True)
     video_url = models.URLField(blank=True)
 
     class Meta:
@@ -27,8 +27,6 @@ class Country(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.region.name})"
-    
-
 
 class TravelType(models.Model):
     name = models.CharField(max_length=100)
@@ -42,7 +40,6 @@ class TravelOption(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class DealCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -60,12 +57,21 @@ class DealOffer(models.Model):
 class TravelDeal(models.Model):
     country = models.ForeignKey(Country, related_name="deals", on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True, null=True)
     days = models.PositiveIntegerField()
     price = models.CharField(max_length=20)
-    image = models.URLField(blank=True)
+    image = models.ImageField(upload_to='deals/', blank=True, null=True)
     themes = models.JSONField(default=list, blank=True)
     tag = models.CharField(max_length=50, blank=True)
     style = models.CharField(max_length=50, blank=True)
+    description = models.TextField(blank=True, null=True)
+    on_sale = models.BooleanField(default=False)
+    last_minute = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title} - {self.country.name}"
@@ -87,7 +93,7 @@ class Article(models.Model):
     title = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     description = models.TextField()
-    image = models.URLField(blank=True)
+    image = models.ImageField(upload_to='articles/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.title} ({self.country.name})"
@@ -99,3 +105,29 @@ class FAQ(models.Model):
 
     def __str__(self):
         return f"FAQ for {self.country.name}: {self.question[:50]}{'...' if len(self.question) > 50 else ''}"
+
+class CountryOverview(models.Model):
+    country = models.OneToOneField(Country, related_name="overview", on_delete=models.CASCADE)
+    capital = models.CharField(max_length=100)
+    population = models.CharField(max_length=100)
+    currency = models.CharField(max_length=50)
+    language = models.CharField(max_length=100)
+    timezone = models.CharField(max_length=50)
+    calling_code = models.CharField(max_length=20)
+    electricity = models.TextField()
+
+    def __str__(self):
+        return f"Overview of {self.country.name}"
+
+class CountryLearnMoreTopic(models.Model):
+    country = models.ForeignKey(Country, related_name="learn_more_topics", on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    image = models.ImageField(upload_to="learn_more_images/", blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)  # for ordering topics
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.title} - {self.country.name}"

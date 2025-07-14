@@ -1,26 +1,34 @@
 import React, { useState } from "react";
-import reviewsData from "../../data/review"; // Your data file
 import { FaStar } from "react-icons/fa";
 import "../../pagescss/review.css";
 
-export default function ReviewSection() {
+export default function TripReviewsSection({ reviews = [] }) {
   const [selectedRating, setSelectedRating] = useState(null);
+  const [expandedReviewIds, setExpandedReviewIds] = useState([]);
 
-  const totalReviews = reviewsData.length;
+  const totalReviews = reviews.length;
   const averageRating =
-    reviewsData.reduce((sum, r) => sum + r.rating, 0) / totalReviews;
+    totalReviews > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / totalReviews
+      : 0;
 
   const ratingCounts = [5, 4, 3, 2, 1].map((star) => ({
     star,
-    count: reviewsData.filter((r) => r.rating === star).length,
+    count: reviews.filter((r) => r.rating === star).length,
   }));
 
   const filteredReviews = selectedRating
-    ? reviewsData.filter((r) => r.rating === selectedRating)
-    : reviewsData;
+    ? reviews.filter((r) => r.rating === selectedRating)
+    : reviews;
 
   const handleCheckboxChange = (star) => {
     setSelectedRating(selectedRating === star ? null : star);
+  };
+
+  const toggleReadMore = (id) => {
+    setExpandedReviewIds((prev) =>
+      prev.includes(id) ? prev.filter((rid) => rid !== id) : [...prev, id]
+    );
   };
 
   return (
@@ -67,24 +75,44 @@ export default function ReviewSection() {
 
         {/* Review Cards */}
         <div className="review-list">
-          {filteredReviews.map((r) => (
-            <div className="review-card" key={r.id}>
-              <div className="stars">
-                {Array.from({ length: r.rating }).map((_, i) => (
-                  <FaStar key={i} color="#f4b400" size={14} />
-                ))}
+          {filteredReviews.map((r) => {
+            const isExpanded = expandedReviewIds.includes(r.id);
+            const content = isExpanded
+              ? r.content
+              : r.content.length > 150
+              ? r.content.slice(0, 150) + "..."
+              : r.content;
+
+            return (
+              <div className="review-card" key={r.id}>
+                <div className="stars">
+                  {Array.from({ length: r.rating }).map((_, i) => (
+                    <FaStar key={i} color="#f4b400" size={14} />
+                  ))}
+                </div>
+                <h3>{r.title}</h3>
+                <p className="review-meta">
+                  <strong>{r.name}</strong> . Traveled {r.travel_date}
+                </p>
+                <p>{content}</p>
+                {r.content.length > 150 && (
+                  <a
+                    href="#"
+                    className="read-more"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleReadMore(r.id);
+                    }}
+                  >
+                    {isExpanded ? "Show less" : "Read more"}
+                  </a>
+                )}
+                <p className="review-date">
+                  Review submitted on {r.submitted_on}
+                </p>
               </div>
-              <h3>{r.title}</h3>
-              <p className="review-meta">
-                <strong>{r.name}</strong> . Traveled {r.travelDate}
-              </p>
-              <p>{r.content}</p>
-              <a href="#" className="read-more">
-                Read more
-              </a>
-              <p className="review-date">Review submitted on {r.date}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

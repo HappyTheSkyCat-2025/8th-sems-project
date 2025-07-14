@@ -2,6 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    # Admin Stats View
+    path('admin/stats/', views.AdminStatsView.as_view(), name='admin-stats'),
+
     # === Regions CRUD ===
     path('regions/', views.RegionListCreateAPIView.as_view(), name='region-list'),
     path('regions/<int:pk>/', views.RegionRetrieveUpdateDestroyAPIView.as_view(), name='region-detail'),
@@ -19,8 +22,8 @@ urlpatterns = [
     path('deals/<int:pk>/', views.DealCategoryRetrieveUpdateDestroyAPIView.as_view(), name='deal-category-detail'),
 
     # === Travel Deals CRUD ===
-    path('travel-deals/', views.TravelDealListCreateAPIView.as_view(), name='travel-deal-list'),
-    path('travel-deals/<int:pk>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
+    path('countries/<slug:slug>/travel-deals/', views.TravelDealListCreateAPIView.as_view(), name='travel-deal-list'),
+    path('countries/<slug:country_slug>/travel-deals/<slug:slug>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
 
     # === Reviews CRUD ===
     path('reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
@@ -36,4 +39,11 @@ urlpatterns = [
 
     # === Public Read-Only Destinations API ===
     path("", views.DestinationsAPIView.as_view(), name="destinations-api"),
+
+    
+    path('country-overview/', views.CountryOverviewListCreateAPIView.as_view(), name='countryoverview-listcreate'),
+    path('country-overview/<int:pk>/', views.CountryOverviewRetrieveUpdateDestroyAPIView.as_view(), name='countryoverview-detail'),
+
+    path('learn-more-topic/', views.CountryLearnMoreTopicListCreateAPIView.as_view(), name='learnmoretopic-listcreate'),
+    path('learn-more-topic/<int:pk>/', views.CountryLearnMoreTopicRetrieveUpdateDestroyAPIView.as_view(), name='learnmoretopic-detail'),
 ]
