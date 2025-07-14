@@ -40,14 +40,7 @@ export default function CountryList() {
         <h2 style={{ fontWeight: 600 }}>🌎 Countries</h2>
         <Link
           to="/admin/countries/create"
-          style={{
-            backgroundColor: "#1e88e5",
-            color: "#fff",
-            padding: "8px 14px",
-            borderRadius: 6,
-            textDecoration: "none",
-            fontWeight: 500,
-          }}
+          style={btnCreate}
         >
           + Add Country
         </Link>
@@ -68,7 +61,7 @@ export default function CountryList() {
             <th style={thStyle}>ID</th>
             <th style={thStyle}>Name</th>
             <th style={thStyle}>Region</th>
-            <th style={thStyle}>Deals</th>
+            <th style={thStyle}>Manage</th>
             <th style={thStyle}></th>
           </tr>
         </thead>
@@ -80,12 +73,23 @@ export default function CountryList() {
                 <td style={tdStyle}>{country.name}</td>
                 <td style={tdStyle}>{country.region || "-"}</td>
                 <td style={tdStyle}>
-                  <Link
-                    to={`/admin/countries/${country.slug}/travel-deals`}
-                    style={btnManage}
-                  >
-                    Manage Deals
-                  </Link>
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                    <Link to={`/admin/countries/${country.slug}/overview`} style={btnManage}>
+                      Overview
+                    </Link>
+                    <Link to={`/admin/countries/${country.slug}/learn-more-topics`} style={btnManage}>
+                      Learn More Topics
+                    </Link>
+                    <Link to={`/admin/countries/${country.slug}/travel-deals`} style={btnManage}>
+                      Deals
+                    </Link>
+                    <Link to={`/admin/countries/${country.slug}/faqs`} style={btnManage}>
+                      FAQs
+                    </Link>
+                    <Link to={`/admin/countries/${country.slug}/reviews`} style={btnManage}>
+                      Reviews
+                    </Link>
+                  </div>
                 </td>
                 <td style={{ ...tdStyle, textAlign: "right" }}>
                   <Link
@@ -161,4 +165,13 @@ const btnManage = {
   fontSize: "13px",
   cursor: "pointer",
   textDecoration: "none",
+};
+
+const btnCreate = {
+  backgroundColor: "#1e88e5",
+  color: "#fff",
+  padding: "8px 14px",
+  borderRadius: 6,
+  textDecoration: "none",
+  fontWeight: 500,
 };
