@@ -2,168 +2,143 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function TravelDealForm() {
-  const { country_slug, slug } = useParams(); // country_slug + deal slug for edit
+export default function CountryForm() {
+  const { slug } = useParams();
   const navigate = useNavigate();
 
-  const [countryId, setCountryId] = useState(null);
-
+  const [regions, setRegions] = useState([]);
   const [formData, setFormData] = useState({
-    title: "",
+    name: "",
     slug: "",
-    days: 1,
-    price: "",
-    tag: "",
-    style: "",
+    region: null, // Use null initially, number expected
+    subtitle: "",
+    section_title: "",
     description: "",
-    themes: [],
-    on_sale: false,
-    last_minute: false,
-    image: null,
+    video_url: "",
   });
 
-  const [existingImageUrl, setExistingImageUrl] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch country ID from slug
+  // Fetch regions
   useEffect(() => {
     axios
-      .get(`/api/destinations/countries/${country_slug}/`)
+      .get("/api/destinations/regions/")
       .then((res) => {
-        setCountryId(res.data.id);
+        const data = res.data.results ? res.data.results : res.data;
+        setRegions(data);
       })
-      .catch((err) => {
-        console.error("Failed to fetch country ID:", err);
-        setError("Failed to load country data.");
-      });
-  }, [country_slug]);
+      .catch((err) => console.error("Failed to load regions", err));
+  }, []);
 
-  // Fetch existing deal for edit
+  // Fetch existing country for edit
   useEffect(() => {
     if (slug) {
       axios
-        .get(`/api/destinations/countries/${country_slug}/travel-deals/${slug}/`)
+        .get(`/api/destinations/countries/${slug}/`)
         .then((res) => {
           const data = res.data;
           setFormData({
-            title: data.title || "",
+            name: data.name || "",
             slug: data.slug || "",
-            days: data.days || 1,
-            price: data.price || "",
-            tag: data.tag || "",
-            style: data.style || "",
+            // IMPORTANT: region should be number or null
+            region:
+              data.region && typeof data.region === "object"
+                ? data.region.id
+                : data.region || null,
+            subtitle: data.subtitle || "",
+            section_title: data.section_title || "",
             description: data.description || "",
-            themes: Array.isArray(data.themes) ? data.themes : [],
-            on_sale: data.on_sale || false,
-            last_minute: data.last_minute || false,
-            image: null,
+            video_url: data.video_url || "",
           });
-          setExistingImageUrl(data.image || null);
+          setImagePreview(data.image || "");
           setLoading(false);
         })
         .catch((err) => {
-          console.error("Failed to fetch deal:", err);
+          console.error("Failed to load country", err);
           setLoading(false);
-          setError("Failed to load travel deal data.");
         });
     } else {
       setLoading(false);
     }
-  }, [country_slug, slug]);
+  }, [slug]);
 
-  // Handle input changes including themes and file
+  // Handle input changes
   function handleChange(e) {
-    const { name, value, type, checked, files } = e.target;
-    if (type === "file") {
-      setFormData((prev) => ({ ...prev, image: files[0] || null }));
-    } else if (name === "themes") {
-      setFormData((prev) => ({
-        ...prev,
-        themes: value
-          .split(",")
-          .map((t) => t.trim())
-          .filter((t) => t !== ""),
-      }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      // region should be number or null, others strings
+      [name]: name === "region" ? (value === "" ? null : Number(value)) : value,
+    }));
+  }
+
+  // Handle file input
+  function handleFileChange(e) {
+    const file = e.target.files[0];
+    setImageFile(file);
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
+      setImagePreview("");
     }
   }
 
-  // Handle form submit
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
     setError(null);
 
-    if (!countryId) {
-      setError("Country ID not loaded yet. Please wait.");
-      setSaving(false);
-      return;
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("slug", formData.slug);
+    if (formData.region !== null) {
+      data.append("region", formData.region); // number
     }
+    data.append("subtitle", formData.subtitle);
+    data.append("section_title", formData.section_title);
+    data.append("description", formData.description);
+    data.append("video_url", formData.video_url);
+    if (imageFile) data.append("image", imageFile);
 
     const token = localStorage.getItem("access_token");
-    const data = new FormData();
-
-    // Append all fields except themes and image (handle separately)
-    Object.entries(formData).forEach(([key, val]) => {
-      if (key === "themes" || key === "image") return;
-      if (val !== null && val !== "") {
-        data.append(key, val);
-      }
-    });
-
-    data.append("country", countryId);
-    data.append("themes", JSON.stringify(formData.themes));
-
-    if (formData.image) {
-      data.append("image", formData.image);
-    }
 
     try {
       if (slug) {
-        await axios.put(
-          `/api/destinations/countries/${country_slug}/travel-deals/${slug}/`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await axios.put(`/api/destinations/countries/${slug}/`, data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
       } else {
-        await axios.post(
-          `/api/destinations/countries/${country_slug}/travel-deals/`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        await axios.post("/api/destinations/countries/", data, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
       }
       setSaving(false);
-      navigate(`/admin/countries/${country_slug}/travel-deals`);
+      navigate("/admin/countries");
     } catch (err) {
       setSaving(false);
       setError(
         err.response?.data
           ? JSON.stringify(err.response.data)
-          : "Failed to save travel deal. Please try again."
+          : "Failed to save country. Please check the data and try again."
       );
-      console.error("Save error:", err.response?.data || err.message);
     }
   }
 
   if (loading) return <p>Loading...</p>;
 
-  // Styling (reuse or customize)
   const inputStyle = {
     width: "100%",
     padding: "12px 16px",
@@ -212,7 +187,7 @@ export default function TravelDealForm() {
       }}
     >
       <h2 style={{ marginBottom: "24px", fontWeight: "700", color: "#333" }}>
-        {slug ? "Edit" : "Create"} Travel Deal
+        {slug ? "Edit" : "Create"} Country
       </h2>
 
       {error && (
@@ -221,17 +196,17 @@ export default function TravelDealForm() {
         </p>
       )}
 
-      <label htmlFor="title" style={labelStyle}>
-        Title:
+      <label htmlFor="name" style={labelStyle}>
+        Name:
       </label>
       <input
-        id="title"
-        name="title"
+        id="name"
+        name="name"
         type="text"
-        value={formData.title}
+        value={formData.name}
         onChange={handleChange}
         required
-        placeholder="Enter title"
+        placeholder="Enter country name"
         style={inputStyle}
         onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
         onBlur={(e) => (e.target.style.borderColor = "#ccc")}
@@ -252,78 +227,52 @@ export default function TravelDealForm() {
         onBlur={(e) => (e.target.style.borderColor = "#ccc")}
       />
 
-      <label htmlFor="days" style={labelStyle}>
-        Days:
+      <label htmlFor="region" style={labelStyle}>
+        Region:
       </label>
-      <input
-        id="days"
-        name="days"
-        type="number"
-        min={1}
-        value={formData.days}
+      <select
+        id="region"
+        name="region"
+        value={formData.region === null ? "" : formData.region}
         onChange={handleChange}
         required
+        style={{ ...inputStyle, paddingRight: "40px", cursor: "pointer" }}
+        onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
+        onBlur={(e) => (e.target.style.borderColor = "#ccc")}
+      >
+        <option value="">Select a region</option>
+        {regions.map((region) => (
+          <option key={region.id} value={region.id}>
+            {region.name}
+          </option>
+        ))}
+      </select>
+
+      <label htmlFor="subtitle" style={labelStyle}>
+        Subtitle:
+      </label>
+      <input
+        id="subtitle"
+        name="subtitle"
+        type="text"
+        value={formData.subtitle}
+        onChange={handleChange}
+        placeholder="Enter subtitle"
         style={inputStyle}
         onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
         onBlur={(e) => (e.target.style.borderColor = "#ccc")}
       />
 
-      <label htmlFor="price" style={labelStyle}>
-        Price:
+      <label htmlFor="section_title" style={labelStyle}>
+        Section Title:
       </label>
       <input
-        id="price"
-        name="price"
+        id="section_title"
+        name="section_title"
         type="text"
-        value={formData.price}
+        value={formData.section_title}
         onChange={handleChange}
-        required
-        placeholder="Enter price"
-        style={inputStyle}
-        onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
-        onBlur={(e) => (e.target.style.borderColor = "#ccc")}
-      />
-
-      <label htmlFor="tag" style={labelStyle}>
-        Tag:
-      </label>
-      <input
-        id="tag"
-        name="tag"
-        type="text"
-        value={formData.tag}
-        onChange={handleChange}
-        placeholder="Enter tag"
-        style={inputStyle}
-        onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
-        onBlur={(e) => (e.target.style.borderColor = "#ccc")}
-      />
-
-      <label htmlFor="style" style={labelStyle}>
-        Style:
-      </label>
-      <input
-        id="style"
-        name="style"
-        type="text"
-        value={formData.style}
-        onChange={handleChange}
-        placeholder="Enter style"
-        style={inputStyle}
-        onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
-        onBlur={(e) => (e.target.style.borderColor = "#ccc")}
-      />
-
-      <label htmlFor="themes" style={labelStyle}>
-        Themes (comma-separated):
-      </label>
-      <input
-        id="themes"
-        name="themes"
-        type="text"
-        value={formData.themes.join(", ")}
-        onChange={handleChange}
-        placeholder="Enter themes separated by commas"
+        placeholder="Enter section title"
         style={inputStyle}
         onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
         onBlur={(e) => (e.target.style.borderColor = "#ccc")}
@@ -335,13 +284,12 @@ export default function TravelDealForm() {
       <textarea
         id="description"
         name="description"
-        rows={5}
         value={formData.description}
         onChange={handleChange}
         placeholder="Enter description"
         style={{
           ...inputStyle,
-          height: "120px",
+          height: "100px",
           resize: "vertical",
           fontFamily: "inherit",
           lineHeight: "1.5",
@@ -350,35 +298,20 @@ export default function TravelDealForm() {
         onBlur={(e) => (e.target.style.borderColor = "#ccc")}
       />
 
-      <label
-        htmlFor="on_sale"
-        style={{ ...labelStyle, display: "inline-flex", alignItems: "center", gap: 8 }}
-      >
-        <input
-          id="on_sale"
-          name="on_sale"
-          type="checkbox"
-          checked={formData.on_sale}
-          onChange={handleChange}
-          style={{ width: 18, height: 18 }}
-        />
-        On Sale
+      <label htmlFor="video_url" style={labelStyle}>
+        Video URL:
       </label>
-
-      <label
-        htmlFor="last_minute"
-        style={{ ...labelStyle, display: "inline-flex", alignItems: "center", gap: 8 }}
-      >
-        <input
-          id="last_minute"
-          name="last_minute"
-          type="checkbox"
-          checked={formData.last_minute}
-          onChange={handleChange}
-          style={{ width: 18, height: 18 }}
-        />
-        Last Minute
-      </label>
+      <input
+        id="video_url"
+        name="video_url"
+        type="url"
+        value={formData.video_url}
+        onChange={handleChange}
+        placeholder="Enter video URL"
+        style={inputStyle}
+        onFocus={(e) => (e.target.style.borderColor = "#1e88e5")}
+        onBlur={(e) => (e.target.style.borderColor = "#ccc")}
+      />
 
       <label htmlFor="image" style={labelStyle}>
         Image:
@@ -388,17 +321,16 @@ export default function TravelDealForm() {
         name="image"
         type="file"
         accept="image/*"
-        onChange={handleChange}
+        onChange={handleFileChange}
         style={{ marginBottom: "24px", cursor: "pointer" }}
       />
 
-      {existingImageUrl && !formData.image && (
+      {imagePreview && (
         <div style={{ marginBottom: "24px" }}>
-          <p>Current Image Preview:</p>
           <img
-            src={existingImageUrl}
-            alt="Current"
-            style={{ maxWidth: 300, borderRadius: 8 }}
+            src={imagePreview}
+            alt="Country preview"
+            style={{ maxWidth: 200, maxHeight: 120, objectFit: "cover" }}
           />
         </div>
       )}

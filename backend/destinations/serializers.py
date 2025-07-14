@@ -109,12 +109,17 @@ class CountryDetailSerializer(serializers.ModelSerializer):
     faqs = FAQSerializer(many=True, read_only=True)
     overview = CountryOverviewSerializer(read_only=True)
     learn_more_topics = CountryLearnMoreTopicSerializer(many=True, read_only=True)
+    
+    region = serializers.PrimaryKeyRelatedField(
+        queryset=Region.objects.all()
+    )
 
     class Meta:
         model = Country
         fields = [
             "id", "name", "slug", "subtitle", "section_title",
             "description", "image", "video_url",
+            "region",
             "deals", "reviews", "articles", "faqs",
             "overview", "learn_more_topics",
         ]

@@ -62,7 +62,9 @@ export default function DestinationPage() {
           <h3>{data.subtitle}</h3>
         </div>
       </div>
-
+<div id="overview">
+        <OverviewSection data={data} />
+      </div>
       {/* Top Tabs */}
       <nav className="top-tabs">
         <ul>
@@ -76,9 +78,7 @@ export default function DestinationPage() {
       </nav>
 
       {/* Sections */}
-      <div id="overview">
-        <OverviewSection data={data} />
-      </div>
+      
 
       <div id="travel-deals">
         <DealsSection data={{ deals: data.deals, title: data.name }} />
