@@ -58,35 +58,39 @@
   position: relative;
 }
 
-/* Mega Menus */
+
+/* === Mega Menu Common === */
 .mega-menu-dest,
 .mega-menu-ways,
 .mega-menu-deals {
   position: absolute;
   top: 110%;
   background: white;
-  padding: 20px;
+  padding: 0;
   border-radius: 20px;
-  box-shadow: var(--shadow-light);
+  box-shadow: black;
   display: flex;
   flex-direction: column;
   animation: fadeIn var(--transition);
   z-index: 1000;
 }
+
 .mega-menu-dest {
   left: -170%;
   height: 500px;
   width: 800px;
 }
+
 .mega-menu-ways {
   left: -170%;
-  height: 400px;
-  width: 700px;
+  height: 500px;
+  width: 800px;
 }
+
 .mega-menu-deals {
   left: -500%;
-  height: 400px;
-  width: 600px;
+  height: 500px;
+  width: 800px;
 }
 
 .mega-columns {
@@ -100,9 +104,10 @@
   overflow: hidden;
 }
 
+/* === Mega Menu Columns === */
 .column {
   flex: 1;
-  padding: 10px 20px;
+  padding: 20px;
   border-left: 1px solid #ddd;
   display: flex;
   flex-direction: column;
@@ -110,14 +115,6 @@
 
 .mega-columns .column:first-child {
   border-left: none;
-}
-
-.column h4 {
-  margin-bottom: 12px;
-  font-size: 15px;
-  color: var(--primary-color);
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 6px;
 }
 
 .column ul {
@@ -129,23 +126,26 @@
 }
 
 .column ul li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   padding-bottom: 6px;
   border-bottom: 1px solid #eee;
   color: var(--text-color);
   cursor: pointer;
   transition: color 0.2s;
   user-select: none;
+  font-size: 14px;
 }
 .column ul li:last-child {
   border-bottom: none;
 }
+
 .column ul li:hover,
 .column ul li.active {
   color: var(--primary-color);
   font-weight: bold;
 }
 
+/* === Mega Menu Image Column === */
 .image-column {
   display: flex;
   flex-direction: column;
@@ -153,11 +153,15 @@
   padding-left: 20px;
   border-left: 1px solid #ddd;
 }
+
 .image-column img {
   width: 100%;
   border-radius: 6px;
   margin-bottom: 10px;
+  object-fit: cover;
+  height: 400px;
 }
+
 .image-description {
   font-size: 13px;
   color: #555;

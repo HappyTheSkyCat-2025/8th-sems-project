@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  ChevronDown, ChevronRight, ChevronLeft,
-  Heart, User, Search, Phone, Globe
+  ChevronDown,
+  ChevronRight,
+  ChevronLeft,
+  Heart,
+  User,
+  Search,
+  Phone,
+  Globe,
 } from "lucide-react";
 import { IoLanguageOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -11,7 +17,7 @@ import logo from "../assets/logo1.png";
 import baliImage from "../assets/bali.jpg";
 import "../styles/Navbar.css";
 
-export default function Navbar() { 
+export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -115,7 +121,11 @@ export default function Navbar() {
         <div className="navbar-container">
           <div className="navbar-logo" onClick={handleLogoClick}>
             <img src={logo} alt="Golden Leaf Travels" />
-            <span>Golden Leaf<br />Travels</span>
+            <span>
+              Golden Leaf
+              <br />
+              Travels
+            </span>
           </div>
 
           <div className="hamburger-wrapper">
@@ -131,33 +141,62 @@ export default function Navbar() {
 
           <nav className="navbar-links">
             {/* Destinations */}
-            <div className="dropdown" onMouseEnter={() => setShowDestinations(true)} onMouseLeave={() => setShowDestinations(false)}>
-              <span className="link-item">Destinations <ChevronDown size={14} /></span>
+            {/* Destinations */}
+            <div
+              className="dropdown"
+              onMouseEnter={() => setShowDestinations(true)}
+              onMouseLeave={() => setShowDestinations(false)}
+            >
+              <span className="link-item">
+                Destinations <ChevronDown size={14} />
+              </span>
               {showDestinations && activeRegion && (
                 <div className="mega-menu-dest">
                   <div className="mega-columns">
+                    {/* Left Column - Regions */}
                     <div className="column">
-                      <h4>Destinations</h4>
                       <ul>
                         {regions.map((r) => (
-                          <li key={r} onClick={() => setActiveRegion(r)} className={activeRegion === r ? "active" : ""}>{r}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="column">
-                      <h4>Popular Destinations</h4>
-                      <ul>
-                        {(countriesByRegion[activeRegion] || []).map((c) => (
-                          <li key={c.slug}>
-                            <Link to={`/destinations/${c.slug}`} className="plain-link">{c.name}</Link>
+                          <li
+                            key={r}
+                            onClick={() => setActiveRegion(r)}
+                            className={activeRegion === r ? "active" : ""}
+                          >
+                            {r}
                           </li>
                         ))}
                       </ul>
                     </div>
+
+                    {/* Middle Column - Countries */}
+                    <div className="column">
+                      <ul>
+                        {(countriesByRegion[activeRegion] || []).map((c) => (
+                          <li key={c.slug}>
+                            <Link
+                              to={`/destinations/${c.slug}`}
+                              className="plain-link"
+                            >
+                              {c.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Right Column - Image and CTA */}
                     <div className="column image-column">
                       <img src={baliImage} alt={activeRegion} />
-                      <p className="image-description">Discover unforgettable journeys in <strong>{activeRegion}</strong>.</p>
-                      <Link to={`/destinations/${activeRegion.toLowerCase()}`} className="read-more-btn">Learn More</Link>
+                      <p className="image-description">
+                        Discover unforgettable journeys in{" "}
+                        <strong>{activeRegion}</strong>.
+                      </p>
+                      <Link
+                        to={`/destinations/${activeRegion.toLowerCase()}`}
+                        className="read-more-btn"
+                      >
+                        Learn More
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -165,26 +204,49 @@ export default function Navbar() {
             </div>
 
             {/* Ways to Travel */}
-            <div className="dropdown" onMouseEnter={() => setShowWaysToTravel(true)} onMouseLeave={() => setShowWaysToTravel(false)}>
-              <span className="link-item">Ways to Travel <ChevronDown size={14} /></span>
-              {showWaysToTravel && (
+            <div
+              className="dropdown"
+              onMouseEnter={() => setShowWaysToTravel(true)}
+              onMouseLeave={() => setShowWaysToTravel(false)}
+            >
+              <span className="link-item">
+                Ways to Travel <ChevronDown size={14} />
+              </span>
+              {showWaysToTravel && activeTravelType && (
                 <div className="mega-menu-ways">
                   <div className="mega-columns">
                     <div className="column">
-                      <h4>Travel Types</h4>
                       <ul>
                         {travelTypes.map((t) => (
-                          <li key={t} onClick={() => setActiveTravelType(t)} className={activeTravelType === t ? "active" : ""}>{t}</li>
+                          <li
+                            key={t}
+                            onClick={() => setActiveTravelType(t)}
+                            className={activeTravelType === t ? "active" : ""}
+                          >
+                            {t}
+                          </li>
                         ))}
                       </ul>
                     </div>
                     <div className="column">
-                      <h4>Top Options</h4>
                       <ul>
                         {(travelOptions[activeTravelType] || []).map((o) => (
                           <li key={o}>{o}</li>
                         ))}
                       </ul>
+                    </div>
+                    <div className="column image-column">
+                      <img src={baliImage} alt={activeTravelType} />
+                      <p className="image-description">
+                        Discover flexible adventures with{" "}
+                        <strong>{activeTravelType}</strong> style.
+                      </p>
+                      <Link
+                        to={`/ways-to-travel/${activeTravelType.toLowerCase()}`}
+                        className="read-more-btn"
+                      >
+                        Explore More
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -192,56 +254,92 @@ export default function Navbar() {
             </div>
 
             {/* Deals */}
-            <div className="dropdown" onMouseEnter={() => setShowDeals(true)} onMouseLeave={() => setShowDeals(false)}>
-              <span className="link-item">Deals <ChevronDown size={14} /></span>
-              {showDeals && (
+            <div
+              className="dropdown"
+              onMouseEnter={() => setShowDeals(true)}
+              onMouseLeave={() => setShowDeals(false)}
+            >
+              <span className="link-item">
+                Deals <ChevronDown size={14} />
+              </span>
+              {showDeals && activeDealCategory && (
                 <div className="mega-menu-deals">
                   <div className="mega-columns">
                     <div className="column">
-                      <h4>Deals</h4>
                       <ul>
                         {dealCategories.map((d) => (
-                          <li key={d} onClick={() => setActiveDealCategory(d)} className={activeDealCategory === d ? "active" : ""}>{d}</li>
+                          <li
+                            key={d}
+                            onClick={() => setActiveDealCategory(d)}
+                            className={activeDealCategory === d ? "active" : ""}
+                          >
+                            {d}
+                          </li>
                         ))}
                       </ul>
                     </div>
                     <div className="column">
-                      <h4>Top Offers</h4>
                       <ul>
                         {(dealItems[activeDealCategory] || []).map((o) => (
                           <li key={o}>{o}</li>
                         ))}
                       </ul>
                     </div>
+                    <div className="column image-column">
+                      <img src={baliImage} alt={activeDealCategory} />
+                      <p className="image-description">
+                        Grab hot deals in <strong>{activeDealCategory}</strong>{" "}
+                        now!
+                      </p>
+                      <Link
+                        to={`/deals/${activeDealCategory.toLowerCase()}`}
+                        className="read-more-btn"
+                      >
+                        View Offers
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            <Link to="/about" className="link-item plain-link">About Us</Link>
+            <Link to="/about" className="link-item plain-link">
+              About Us
+            </Link>
           </nav>
 
           {/* Desktop Icons */}
           <div className="navbar-icons">
             {showSearchIcon && (
-              <button className="search-icon" onClick={() => setShowSearchBar((p) => !p)}>
+              <button
+                className="search-icon"
+                onClick={() => setShowSearchBar((p) => !p)}
+              >
                 <Search size={20} />
               </button>
             )}
             <div className="language-switch">
-  <IoLanguageOutline size={20} />
-</div>
+              <IoLanguageOutline size={20} />
+            </div>
 
             <Heart size={18} />
             <div className="profile-dropdown">
-              <User size={18} style={{ cursor: "pointer" }} onClick={() => {
-                if (isAuthenticated) setShowProfile(!showProfile);
-                else navigate("/login");
-              }} />
+              <User
+                size={18}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  if (isAuthenticated) setShowProfile(!showProfile);
+                  else navigate("/login");
+                }}
+              />
               {isAuthenticated && showProfile && (
                 <div className="profile-menu">
-                  <Link to="/profile" className="profile-item">My Profile</Link>
-                  <span onClick={handleLogout} className="profile-item">Logout</span>
+                  <Link to="/profile" className="profile-item">
+                    My Profile
+                  </Link>
+                  <span onClick={handleLogout} className="profile-item">
+                    Logout
+                  </span>
                 </div>
               )}
             </div>
@@ -252,34 +350,82 @@ export default function Navbar() {
         {/* Search bar */}
         {showSearchBar && (
           <div className="search-bar-wrapper">
-            <input type="text" placeholder="Search destinations, deals..." autoFocus />
-            <button onClick={() => setShowSearchBar(false)} className="search-close-btn">×</button>
+            <input
+              type="text"
+              placeholder="Search destinations, deals..."
+              autoFocus
+            />
+            <button
+              onClick={() => setShowSearchBar(false)}
+              className="search-close-btn"
+            >
+              ×
+            </button>
           </div>
         )}
       </header>
 
       {/* Mobile Drawer */}
-      <div className={`mobile-menu-overlay ${isMobileMenuOpen ? "open" : ""}`} onClick={() => setIsMobileMenuOpen(false)} />
-      <aside className={`mobile-menu-panel ${isMobileMenuOpen ? "open" : ""}`} role="dialog" aria-modal="true">
+      <div
+        className={`mobile-menu-overlay ${isMobileMenuOpen ? "open" : ""}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      <aside
+        className={`mobile-menu-panel ${isMobileMenuOpen ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+      >
         <div className="mobile-menu-header">
           {mobileView !== "main" && (
-            <button className="mobile-back-btn" onClick={mobileBack}><ChevronLeft size={20} /> Back</button>
+            <button className="mobile-back-btn" onClick={mobileBack}>
+              <ChevronLeft size={20} /> Back
+            </button>
           )}
           <span />
-          <button className="mobile-close-btn" onClick={() => setIsMobileMenuOpen(false)}>×</button>
+          <button
+            className="mobile-close-btn"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            ×
+          </button>
         </div>
 
         {/* Mobile view rendering (main, destinations, countries, ways, deals) */}
         {mobileView === "main" && (
           <ul className="mobile-menu-list">
-            <li onClick={() => setMobileView("destinations")}>Destinations <ChevronRight size={18} /></li>
-            <li onClick={() => setMobileView("ways")}>Ways to Travel <ChevronRight size={18} /></li>
-            <li onClick={() => setMobileView("deals")}>Deals <ChevronRight size={18} /></li>
-            <li><Link to="/about" onClick={() => setIsMobileMenuOpen(false)}>About</Link></li>
+            <li onClick={() => setMobileView("destinations")}>
+              Destinations <ChevronRight size={18} />
+            </li>
+            <li onClick={() => setMobileView("ways")}>
+              Ways to Travel <ChevronRight size={18} />
+            </li>
+            <li onClick={() => setMobileView("deals")}>
+              Deals <ChevronRight size={18} />
+            </li>
+            <li>
+              <Link to="/about" onClick={() => setIsMobileMenuOpen(false)}>
+                About
+              </Link>
+            </li>
             <hr className="mobile-divider" />
-            <li><Heart size={18} /> <Link to="/wishlist" className="with-icon">Wishlist</Link></li>
-            <li><User size={18} /> <Link to="/manage-booking" className="with-icon">Manage Booking</Link></li>
-            <li><Phone size={18} /> <Link to="/contact" className="with-icon">Contact Us</Link></li>
+            <li>
+              <Heart size={18} />{" "}
+              <Link to="/wishlist" className="with-icon">
+                Wishlist
+              </Link>
+            </li>
+            <li>
+              <User size={18} />{" "}
+              <Link to="/manage-booking" className="with-icon">
+                Manage Booking
+              </Link>
+            </li>
+            <li>
+              <Phone size={18} />{" "}
+              <Link to="/contact" className="with-icon">
+                Contact Us
+              </Link>
+            </li>
           </ul>
         )}
 
@@ -288,7 +434,13 @@ export default function Navbar() {
             <h2 className="mobile-subtitle">Destinations</h2>
             <ul className="mobile-menu-list sub">
               {regions.map((r) => (
-                <li key={r} onClick={() => { setMobileActiveRegion(r); setMobileView("countries"); }}>
+                <li
+                  key={r}
+                  onClick={() => {
+                    setMobileActiveRegion(r);
+                    setMobileView("countries");
+                  }}
+                >
                   {r} <ChevronRight size={18} />
                 </li>
               ))}
@@ -302,7 +454,12 @@ export default function Navbar() {
             <ul className="mobile-menu-list sub">
               {(countriesByRegion[mobileActiveRegion] || []).map((c) => (
                 <li key={c.slug}>
-                  <Link to={`/destinations/${c.slug}`} onClick={() => setIsMobileMenuOpen(false)}>{c.name}</Link>
+                  <Link
+                    to={`/destinations/${c.slug}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {c.name}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -315,7 +472,12 @@ export default function Navbar() {
             <ul className="mobile-menu-list sub">
               {travelTypes.map((t) => (
                 <li key={t}>
-                  <Link to={`/ways-to-travel/${t.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)}>{t}</Link>
+                  <Link
+                    to={`/ways-to-travel/${t.toLowerCase()}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {t}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -328,7 +490,12 @@ export default function Navbar() {
             <ul className="mobile-menu-list sub">
               {dealCategories.map((d) => (
                 <li key={d}>
-                  <Link to={`/deals/${d.toLowerCase()}`} onClick={() => setIsMobileMenuOpen(false)}>{d}</Link>
+                  <Link
+                    to={`/deals/${d.toLowerCase()}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {d}
+                  </Link>
                 </li>
               ))}
             </ul>

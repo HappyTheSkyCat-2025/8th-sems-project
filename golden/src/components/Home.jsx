@@ -11,7 +11,7 @@ export default function Home() {
     <section className="home-section">
       <video autoPlay muted loop className="home-video">
         <source src={homevid1} type="video/mp4" />
-      </video>
+      </video> 
 
       <div className="overlay">
         <div className="home-content">
