@@ -1,7 +1,6 @@
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAdminUser
-from rest_framework import status
 from rest_framework.response import Response
 
 from .models import (
@@ -36,12 +35,10 @@ class RegionListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = RegionSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-
 class RegionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
     permission_classes = [IsSuperUserOrReadOnly]
-
 
 # ====== Countries ======
 class CountryListCreateAPIView(generics.ListCreateAPIView):
@@ -49,13 +46,11 @@ class CountryListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = CountrySerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-
 class CountryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Country.objects.all()
     serializer_class = CountryDetailSerializer
     permission_classes = [IsSuperUserOrReadOnly]
     lookup_field = 'slug'
-
 
 # ====== Travel Deals ======
 class TravelDealListCreateAPIView(generics.ListCreateAPIView):
@@ -66,7 +61,6 @@ class TravelDealListCreateAPIView(generics.ListCreateAPIView):
         country_slug = self.kwargs.get('slug')
         return TravelDeal.objects.filter(country__slug=country_slug)
 
-
 class TravelDealRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TravelDealSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -76,19 +70,26 @@ class TravelDealRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
         country_slug = self.kwargs.get('country_slug')
         return TravelDeal.objects.filter(country__slug=country_slug)
 
-
 # ====== Reviews ======
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
+    def get_queryset(self):
+        country_slug = self.kwargs.get('slug') or self.kwargs.get('country_slug')
+        if country_slug:
+            return Review.objects.filter(country__slug=country_slug)
+        return Review.objects.all()
 
 class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
+    def get_queryset(self):
+        country_slug = self.kwargs.get('country_slug')
+        if country_slug:
+            return Review.objects.filter(country__slug=country_slug)
+        return Review.objects.all()
 
 # ====== Articles ======
 class ArticleListCreateAPIView(generics.ListCreateAPIView):
@@ -96,25 +97,31 @@ class ArticleListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ArticleSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-
 class ArticleRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-
 # ====== FAQs ======
 class FAQListCreateAPIView(generics.ListCreateAPIView):
-    queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
+    def get_queryset(self):
+        country_slug = self.kwargs.get('slug') or self.kwargs.get('country_slug')
+        if country_slug:
+            return FAQ.objects.filter(country__slug=country_slug)
+        return FAQ.objects.all()
 
 class FAQRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
+    def get_queryset(self):
+        country_slug = self.kwargs.get('country_slug')
+        if country_slug:
+            return FAQ.objects.filter(country__slug=country_slug)
+        return FAQ.objects.all()
 
 # ====== Public Read-only Destinations API ======
 class DestinationsAPIView(APIView):
@@ -131,7 +138,6 @@ class DestinationsAPIView(APIView):
             })
         return Response(data)
 
-
 # ====== Travel Types ======
 class TravelTypeListCreateAPIView(generics.ListCreateAPIView):
     queryset = TravelType.objects.prefetch_related('options').all()
@@ -145,12 +151,10 @@ class TravelTypeListCreateAPIView(generics.ListCreateAPIView):
         options = {t['name']: [opt['name'] for opt in t['options']] for t in serializer.data}
         return Response({"types": types, "options": options})
 
-
 class TravelTypeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = TravelType.objects.prefetch_related('options').all()
     serializer_class = TravelTypeSerializer
     permission_classes = [IsSuperUserOrReadOnly]
-
 
 # ====== Deal Categories (Deals) ======
 class DealCategoryListCreateAPIView(generics.ListCreateAPIView):
@@ -165,30 +169,49 @@ class DealCategoryListCreateAPIView(generics.ListCreateAPIView):
         offers = {c['name']: [offer['name'] for offer in c['offers']] for c in serializer.data}
         return Response({"categories": categories, "offers": offers})
 
-
 class DealCategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = DealCategory.objects.prefetch_related('offers').all()
     serializer_class = DealCategorySerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-
-
+# ====== CountryOverview ======
 class CountryOverviewListCreateAPIView(generics.ListCreateAPIView):
-    queryset = CountryOverview.objects.all()
     serializer_class = CountryOverviewSerializer
     permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        country_slug = self.kwargs.get('slug') or self.kwargs.get('country_slug')
+        if country_slug:
+            return CountryOverview.objects.filter(country__slug=country_slug)
+        return CountryOverview.objects.all()
 
 class CountryOverviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = CountryOverview.objects.all()
     serializer_class = CountryOverviewSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
+    def get_queryset(self):
+        country_slug = self.kwargs.get('country_slug')
+        if country_slug:
+            return CountryOverview.objects.filter(country__slug=country_slug)
+        return CountryOverview.objects.all()
+
+# ====== CountryLearnMoreTopic ======
 class CountryLearnMoreTopicListCreateAPIView(generics.ListCreateAPIView):
-    queryset = CountryLearnMoreTopic.objects.all()
     serializer_class = CountryLearnMoreTopicSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
+    def get_queryset(self):
+        country_slug = self.kwargs.get('slug') or self.kwargs.get('country_slug')
+        if country_slug:
+            return CountryLearnMoreTopic.objects.filter(country__slug=country_slug)
+        return CountryLearnMoreTopic.objects.all()
+
 class CountryLearnMoreTopicRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = CountryLearnMoreTopic.objects.all()
     serializer_class = CountryLearnMoreTopicSerializer
     permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        country_slug = self.kwargs.get('country_slug')
+        if country_slug:
+            return CountryLearnMoreTopic.objects.filter(country__slug=country_slug)
+        return CountryLearnMoreTopic.objects.all()

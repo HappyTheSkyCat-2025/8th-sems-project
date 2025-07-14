@@ -171,7 +171,8 @@ function Layout() {
           <Route path="countries/:country_slug/faqs/:id/edit" element={<FAQForm />} />
 
           <Route path="countries/:country_slug/overview" element={<CountryOverviewList />} />
-          <Route path="countries/:country_slug/overview" element={<CountryOverviewForm />} />
+          <Route path="countries/:country_slug/overview/create" element={<CountryOverviewForm />} />
+          <Route path="countries/:country_slug/overview/:id/edit" element={<CountryOverviewForm />} />
 
           <Route path="countries/:country_slug/learn-more-topics" element={<LearnMoreTopicList />} />
           <Route path="countries/:country_slug/learn-more-topics/create" element={<LearnMoreTopicForm />} />

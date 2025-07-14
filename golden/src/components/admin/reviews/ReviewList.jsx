@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 export default function ReviewList() {
+  const { country_slug } = useParams();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -10,25 +11,26 @@ export default function ReviewList() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     axios
-      .get("/api/destinations/reviews/", {
+      .get(`/api/destinations/countries/${country_slug}/reviews/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setReviews(res.data.results || res.data);
+        const data = res.data.results || res.data;
+        setReviews(data);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to load reviews:", err);
         setLoading(false);
       });
-  }, []);
+  }, [country_slug]);
 
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this review?")) return;
 
     const token = localStorage.getItem("access_token");
     axios
-      .delete(`/api/destinations/reviews/${id}/`, {
+      .delete(`/api/destinations/countries/${country_slug}/reviews/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => setReviews((prev) => prev.filter((r) => r.id !== id)))
@@ -40,13 +42,22 @@ export default function ReviewList() {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-        <h2 style={{ fontWeight: 600 }}>🌍 Reviews</h2>
+        <h2 style={{ fontWeight: 600 }}>🌍 Reviews for "{country_slug}"</h2>
         <Link to="create" style={btnCreate}>
           + New Review
         </Link>
       </div>
 
-      <table style={tableStyle}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          background: "#fff",
+          borderRadius: 10,
+          overflow: "hidden",
+          boxShadow: "0 0 10px rgba(0,0,0,0.05)",
+        }}
+      >
         <thead style={{ background: "#f7f7f7" }}>
           <tr>
             <th style={thStyle}>Name</th>
@@ -57,14 +68,18 @@ export default function ReviewList() {
         </thead>
         <tbody>
           {reviews.length > 0 ? (
-            reviews.map((r) => (
-              <tr key={r.id} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={tdStyle}>{r.name}</td>
-                <td style={tdStyle}>{r.country}</td>
-                <td style={tdStyle}>{r.rating} / 5</td>
+            reviews.map((review) => (
+              <tr key={review.id} style={{ borderBottom: "1px solid #eee" }}>
+                <td style={tdStyle}>{review.name}</td>
+                <td style={tdStyle}>{review.country}</td>
+                <td style={tdStyle}>{review.rating} / 5</td>
                 <td style={{ ...tdStyle, textAlign: "right" }}>
-                  <button onClick={() => navigate(`${r.id}/edit`)} style={btnEdit}>Edit</button>
-                  <button onClick={() => handleDelete(r.id)} style={btnDelete}>Delete</button>
+                  <button onClick={() => navigate(`${review.id}/edit`)} style={btnEdit}>
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(review.id)} style={btnDelete}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))
@@ -80,15 +95,6 @@ export default function ReviewList() {
     </div>
   );
 }
-
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  background: "#fff",
-  borderRadius: 10,
-  overflow: "hidden",
-  boxShadow: "0 0 10px rgba(0,0,0,0.05)",
-};
 
 const thStyle = {
   textAlign: "left",

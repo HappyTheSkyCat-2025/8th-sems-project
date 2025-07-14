@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 export default function FAQList() {
+  const { country_slug } = useParams();
   const [faqs, setFaqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -10,28 +11,29 @@ export default function FAQList() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     axios
-      .get("/api/destinations/faqs/", {
+      .get(`/api/destinations/countries/${country_slug}/faqs/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setFaqs(res.data.results || res.data);
+        const data = res.data.results || res.data;
+        setFaqs(data);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to load FAQs:", err);
         setLoading(false);
       });
-  }, []);
+  }, [country_slug]);
 
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this FAQ?")) return;
 
     const token = localStorage.getItem("access_token");
     axios
-      .delete(`/api/destinations/faqs/${id}/`, {
+      .delete(`/api/destinations/countries/${country_slug}/faqs/${id}/`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(() => setFaqs((prev) => prev.filter((faq) => faq.id !== id)))
+      .then(() => setFaqs((prev) => prev.filter((f) => f.id !== id)))
       .catch((err) => alert("Failed to delete: " + err.message));
   };
 
@@ -40,17 +42,26 @@ export default function FAQList() {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-        <h2 style={{ fontWeight: 600 }}>📌 FAQs</h2>
+        <h2 style={{ fontWeight: 600 }}>📌 FAQs for "{country_slug}"</h2>
         <Link to="create" style={btnCreate}>
           + New FAQ
         </Link>
       </div>
 
-      <table style={tableStyle}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          background: "#fff",
+          borderRadius: 10,
+          overflow: "hidden",
+          boxShadow: "0 0 10px rgba(0,0,0,0.05)",
+        }}
+      >
         <thead style={{ background: "#f7f7f7" }}>
           <tr>
-            <th style={thStyle}>Country</th>
             <th style={thStyle}>Question</th>
+            <th style={thStyle}>Country</th>
             <th style={thStyle}>Actions</th>
           </tr>
         </thead>
@@ -58,11 +69,15 @@ export default function FAQList() {
           {faqs.length > 0 ? (
             faqs.map((faq) => (
               <tr key={faq.id} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={tdStyle}>{faq.country}</td>
                 <td style={tdStyle}>{faq.question.slice(0, 80)}...</td>
+                <td style={tdStyle}>{faq.country}</td>
                 <td style={{ ...tdStyle, textAlign: "right" }}>
-                  <button onClick={() => navigate(`${faq.id}/edit`)} style={btnEdit}>Edit</button>
-                  <button onClick={() => handleDelete(faq.id)} style={btnDelete}>Delete</button>
+                  <button onClick={() => navigate(`${faq.id}/edit`)} style={btnEdit}>
+                    Edit
+                  </button>
+                  <button onClick={() => handleDelete(faq.id)} style={btnDelete}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))
@@ -78,15 +93,6 @@ export default function FAQList() {
     </div>
   );
 }
-
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  background: "#fff",
-  borderRadius: 10,
-  overflow: "hidden",
-  boxShadow: "0 0 10px rgba(0,0,0,0.05)",
-};
 
 const thStyle = {
   textAlign: "left",

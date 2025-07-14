@@ -4,7 +4,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 
 export default function CountryOverviewList() {
   const { country_slug } = useParams();
-  const [overviews, setOverviews] = useState([]);
+  const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -15,7 +15,12 @@ export default function CountryOverviewList() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setOverviews(res.data.results || res.data);
+        const results = res.data.results;
+        if (results.length > 0) {
+          setOverview(results[0]);
+        } else {
+          setOverview(null);
+        }
         setLoading(false);
       })
       .catch((err) => {
@@ -24,67 +29,52 @@ export default function CountryOverviewList() {
       });
   }, [country_slug]);
 
-  const handleDelete = (id) => {
-    if (!window.confirm("Are you sure you want to delete this overview?")) return;
-
-    const token = localStorage.getItem("access_token");
-    axios
-      .delete(`/api/destinations/countries/${country_slug}/overview/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => setOverviews((prev) => prev.filter((o) => o.id !== id)))
-      .catch((err) => alert("Failed to delete: " + err.message));
-  };
-
   if (loading) return <p>Loading...</p>;
 
   return (
     <div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-        <h2 style={{ fontWeight: 600 }}>🌍 Country Overview for "{country_slug}"</h2>
-        <Link to="create" style={btnCreate}>
-          + New Overview
-        </Link>
-      </div>
+      <h2 style={{ fontWeight: 600 }}>
+        🌍 Country Overview for "{country_slug}"
+      </h2>
 
-      {overviews.length === 0 ? (
-        <p style={{ color: "#777" }}>No country overview found.</p>
+      {!overview ? (
+        <Link to="create" style={btnCreate}>
+          + Add Overview
+        </Link>
       ) : (
-        <table style={tableStyle}>
-          <thead style={theadStyle}>
-            <tr>
-              <th style={thStyle}>Capital</th>
-              <th style={thStyle}>Population</th>
-              <th style={thStyle}>Currency</th>
-              <th style={thStyle}>Language</th>
-              <th style={thStyle}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {overviews.map((overview) => (
-              <tr key={overview.id} style={trStyle}>
+        <>
+          <table style={tableStyle}>
+            <thead style={theadStyle}>
+              <tr>
+                <th style={thStyle}>Capital</th>
+                <th style={thStyle}>Population</th>
+                <th style={thStyle}>Currency</th>
+                <th style={thStyle}>Language</th>
+                <th style={thStyle}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={trStyle}>
                 <td style={tdStyle}>{overview.capital}</td>
                 <td style={tdStyle}>{overview.population}</td>
                 <td style={tdStyle}>{overview.currency}</td>
                 <td style={tdStyle}>{overview.language}</td>
                 <td style={{ ...tdStyle, textAlign: "right" }}>
                   <button
-                    onClick={() => navigate(`${overview.id}/edit`)}
+                    onClick={() =>
+                      navigate(
+                        `/admin/countries/${country_slug}/overview/${overview.id}/edit`
+                      )
+                    }
                     style={btnEdit}
                   >
                     Edit
                   </button>
-                  <button
-                    onClick={() => handleDelete(overview.id)}
-                    style={btnDelete}
-                  >
-                    Delete
-                  </button>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   );
@@ -100,6 +90,7 @@ const tableStyle = {
 };
 
 const theadStyle = { background: "#f7f7f7" };
+
 const thStyle = {
   textAlign: "left",
   padding: "12px 16px",
@@ -126,19 +117,8 @@ const btnCreate = {
 };
 
 const btnEdit = {
-  marginRight: "10px",
   background: "#ffc107",
   color: "#000",
-  border: "none",
-  padding: "6px 12px",
-  borderRadius: "4px",
-  fontSize: "13px",
-  cursor: "pointer",
-};
-
-const btnDelete = {
-  background: "#e53935",
-  color: "#fff",
   border: "none",
   padding: "6px 12px",
   borderRadius: "4px",

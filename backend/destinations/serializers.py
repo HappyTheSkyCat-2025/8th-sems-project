@@ -65,8 +65,8 @@ class CountryOverviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CountryOverview
         fields = [
-            'capital', 'population', 'currency', 'language',
-            'timezone', 'calling_code', 'electricity'
+            'id', 'capital', 'population', 'currency',
+            'language', 'timezone', 'calling_code', 'electricity'
         ]
 
 
