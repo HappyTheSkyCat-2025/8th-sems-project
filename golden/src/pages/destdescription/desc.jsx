@@ -1,3 +1,4 @@
+// src/pages/destdescription/desc.jsx
 import React from "react";
 import {
   FaStar,
@@ -30,7 +31,6 @@ export default function Desc({ data, onViewDatesClick }) {
     );
   };
 
-  // Scroll to review section
   const scrollToReviewSection = () => {
     const reviewSection = document.getElementById("review-section");
     if (reviewSection) {
@@ -45,7 +45,7 @@ export default function Desc({ data, onViewDatesClick }) {
         <p>
           <strong>{data.days} days</strong> · {renderStars(rating)}{" "}
           <span className="review-count">
-            {rating} ({data.review_count || 0} reviews)
+            {rating.toFixed(1)} ({data.review_count || 0} reviews)
           </span>{" "}
           · {data.country?.name || "Unknown"}
           <button className="leave-review-btn" onClick={scrollToReviewSection}>
@@ -58,13 +58,14 @@ export default function Desc({ data, onViewDatesClick }) {
         {/* Gallery */}
         <div className="trip-gallery">
           <div className="top-gallery">
-            <img src={data.image || "/fallback.jpg"} alt={data.title} />
-            <img src={data.image || "/fallback.jpg"} alt={data.title} />
+            {data.gallery?.slice(0, 2).map((img, i) => (
+              <img key={i} src={img.image} alt={`${data.title} ${i + 1}`} />
+            ))}
           </div>
-
           <div className="bottom-imgs">
-            <img src={data.image || "/fallback.jpg"} alt={data.title} />
-            <img src={data.image || "/fallback.jpg"} alt={data.title} />
+            {data.gallery?.slice(2, 5).map((img, i) => (
+              <img key={i} src={img.image} alt={`${data.title} ${i + 3}`} />
+            ))}
             <div className="testimonial">
               <p>
                 “The guide was exceptional, and the trip was well organized.”

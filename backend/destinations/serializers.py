@@ -2,9 +2,9 @@ from rest_framework import serializers
 import json
 from django.db.models import Avg
 from .models import (
-    Region, Country, TravelDeal, Review, Article, FAQ,
+    Region, Country, TravelDeal, TravelImage, Review, Article, FAQ,
     TravelOption, TravelType, DealCategory, DealOffer,
-    CountryOverview, CountryLearnMoreTopic
+    CountryOverview, CountryLearnMoreTopic, TravelDealDate
 )
 
 
@@ -36,10 +36,17 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'region', 'image']
 
 
+class TravelImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelImage
+        fields = ['id', 'image']
+
+
 class TravelDealSerializer(serializers.ModelSerializer):
     themes = JSONListField()
     country = CountrySerializer(read_only=True)
     country_id = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), write_only=True, source='country')
+    gallery = TravelImageSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
 
     class Meta:
@@ -213,3 +220,27 @@ class DealCategorySerializer(serializers.ModelSerializer):
                 DealOffer.objects.create(category=instance, **offer_data)
 
         return instance
+
+class TravelDealDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TravelDealDate
+        fields = '__all__'
+
+    def validate(self, data):
+        original = data.get("original_price")
+        discounted = data.get("discounted_price")
+
+        if original and discounted:
+            try:
+                original_float = float(str(original).replace(",", "").replace("€", "").strip())
+                discounted_float = float(str(discounted).replace(",", "").replace("€", "").strip())
+                if original_float > 0 and discounted_float < original_float:
+                    data["discount_percent"] = f"{round((original_float - discounted_float) / original_float * 100)}%"
+                else:
+                    data["discount_percent"] = None
+            except ValueError:
+                raise serializers.ValidationError("Prices must be numeric.")
+        else:
+            data["discount_percent"] = None
+
+        return data

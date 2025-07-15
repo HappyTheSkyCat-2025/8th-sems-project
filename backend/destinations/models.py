@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -60,7 +61,7 @@ class TravelDeal(models.Model):
     slug = models.SlugField(unique=True, blank=True, null=True)
     days = models.PositiveIntegerField()
     price = models.CharField(max_length=20)
-    image = models.ImageField(upload_to='deals/', blank=True, null=True)
+    image = models.ImageField(upload_to="deals/cover/", null=True, blank=True)
     themes = models.JSONField(default=list, blank=True)
     tag = models.CharField(max_length=50, blank=True)
     style = models.CharField(max_length=50, blank=True)
@@ -75,6 +76,14 @@ class TravelDeal(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.country.name}"
+
+
+class TravelImage(models.Model):
+    deal = models.ForeignKey(TravelDeal, related_name="gallery", on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="deals/gallery/")
+
+    def __str__(self):
+        return f"Image for {self.deal.title}"
 
 class Review(models.Model):
     travel_deal = models.ForeignKey("TravelDeal", related_name="reviews", on_delete=models.CASCADE)
@@ -131,3 +140,35 @@ class CountryLearnMoreTopic(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.country.name}"
+    
+
+class TravelDealDate(models.Model):
+    travel_deal = models.ForeignKey(TravelDeal, related_name="dates", on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    language = models.CharField(max_length=100)
+    guaranteed = models.BooleanField(default=False)
+    rooms = models.CharField(max_length=100)
+    original_price = models.CharField(max_length=50, blank=True, null=True)  # in €
+    discounted_price = models.CharField(max_length=50)  # in €
+    discount_percent = models.CharField(max_length=10, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.original_price and self.discounted_price:
+            try:
+                original = float(self.original_price.replace(",", "").replace("€", "").strip())
+                discounted = float(self.discounted_price.replace(",", "").replace("€", "").strip())
+                if original > 0 and discounted < original:
+                    percent = round((original - discounted) / original * 100)
+                    self.discount_percent = f"{percent}%"
+                else:
+                    self.discount_percent = None
+            except ValueError:
+                raise ValidationError("Prices must be numeric.")
+        else:
+            self.discount_percent = None
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.travel_deal.title} ({self.start_date} → {self.end_date})"

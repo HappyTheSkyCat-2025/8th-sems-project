@@ -46,4 +46,16 @@ urlpatterns = [
 
     path('countries/<slug:country_slug>/learn-more-topics/', views.CountryLearnMoreTopicListCreateAPIView.as_view(), name='learnmoretopic-listcreate'),
     path('countries/<slug:country_slug>/learn-more-topics/<int:pk>/', views.CountryLearnMoreTopicRetrieveUpdateDestroyAPIView.as_view(), name='learnmoretopic-detail'),
-]
+
+    
+    # CRUD for TravelDealDate
+    path(
+        'countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/',
+        views.TravelDealDateListCreateAPIView.as_view(),
+        name='travel-deal-date-list-create'
+    ),
+    path(
+        'countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/<int:pk>/',
+        views.TravelDealDateRetrieveUpdateDestroyAPIView.as_view(),
+        name='travel-deal-date-detail'
+    ),]

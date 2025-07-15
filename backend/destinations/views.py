@@ -6,13 +6,14 @@ from rest_framework.response import Response
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,
     TravelType, DealCategory, DealOffer,
-    CountryOverview, CountryLearnMoreTopic
+    CountryOverview, CountryLearnMoreTopic, TravelDealDate
 )
 from .serializers import (
     RegionSerializer, CountrySerializer, CountryDetailSerializer,
     TravelDealSerializer, ReviewSerializer, ArticleSerializer,
     FAQSerializer, TravelTypeSerializer, DealCategorySerializer,
-    CountryOverviewSerializer, CountryLearnMoreTopicSerializer
+    CountryOverviewSerializer, CountryLearnMoreTopicSerializer,
+    TravelDealDateSerializer
 )
 from .permissions import IsSuperUserOrReadOnly
 
@@ -218,3 +219,38 @@ class CountryLearnMoreTopicRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateD
         if country_slug:
             return CountryLearnMoreTopic.objects.filter(country__slug=country_slug)
         return CountryLearnMoreTopic.objects.all()
+
+class TravelDealDateListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = TravelDealDateSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        country_slug = self.kwargs['country_slug']
+        deal_slug = self.kwargs['deal_slug']
+        return TravelDealDate.objects.filter(
+            travel_deal__slug=deal_slug,
+            travel_deal__country__slug=country_slug
+        )
+
+    def perform_create(self, serializer):
+        country_slug = self.kwargs['country_slug']
+        deal_slug = self.kwargs['deal_slug']
+        try:
+            deal = TravelDeal.objects.get(slug=deal_slug, country__slug=country_slug)
+        except TravelDeal.DoesNotExist:
+            raise NotFound("Travel deal not found.")
+        serializer.save(travel_deal=deal)
+
+
+class TravelDealDateRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TravelDealDateSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        country_slug = self.kwargs['country_slug']
+        deal_slug = self.kwargs['deal_slug']
+        return TravelDealDate.objects.filter(
+            travel_deal__slug=deal_slug,
+            travel_deal__country__slug=country_slug
+        )
