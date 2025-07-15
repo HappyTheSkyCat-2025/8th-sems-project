@@ -9,7 +9,7 @@
 /* Breadcrumb */
 .breadcrumb {
   font-size: 0.9rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
   color: #555;
 }
 
@@ -21,7 +21,7 @@
 .breadcrumb a:hover {
   text-decoration: underline;
 }
-
+ 
 /* Title */
 .page-title {
   text-align: center;

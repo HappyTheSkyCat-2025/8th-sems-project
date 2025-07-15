@@ -11,6 +11,9 @@
   --radius: 8px;
   --spacing: 12px;
   --transition: 0.3s ease-in-out;
+    --text-color: #333;
+  --underline-height: 2.5px;
+  --underline-width-percent: 60%;
 }
 
 * { 

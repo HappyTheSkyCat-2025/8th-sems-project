@@ -79,7 +79,7 @@ export default function DestinationPage() {
 
       {/* Sections */}
       
-
+ 
       <div id="travel-deals">
         <DealsSection data={{ deals: data.deals, title: data.name }} />
       </div>

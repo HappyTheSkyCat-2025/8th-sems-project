@@ -1,70 +1,134 @@
 .about-container {
-  max-width: 1200px;
   margin: auto;
-  padding: 2rem;
-  font-family: 'Segoe UI', sans-serif;
-  color: #333;
-  background-color: #fff;
+  font-family: "Segoe UI", sans-serif;
+  color: var(--text-color);
+  background: #fff;
 }
 
-.about-container h1,
-.about-container h2 {
-  text-align: center;
-  color: #2a2a2a;
-  margin-bottom: 1rem;
-}
-
-.about-container p {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  text-align: center;
-  margin-bottom: 2rem;
-  padding: 0 1rem;
-}
-
-.about-main-img {
+/* ─── breadcrumb ───────────────────── */
+.breadcrumb {
   width: 100%;
-  height: auto;
-  border-radius: 12px;
-  margin: 2rem 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 12px 30px;
+  font-size: 0.95rem;
+  color: #777;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #e2e2e2;
 }
 
-.img-grid {
+.breadcrumb a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.breadcrumb .arrow {
+  color: #999;
+}
+
+/* ─── hero ─────────────────────────── */
+.about-hero {
+  height: 65vh;
+  background-size: cover;
+  background-position: center;
+  position: relative;
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
+  align-items: center;
+  text-align: center;
+  color: white;
+  box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.3);
 }
 
-.img-grid img {
-  width: 45%;
-  border-radius: 12px;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
-}
-
-.wide-img {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  margin: 2rem 0;
-  box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
-}
-
-.why-us {
-  background-color: #f7f7f7;
-  padding: 2rem;
-  border-radius: 12px;
-  margin-top: 2rem;
-}
-
-.why-us ul {
-  list-style: none;
-  padding: 0;
+.hero-text {
   text-align: center;
 }
 
-.why-us li {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
+.hero-heading {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  color: #eee;
+  margin-top: 0.5rem;
+}
+
+/* ─── top-tabs ───────────────────── */
+.top-tabs {
+  background: #f5f5f5;
+  padding: 1.25rem 0 0.5rem;
+  border-top: 1px solid #ddd;
+  border-bottom: none;
+}
+
+.top-tabs ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.tab-button {
+  all: unset;
+  font-size: 1rem;
+  color: var(--text-color);
+  cursor: pointer;
+  position: relative;
+  padding: 0.5rem 1rem;
+  text-align: center;
+}
+
+/* Remove underline on all states */
+.tab-button::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--highlight-color);
+  transition: width 0.3s ease;
+}
+
+/* Only show underline on hover */
+.tab-button:hover::after {
+  width: 60%;
+}
+
+/* ─── description ───────────────────── */
+.tabs-description {
+  background: #fff;
+  text-align: center;
+  max-width: 800px;
+  margin: 2rem auto 3rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+/* ─── responsive ───────────────────── */
+@media (max-width: 768px) {
+  .hero-heading {
+    font-size: 1.8rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .top-tabs ul {
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-button {
+    font-size: 0.95rem;
+  }
 }
