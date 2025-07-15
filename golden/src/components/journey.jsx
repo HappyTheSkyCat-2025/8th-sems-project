@@ -1,11 +1,22 @@
 import React, { useState } from "react";
 import "../styles/journey.css";
 import tripsData from "../data/journey";
+import { CiHeart } from "react-icons/ci";
+import { FaHeart } from "react-icons/fa"; // filled heart
 
 export default function ExclusiveTrips() {
   const tabs = Object.keys(tripsData);
   const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [favorites, setFavorites] = useState([]);
   const [signatureRemoved, setSignatureRemoved] = useState(false);
+
+  const toggleFavorite = (tripId) => {
+    setFavorites((prev) =>
+      prev.includes(tripId)
+        ? prev.filter((id) => id !== tripId)
+        : [...prev, tripId]
+    );
+  };
 
   return (
     <section className="exclusive-section">
@@ -43,7 +54,17 @@ export default function ExclusiveTrips() {
                   <div className="exclusive-badge">Signature Trip</div>
                 </div>
               )}
-              <div className="exclusive-heart">♡</div>
+
+              <div
+                className="exclusive-heart"
+                onClick={() => toggleFavorite(trip.id)}
+              >
+                {favorites.includes(trip.id) ? (
+                  <FaHeart className="heart-icon filled" size={18} />
+                ) : (
+                  <CiHeart className="heart-icon outline" size={20} />
+                )}
+              </div>
             </div>
 
             <div className="exclusive-content">
@@ -64,3 +85,4 @@ export default function ExclusiveTrips() {
     </section>
   );
 }
+ 
