@@ -41,23 +41,31 @@ import DestDescription from "./pages/destdescription";
 import Payment1 from "./payment/payment1";
 import Payment2 from "./payment/payment2";
 import Payment3 from "./payment/payment3";
+import ThankYou from "./payment/ThankYou";
 
 // Admin Pages and utilities
 import RequireAdmin from "./utils/RequireAdmin";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
+
 import RegionList from "./components/admin/regions/RegionList";
 import RegionForm from "./components/admin/regions/RegionForm";
+
 import CountryList from "./components/admin/countries/CountryList";
 import CountryForm from "./components/admin/countries/CountryForm";
+
 import TravelDealList from "./components/admin/travel-deals/TravelDealList";
 import TravelDealForm from "./components/admin/travel-deals/TravelDealForm";
+
 import FAQList from "./components/admin/faqs/FAQList";
 import FAQForm from "./components/admin/faqs/FAQForm";
+
 import ReviewList from "./components/admin/reviews/ReviewList";
 import ReviewForm from "./components/admin/reviews/ReviewForm";
+
 import CountryOverviewList from "./components/admin/country-overview/CountryOverviewList";
 import CountryOverviewForm from "./components/admin/country-overview/CountryOverviewForm";
+
 import LearnMoreTopicList from "./components/admin/learn-more-topics/LearnMoreTopicList";
 import LearnMoreTopicForm from "./components/admin/learn-more-topics/LearnMoreTopicForm";
 
@@ -68,30 +76,38 @@ import { ToastContainer } from 'react-toastify';
 function Layout() {
   const location = useLocation();
 
+  // Routes where navbar/footer are hidden
   const noLayoutRoutes = [
     "/login",
     "/register",
     "/verify-otp",
     "/forgot-password",
     "/reset-password",
-    "/payment",
+    "/payment/payment1",
     "/payment/payment2",
     "/payment/payment3",
+    "/thank-you",
   ];
 
+  // Admin routes handled inside <Route path="/admin" /> block separately
   const adminRoutes = [
     "/admin",
     "/admin/regions",
     "/admin/regions/create",
     "/admin/regions/:id/edit",
+    "/admin/countries",
+    "/admin/countries/create",
+    "/admin/countries/:slug/edit",
+    // Add all your admin routes here similarly if needed
   ];
 
+  // Check if current path matches any no-layout or admin routes
   const hideLayout =
     noLayoutRoutes.some((path) =>
-      matchPath({ path, end: true }, location.pathname)
+      matchPath({ path, end: false }, location.pathname)
     ) ||
     adminRoutes.some((path) =>
-      location.pathname.startsWith(path.replace(":id", ""))
+      location.pathname.startsWith(path.replace(":id", "").replace(":slug", ""))
     );
 
   return (
@@ -133,9 +149,10 @@ function Layout() {
         <Route path="/profile" element={<Profile />} />
 
         {/* === Payment Routes === */}
-        <Route path="/payment" element={<Payment1 />} />
-        <Route path="/payment/payment2" element={<Payment2 />} />
-        <Route path="/payment/payment3" element={<Payment3 />} />
+        <Route path="/payment/payment1" element={<Payment1 />} />
+        <Route path="/payment/payment2/:id" element={<Payment2 />} />
+        <Route path="/payment/payment3/:id" element={<Payment3 />} />
+        <Route path="/thank-you" element={<ThankYou />} />
 
         {/* === Admin Routes === */}
         <Route

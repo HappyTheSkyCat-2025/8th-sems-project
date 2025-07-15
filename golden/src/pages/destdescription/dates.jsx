@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../../pagescss/dates.css";
 import { FaCheckCircle, FaGlobe, FaBed } from "react-icons/fa";
 
 export default function Dates({ data }) {
-  const initialVisibleCount = 3; // change this to how many to show initially
+  const { country: countrySlug, dealId: dealSlug } = useParams();
+  const initialVisibleCount = 3;
   const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
   const [filterMonth, setFilterMonth] = useState("All Months");
   const [sortBy, setSortBy] = useState("Start date (earliest)");
@@ -49,22 +50,14 @@ export default function Dates({ data }) {
       <h2 className="dates-title">Dates and Availability</h2>
 
       <div className="dates-filters">
-        <select
-          className="filter-dropdown"
-          value={filterMonth}
-          onChange={(e) => setFilterMonth(e.target.value)}
-        >
+        <select className="filter-dropdown" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)}>
           <option>All Months</option>
           {monthNames.map((month) => (
             <option key={month}>{month}</option>
           ))}
         </select>
 
-        <select
-          className="sort-dropdown"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
+        <select className="sort-dropdown" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
           <option>Start date (earliest)</option>
           <option>Start date (latest)</option>
           <option>Price (lowest)</option>
@@ -114,14 +107,18 @@ export default function Dates({ data }) {
               <option>Full Payment</option>
             </select>
 
-            <button className="confirm-btn" onClick={() => navigate("/payment")}>
+            <button
+              className="confirm-btn"
+              onClick={() =>
+                navigate(`/payment/payment1?country=${countrySlug}&deal=${dealSlug}&date=${item.id}`)
+              }
+            >
               Confirm Dates
             </button>
           </div>
         </div>
       ))}
 
-      {/* Show button only if more dates than initial visible count */}
       {sortedDates.length > initialVisibleCount && (
         <div className="view-more-wrapper">
           <button className="view-more-btn" onClick={handleToggle}>

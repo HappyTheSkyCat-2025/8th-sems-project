@@ -85,7 +85,8 @@ export default function DestDescription() {
       <Feat data={dealData} />
       <Included data={dealData} />
       <div ref={datesRef}>
-        <Dates data={dates} />
+        {/* Pass dealData.id to Dates */}
+        <Dates data={dates} dealId={dealData.id} />
       </div>
       <Reviewplaces data={dealData} reviews={reviews} setReviews={setReviews} />
       <Foot />

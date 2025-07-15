@@ -37,9 +37,7 @@ INSTALLED_APPS = [
     'accounts',       # Custom user, KYC, authentication
     'destinations',   # Region, Country, TravelDeal, Article, FAQ, Review
     'contacts',       # Contact forms, messages, emergency contacts
-    'trips',          # Trip model
     'blogs',          # Blog + Comment
-    'tours',          # Tours, Booking, TourRating
     'payments',       # Stripe / PayPal integration
     'utils',          # Any shared logic
 ]

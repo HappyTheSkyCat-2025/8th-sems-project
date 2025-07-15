@@ -1,24 +1,121 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import StepIndicator from "../components/StepIndicator";
-import "./payment2.css";
+import "../payment/payment2.css";
 
 export default function Payment2() {
   const navigate = useNavigate();
+  const { id } = useParams(); // booking ID from URL
+
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Extras state (camelCase for frontend)
+  const [roomOption, setRoomOption] = useState("");
+  const [addTransfer, setAddTransfer] = useState(false);
+  const [addNights, setAddNights] = useState(false);
+  const [flightHelp, setFlightHelp] = useState(false);
+  const [donation, setDonation] = useState(false);
+
+  // Modal states
   const [showLateModal, setShowLateModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
+
+  useEffect(() => {
+    async function fetchBooking() {
+      try {
+        setLoading(true);
+        setError(null);
+        const resp = await axios.get(`/api/payments/bookings/${id}/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+          },
+        });
+        setBooking(resp.data);
+        // Convert snake_case to camelCase for frontend state:
+        setRoomOption(resp.data.room_option || "shared");
+        setAddTransfer(resp.data.add_transfer || false);
+        setAddNights(resp.data.add_nights || false);
+        setFlightHelp(resp.data.flight_help || false);
+        setDonation(resp.data.donation || false);
+      } catch (err) {
+        setError("Failed to load booking data.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBooking();
+  }, [id]);
+
+  const handleContinue = async () => {
+    try {
+      // Prepare snake_case data for backend update
+      const updateData = {
+        room_option: roomOption,
+        add_transfer: addTransfer,
+        add_nights: addNights,
+        flight_help: flightHelp,
+        donation: donation,
+      };
+
+      await axios.patch(`/api/payments/bookings/${id}/update/`, updateData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
+        },
+      });
+
+      // Pass camelCase keys in navigation state (frontend)
+      const extrasForState = {
+        roomOption,
+        addTransfer,
+        addNights,
+        flightHelp,
+        donation,
+      };
+
+      navigate(`/payment/payment3/${id}`, {
+        state: { extras: extrasForState },
+      });
+    } catch (err) {
+      alert("Failed to save your extras. Please try again.");
+    }
+  };
+
+  if (loading) return <div>Loading booking details...</div>;
+  if (error)
+    return (
+      <div style={{ color: "red" }} role="alert">
+        {error}
+      </div>
+    );
+  if (!booking) return <div>No booking found.</div>;
+
+  const travelDeal = booking?.travel_deal || {};
+  const dateOption = booking?.date_option || {};
+
+  // Calculate total price
+  const tripCost = parseFloat(dateOption.discounted_price) || 0;
+  const roomCost = roomOption === "private" ? 345 : 0;
+  const donationCost = donation ? 23 : 0;
+  const totalCost = (tripCost + roomCost + donationCost).toFixed(2);
 
   return (
     <div className="payment-container">
       <StepIndicator current={1} />
-      <h2 className="trip-title">Trip extras</h2>
+      <h2 className="trip-title">Trip Extras</h2>
 
       <div className="payment-grid">
         {/* LEFT SIDE */}
         <div className="left-column">
           <div
             className="notice-box late-request"
+            role="button"
+            tabIndex={0}
             onClick={() => setShowLateModal(true)}
+            onKeyDown={(e) => e.key === "Enter" && setShowLateModal(true)}
+            aria-label="Late request information"
           >
             <div className="icon">i</div>
             <div className="notice-content">
@@ -46,101 +143,133 @@ export default function Payment2() {
 
           <div className="room-options">
             <h3>Room options</h3>
-            <p>Want to change your room?</p>
-            <p>
-              Individual rooms are subject to availability. We’ll be in touch in
-              2 - 4 business days with an update.
-            </p>
             <form>
               <label>
-                <input type="radio" name="room" />
-                <span className="room-option">
-                  Individual room <span className="price">+ EUR €345.00</span>
-                </span>
+                <input
+                  type="radio"
+                  name="room"
+                  value="private"
+                  checked={roomOption === "private"}
+                  onChange={(e) => setRoomOption(e.target.value)}
+                  aria-checked={roomOption === "private"}
+                />
+                <span className="room-option">Private room (+€345.00)</span>
               </label>
               <label>
-                <input type="radio" name="room" />
-                <span className="room-option">
-                  Share with a friend on another booking{" "}
-                  <span className="price">(No additional cost)</span>
-                </span>
+                <input
+                  type="radio"
+                  name="room"
+                  value="shared"
+                  checked={roomOption === "shared"}
+                  onChange={(e) => setRoomOption(e.target.value)}
+                  aria-checked={roomOption === "shared"}
+                />
+                <span className="room-option">Shared (no extra cost)</span>
               </label>
             </form>
           </div>
 
           <div className="prepost-section">
             <h3>Pre & post-trip extras</h3>
-            <div className="prepost-info">
-              <strong>Complimentary transfer</strong>
-              <p>
-                You're entitled to a complimentary arrival transfer. Don’t
-                forget to add it to your booking.
-              </p>
-            </div>
-            <button className="extras-btn">🚌 Add transfers</button>
-            <button className="extras-btn">🏨 Add extra nights</button>
+            <button
+              className="extras-btn"
+              type="button"
+              aria-pressed={addTransfer}
+              onClick={() => setAddTransfer((prev) => !prev)}
+            >
+              🚌 {addTransfer ? "✔" : ""} Add transfers
+            </button>
+            <button
+              className="extras-btn"
+              type="button"
+              aria-pressed={addNights}
+              onClick={() => setAddNights((prev) => !prev)}
+            >
+              🏨 {addNights ? "✔" : ""} Add extra nights
+            </button>
           </div>
 
           <div className="additional-services">
-            <h3>Additional services</h3>
-            <p>We can help you book flights.</p>
             <label>
-              <input type="checkbox" /> Contact me about flights
+              <input
+                type="checkbox"
+                checked={flightHelp}
+                onChange={(e) => setFlightHelp(e.target.checked)}
+                aria-checked={flightHelp}
+              />{" "}
+              Contact me about flights
             </label>
-            <p className="small">
-              We’ll be in touch in 2 - 4 business days after we receive your
-              request to discuss how we can help.
-            </p>
           </div>
 
           <div className="donation-box">
-            <h3>Would you like to support the communities we visit?</h3>
-            <p>
-              Donate 1% of your trip cost to the Intrepid Foundation to support
-              life-changing projects empowering local people.
-            </p>
-            <p>
-              100% of your donation goes to local organisations creating
-              positive change for people and the planet.
-            </p>
             <label>
-              <input type="checkbox" /> Yes, add EUR €23.00 to help local
-              communities
+              <input
+                type="checkbox"
+                checked={donation}
+                onChange={(e) => setDonation(e.target.checked)}
+                aria-checked={donation}
+              />{" "}
+              Yes, add €23 donation
             </label>
           </div>
         </div>
 
         {/* RIGHT SIDE */}
         <div className="right-column">
-          <div className="booking-summary">
-            <h3>Booking summary</h3>
-            <div className="trip-name">Classic Vietnam</div>
-            <div className="duration">15 days</div>
+          <div className="booking-summary" aria-label="Booking Summary">
+            <h3>Booking Summary</h3>
+            <div className="trip-name">{travelDeal.title || "Trip name"}</div>
+            <div className="duration">{travelDeal.days ? `${travelDeal.days} days` : ""}</div>
             <div className="details">
               <p>
                 <strong>Start</strong>
                 <br />
-                26 Jul 2025
-                <br />
-                Ho Chi Minh City, VIETNAM
+                {dateOption.start_date
+                  ? new Date(dateOption.start_date).toLocaleDateString()
+                  : "N/A"}
               </p>
               <p>
                 <strong>Finish</strong>
                 <br />
-                09 Aug 2025
-                <br />
-                Hanoi, VIETNAM
+                {dateOption.end_date
+                  ? new Date(dateOption.end_date).toLocaleDateString()
+                  : "N/A"}
               </p>
             </div>
             <div className="total">
-              <span>Trip</span>
+              <span>Trip cost</span>
               <span>
-                Total: <strong>EUR €2,330.00</strong>
+                <strong>€{tripCost.toFixed(2)}</strong>
+              </span>
+            </div>
+            {roomOption === "private" && (
+              <div className="total">
+                <span>Private room</span>
+                <span>+ €345</span>
+              </div>
+            )}
+            {donation && (
+              <div className="total">
+                <span>Donation</span>
+                <span>+ €23</span>
+              </div>
+            )}
+            <hr />
+            <div className="total">
+              <span>
+                <strong>Total Payment</strong>
+              </span>
+              <span>
+                <strong>€{totalCost}</strong>
               </span>
             </div>
             <div
               className="how-to-credit"
+              role="button"
+              tabIndex={0}
               onClick={() => setShowCreditModal(true)}
+              onKeyDown={(e) => e.key === "Enter" && setShowCreditModal(true)}
+              aria-label="How to redeem credit information"
             >
               ⓘ How to redeem credit
             </div>
@@ -149,19 +278,21 @@ export default function Payment2() {
       </div>
 
       <div className="nav-buttons">
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button className="back-btn" type="button" onClick={() => navigate(-1)}>
           Back
         </button>
         <button
           className="continue-btn"
-          onClick={() => navigate("/payment/payment3")}
+          type="button"
+          disabled={loading}
+          onClick={handleContinue}
+          aria-disabled={loading}
         >
           Continue →
         </button>
       </div>
 
-      {/* Footer Links */}
-      <footer className="footer-links">
+      <footer className="footer-links" aria-label="Footer Links">
         <span>Privacy</span>
         <span>Booking conditions</span>
         <span>Data collection notice</span>
@@ -169,9 +300,15 @@ export default function Payment2() {
 
       {/* Modals */}
       {showLateModal && (
-        <div className="modal" onClick={() => setShowLateModal(false)}>
+        <div
+          className="modal"
+          onClick={() => setShowLateModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lateModalTitle"
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h4>Late request</h4>
+            <h4 id="lateModalTitle">Late request</h4>
             <p>
               For bookings close to departure date, full payment is required to
               request your place with our local operators. This usually takes 2
@@ -181,20 +318,26 @@ export default function Payment2() {
               Please wait for confirmation before booking flights or
               non-refundable travel arrangements.
             </p>
-            <button onClick={() => setShowLateModal(false)}>Close</button>
+            <button type="button" onClick={() => setShowLateModal(false)}>
+              Close
+            </button>
           </div>
         </div>
       )}
-
       {showCreditModal && (
-        <div className="modal" onClick={() => setShowCreditModal(false)}>
+        <div
+          className="modal"
+          onClick={() => setShowCreditModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="creditModalTitle"
+        >
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h4>How to redeem credit</h4>
-            <p>
-              You can redeem travel credit on the payment page by selecting “Use
-              Credit” before finalizing payment.
-            </p>
-            <button onClick={() => setShowCreditModal(false)}>Close</button>
+            <h4 id="creditModalTitle">How to redeem credit</h4>
+            <p>Select “Use Credit” on payment page before finalizing payment.</p>
+            <button type="button" onClick={() => setShowCreditModal(false)}>
+              Close
+            </button>
           </div>
         </div>
       )}
