@@ -77,7 +77,7 @@ class TravelDeal(models.Model):
         return f"{self.title} - {self.country.name}"
 
 class Review(models.Model):
-    country = models.ForeignKey(Country, related_name="reviews", on_delete=models.CASCADE)
+    travel_deal = models.ForeignKey("TravelDeal", related_name="reviews", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     rating = models.IntegerField()
@@ -86,7 +86,7 @@ class Review(models.Model):
     submitted_on = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"Review by {self.name} on {self.country.name} - {self.rating}/5"
+        return f"Review by {self.name} on {self.travel_deal.title} - {self.rating}/5"
 
 class Article(models.Model):
     country = models.ForeignKey(Country, related_name="articles", on_delete=models.CASCADE)

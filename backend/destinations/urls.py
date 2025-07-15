@@ -26,8 +26,8 @@ urlpatterns = [
     path('countries/<slug:country_slug>/travel-deals/<slug:slug>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
 
     # === Reviews CRUD ===
-    path('countries/<slug:slug>/reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
-    path('countries/<slug:country_slug>/reviews/<int:pk>/', views.ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
+    path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
+    path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/<int:pk>/', views.ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
 
     # === Articles CRUD ===
     path('articles/', views.ArticleListCreateAPIView.as_view(), name='article-list'),

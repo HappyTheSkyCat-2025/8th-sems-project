@@ -1,5 +1,6 @@
 from rest_framework import serializers
 import json
+from django.db.models import Avg
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,
     TravelOption, TravelType, DealCategory, DealOffer,
@@ -7,14 +8,10 @@ from .models import (
 )
 
 
-# -------------------------
-# TravelDeal, Review, Article, FAQ Serializers
-# -------------------------
-
+# Custom JSONListField to handle JSON list strings
 class JSONListField(serializers.Field):
     def to_internal_value(self, data):
         if isinstance(data, list):
-            # Already a list, good
             return data
         if isinstance(data, str):
             try:
@@ -28,21 +25,41 @@ class JSONListField(serializers.Field):
         raise serializers.ValidationError("Invalid data type.")
 
     def to_representation(self, value):
-        # Return the list as is (JSONField serializes correctly)
         return value
+
+
+# --- TravelDeal, Review, Article, FAQ Serializers ---
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['id', 'name', 'slug', 'region', 'image']
+
 
 class TravelDealSerializer(serializers.ModelSerializer):
     themes = JSONListField()
+    country = CountrySerializer(read_only=True)
+    country_id = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), write_only=True, source='country')
+    average_rating = serializers.SerializerMethodField()
 
     class Meta:
         model = TravelDeal
         fields = "__all__"
 
+    def get_average_rating(self, obj):
+        # Get all reviews related to this travel deal
+        reviews = obj.reviews.all()
+        if reviews.exists():
+            avg_rating = reviews.aggregate(avg=Avg('rating'))['avg']
+            return round(avg_rating, 1) if avg_rating else 0
+        return 0
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = "__all__"
+        fields = '__all__'
+        read_only_fields = ['travel_deal', 'submitted_on']
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -57,9 +74,7 @@ class FAQSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# -------------------------
-# Country Overview and Learn More Topic Serializers
-# -------------------------
+# --- Country Overview and Learn More Topic Serializers ---
 
 class CountryOverviewSerializer(serializers.ModelSerializer):
     class Meta:
@@ -82,11 +97,9 @@ class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
         if obj.image and request:
             return request.build_absolute_uri(obj.image.url)
         return None
-    
 
-# -------------------------
-# Region and Country Serializers
-# -------------------------
+
+# --- Region Serializer ---
 
 class RegionSerializer(serializers.ModelSerializer):
     countries = serializers.StringRelatedField(many=True, read_only=True)
@@ -96,38 +109,43 @@ class RegionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'countries']
 
 
-class CountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Country
-        fields = ['id', 'name', 'slug', 'region']
-
+# --- CountryDetailSerializer ---
 
 class CountryDetailSerializer(serializers.ModelSerializer):
-    deals = TravelDealSerializer(many=True, read_only=True)
-    reviews = ReviewSerializer(many=True, read_only=True)
-    articles = ArticleSerializer(many=True, read_only=True)
-    faqs = FAQSerializer(many=True, read_only=True)
+    deals = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
+    articles = serializers.SerializerMethodField()
+    faqs = serializers.SerializerMethodField()
     overview = CountryOverviewSerializer(read_only=True)
     learn_more_topics = CountryLearnMoreTopicSerializer(many=True, read_only=True)
-    
-    region = serializers.PrimaryKeyRelatedField(
-        queryset=Region.objects.all()
-    )
+    region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
 
     class Meta:
         model = Country
         fields = [
             "id", "name", "slug", "subtitle", "section_title",
             "description", "image", "video_url",
-            "region",
-            "deals", "reviews", "articles", "faqs",
+            "region", "deals", "reviews", "articles", "faqs",
             "overview", "learn_more_topics",
         ]
 
+    def get_deals(self, obj):
+        return TravelDealSerializer(obj.deals.all(), many=True, context=self.context).data
 
-# -------------------------
-# TravelOption and TravelType Serializers
-# -------------------------
+    def get_reviews(self, obj):
+        # Aggregate reviews from all deals of this country
+        deals = obj.deals.all()
+        reviews = Review.objects.filter(travel_deal__in=deals)
+        return ReviewSerializer(reviews, many=True).data
+
+    def get_articles(self, obj):
+        return ArticleSerializer(obj.articles.all(), many=True).data
+
+    def get_faqs(self, obj):
+        return FAQSerializer(obj.faqs.all(), many=True).data
+
+
+# --- TravelOption and TravelType Serializers ---
 
 class TravelOptionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -162,9 +180,7 @@ class TravelTypeSerializer(serializers.ModelSerializer):
         return instance
 
 
-# -------------------------
-# DealOffer and DealCategory Serializers
-# -------------------------
+# --- DealOffer and DealCategory Serializers ---
 
 class DealOfferSerializer(serializers.ModelSerializer):
     class Meta:
@@ -197,4 +213,3 @@ class DealCategorySerializer(serializers.ModelSerializer):
                 DealOffer.objects.create(category=instance, **offer_data)
 
         return instance
-    

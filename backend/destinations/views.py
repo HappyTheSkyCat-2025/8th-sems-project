@@ -73,22 +73,25 @@ class TravelDealRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
 # ====== Reviews ======
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
-    permission_classes = [IsSuperUserOrReadOnly]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
-        country_slug = self.kwargs.get('slug') or self.kwargs.get('country_slug')
-        if country_slug:
-            return Review.objects.filter(country__slug=country_slug)
+        deal_slug = self.kwargs.get('deal_slug')
+        if deal_slug:
+            return Review.objects.filter(travel_deal__slug=deal_slug)
         return Review.objects.all()
+
+    def perform_create(self, serializer):
+        deal_slug = self.kwargs.get('deal_slug')
+        deal = TravelDeal.objects.get(slug=deal_slug)
+        serializer.save(travel_deal=deal)
+
 
 class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
     def get_queryset(self):
-        country_slug = self.kwargs.get('country_slug')
-        if country_slug:
-            return Review.objects.filter(country__slug=country_slug)
         return Review.objects.all()
 
 # ====== Articles ======
