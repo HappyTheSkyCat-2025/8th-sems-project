@@ -15,7 +15,8 @@ export default function DestDescription() {
   const datesRef = useRef(null);
 
   const [dealData, setDealData] = useState(null);
-  const [reviews, setReviews] = useState([]);  // <-- NEW state for reviews
+  const [reviews, setReviews] = useState([]);
+  const [dates, setDates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,22 +30,26 @@ export default function DestDescription() {
     setLoading(true);
     setError(null);
 
-    // Fetch deal data and reviews concurrently
     const fetchDeal = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/`);
     const fetchReviews = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/reviews/`);
+    const fetchDates = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/dates/`);
 
-    Promise.all([fetchDeal, fetchReviews])
-      .then(([dealRes, reviewsRes]) => {
+    Promise.all([fetchDeal, fetchReviews, fetchDates])
+      .then(([dealRes, reviewsRes, datesRes]) => {
         setDealData(dealRes.data);
 
-        // Extract review list from paginated API response
         const reviewsData = Array.isArray(reviewsRes.data)
           ? reviewsRes.data
           : reviewsRes.data.results || [];
         setReviews(reviewsData);
+
+        const datesData = Array.isArray(datesRes.data)
+          ? datesRes.data
+          : datesRes.data.results || [];
+        setDates(datesData);
       })
       .catch(() => {
-        setError("Failed to load travel deal or reviews.");
+        setError("Failed to load travel deal, reviews, or dates.");
       })
       .finally(() => {
         setLoading(false);
@@ -55,13 +60,11 @@ export default function DestDescription() {
   if (error) return <div>{error}</div>;
   if (!dealData) return <div>No travel deal found.</div>;
 
-  // Calculate average rating and review count here for Desc
   const reviewCount = reviews.length;
   const averageRating = reviewCount
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
     : 0;
 
-  // Pass rating info as part of dealData to Desc
   const descData = {
     ...dealData,
     review_count: reviewCount,
@@ -82,12 +85,9 @@ export default function DestDescription() {
       <Feat data={dealData} />
       <Included data={dealData} />
       <div ref={datesRef}>
-        <Dates data={dealData} />
+        <Dates data={dates} />
       </div>
-
-      {/* Pass reviews and setter to Reviewplaces */}
       <Reviewplaces data={dealData} reviews={reviews} setReviews={setReviews} />
-
       <Foot />
     </div>
   );

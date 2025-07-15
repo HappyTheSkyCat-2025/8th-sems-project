@@ -26,8 +26,8 @@ urlpatterns = [
     path('countries/<slug:country_slug>/travel-deals/<slug:slug>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
 
     # === Reviews CRUD ===
-    path('countries/<slug:slug>/reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
-    path('countries/<slug:country_slug>/reviews/<int:pk>/', views.ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
+    path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
+    path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/<int:pk>/', views.ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
 
     # === Articles CRUD ===
     path('articles/', views.ArticleListCreateAPIView.as_view(), name='article-list'),
@@ -46,4 +46,16 @@ urlpatterns = [
 
     path('countries/<slug:country_slug>/learn-more-topics/', views.CountryLearnMoreTopicListCreateAPIView.as_view(), name='learnmoretopic-listcreate'),
     path('countries/<slug:country_slug>/learn-more-topics/<int:pk>/', views.CountryLearnMoreTopicRetrieveUpdateDestroyAPIView.as_view(), name='learnmoretopic-detail'),
-]
+
+    
+    # CRUD for TravelDealDate
+    path(
+        'countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/',
+        views.TravelDealDateListCreateAPIView.as_view(),
+        name='travel-deal-date-list-create'
+    ),
+    path(
+        'countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/<int:pk>/',
+        views.TravelDealDateRetrieveUpdateDestroyAPIView.as_view(),
+        name='travel-deal-date-detail'
+    ),]
