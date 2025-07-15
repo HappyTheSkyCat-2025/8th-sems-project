@@ -61,11 +61,13 @@ import CountryOverviewForm from "./components/admin/country-overview/CountryOver
 import LearnMoreTopicList from "./components/admin/learn-more-topics/LearnMoreTopicList";
 import LearnMoreTopicForm from "./components/admin/learn-more-topics/LearnMoreTopicForm";
 
+// Toastify
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 function Layout() {
   const location = useLocation();
 
-  // Routes where Navbar/Footer should NOT be shown
   const noLayoutRoutes = [
     "/login",
     "/register",
@@ -77,7 +79,6 @@ function Layout() {
     "/payment/payment3",
   ];
 
-  // Admin routes where Navbar/Footer should also NOT be shown
   const adminRoutes = [
     "/admin",
     "/admin/regions",
@@ -85,7 +86,6 @@ function Layout() {
     "/admin/regions/:id/edit",
   ];
 
-  // Determine if current path matches any of the no-layout routes
   const hideLayout =
     noLayoutRoutes.some((path) =>
       matchPath({ path, end: true }, location.pathname)
@@ -137,7 +137,7 @@ function Layout() {
         <Route path="/payment/payment2" element={<Payment2 />} />
         <Route path="/payment/payment3" element={<Payment3 />} />
 
-        {/* === Admin Routes (Region & Country CRUD) === */}
+        {/* === Admin Routes === */}
         <Route
           path="/admin"
           element={
@@ -147,21 +147,19 @@ function Layout() {
           }
         >
           <Route index element={<AdminDashboard />} />
-          {/* Region CRUD */}
+
           <Route path="regions" element={<RegionList />} />
           <Route path="regions/create" element={<RegionForm />} />
           <Route path="regions/:id/edit" element={<RegionForm />} />
 
-          {/* Country CRUD */}
           <Route path="countries" element={<CountryList />} />
           <Route path="countries/create" element={<CountryForm />} />
           <Route path="countries/:slug/edit" element={<CountryForm />} />
-          
-          {/* Travel Deal CRUD */}
+
           <Route path="countries/:country_slug/travel-deals" element={<TravelDealList />} />
           <Route path="countries/:country_slug/travel-deals/create" element={<TravelDealForm />} />
           <Route path="countries/:country_slug/travel-deals/:slug/edit" element={<TravelDealForm />} />
-         
+
           <Route path="countries/:country_slug/reviews" element={<ReviewList />} />
           <Route path="countries/:country_slug/reviews/create" element={<ReviewForm />} />
           <Route path="countries/:country_slug/reviews/:id/edit" element={<ReviewForm />} />
@@ -177,19 +175,6 @@ function Layout() {
           <Route path="countries/:country_slug/learn-more-topics" element={<LearnMoreTopicList />} />
           <Route path="countries/:country_slug/learn-more-topics/create" element={<LearnMoreTopicForm />} />
           <Route path="countries/:country_slug/learn-more-topics/:id/edit" element={<LearnMoreTopicForm />} />
-
-          {/* Additional Admin Routes can be added here */}
-          {/*
-          <Route path="articles" element={<ArticleList />} />
-          <Route path="articles/create" element={<ArticleForm />} />
-          <Route path="articles/:id/edit" element={<ArticleForm />} />
-          <Route path="travel-types" element={<TravelTypeList />} />
-          <Route path="travel-types/create" element={<TravelTypeForm />} />
-          <Route path="travel-types/:id/edit" element={<TravelTypeForm />} />
-          <Route path="deal-categories" element={<DealCategoryList />} />
-          <Route path="deal-categories/create" element={<DealCategoryForm />} />
-          <Route path="deal-categories/:id/edit" element={<DealCategoryForm />} />
-          */}
         </Route>
       </Routes>
 
@@ -203,6 +188,7 @@ function App() {
     <Router>
       <ScrollToTop />
       <Layout />
+      <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
 }
