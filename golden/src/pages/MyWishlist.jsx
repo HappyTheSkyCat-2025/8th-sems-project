@@ -1,27 +1,32 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useRef } from "react";
+import axiosInstance from "../utils/axiosInstance";
 import { FaHeart } from "react-icons/fa";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../pagescss/deals.css";
 
 export default function MyWishlist() {
   const [wishlist, setWishlist] = useState([]);
   const navigate = useNavigate();
+  const didRedirectRef = useRef(false); // Track if redirect happened
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
-    if (!token) return;
+    if (!token) {
+      if (!didRedirectRef.current) {
+        toast.info("Please log in to view your wishlist");
+        didRedirectRef.current = true; // Prevent showing toast twice
+        navigate("/login");
+      }
+      return;
+    }
 
-    axios
-      .get("/api/destinations/wishlist/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    // Using custom axios instance
+    axiosInstance
+      .get("/destinations/wishlist/")
       .then((res) => setWishlist(res.data.results || []))
       .catch(() => toast.error("Failed to load wishlist"));
-  }, []);
+  }, [navigate]);
 
   const slugify = (str) =>
     str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -34,18 +39,13 @@ export default function MyWishlist() {
       ) : (
         <div className="deals-grid">
           {wishlist.map((deal, i) => (
-            <article
-              className="deal-card"
-              key={deal.id}
-              style={{ "--i": i }}
-            >
+            <article className="deal-card" key={deal.id} style={{ "--i": i }}>
               <div
                 className="deal-image"
                 style={{
                   backgroundImage: `url(${deal.deal_image || "https://via.placeholder.com/300"})`,
                 }}
               >
-                {/* Read-only Heart */}
                 <button className="fav-btn liked" disabled>
                   <FaHeart />
                 </button>

@@ -6,7 +6,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 const stripePromise = loadStripe("pk_test_51RhozD04WnqvgZDXXbFeCGU9sY4wPefwFc5jR4IFfOosH4BPJzxjiDhQWsfbUtpNTPN37VJLfLBJnh49XnbIh7OF00mpk0vAwJ");
 
@@ -26,17 +26,15 @@ const CheckoutForm = ({ amount, onSuccess, onError }) => {
     if (!stripe || !elements) return;
 
     try {
-      const token = localStorage.getItem("access_token");
-
-      const { data } = await axios.post(
-        "/api/payments/stripe/create-intent/",
-        { amount },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      // Fetching client secret from backend
+      const { data } = await axiosInstance.post(
+        "/api/payments/stripe/create-intent/", 
+        { amount }
       );
 
       const clientSecret = data.clientSecret;
+
+      // Confirm the card payment
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),

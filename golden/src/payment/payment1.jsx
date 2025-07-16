@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import { FaChevronDown, FaInfo } from "react-icons/fa";
 import { BsFillPersonFill } from "react-icons/bs";
 import StepIndicator from "../components/StepIndicator";
@@ -60,13 +60,13 @@ export default function Payment1() {
       }
       try {
         setLoading(true);
-        const dealResp = await axios.get(
-          `/api/destinations/countries/${countrySlug}/travel-deals/${dealSlug}/`
+        const dealResp = await axiosInstance.get(
+          `/destinations/countries/${countrySlug}/travel-deals/${dealSlug}/`
         );
         setDealData(dealResp.data);
 
-        const dateResp = await axios.get(
-          `/api/destinations/countries/${countrySlug}/travel-deals/${dealSlug}/dates/${dateId}/`
+        const dateResp = await axiosInstance.get(
+          `/destinations/countries/${countrySlug}/travel-deals/${dealSlug}/dates/${dateId}/`
         );
         setDateOptionData(dateResp.data);
       } catch (err) {
@@ -97,27 +97,23 @@ export default function Payment1() {
       setLoading(true);
       setError(null);
 
-        const payload = {
-          travel_deal_id: dealData.id,
-          date_option_id: dateOptionData.id,
-          full_name: `${title} ${firstName} ${middleName ? middleName + " " : ""}${lastName}`,
-          email,
-          phone,
-          address_line1: address1,
-          address_line2: address2,
-          town,
-          state,
-          postcode,
-          country,
-          travellers,
-          room_option: roomOption,
-        };
+      const payload = {
+        travel_deal_id: dealData.id,
+        date_option_id: dateOptionData.id,
+        full_name: `${title} ${firstName} ${middleName ? middleName + " " : ""}${lastName}`,
+        email,
+        phone,
+        address_line1: address1,
+        address_line2: address2,
+        town,
+        state,
+        postcode,
+        country,
+        travellers,
+        room_option: roomOption,
+      };
 
-      const response = await axios.post("/api/payments/bookings/create/", payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      });
+      const response = await axiosInstance.post("/payments/bookings/create/", payload);
 
       const booking = response.data;
       navigate(`/payment/payment2/${booking.id}`, { state: { booking } });

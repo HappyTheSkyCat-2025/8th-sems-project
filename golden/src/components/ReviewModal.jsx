@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import axiosInstance from "../utils/axiosInstance";
 import "../styles/reviewModal.css";
 
 export default function ReviewModal({ countrySlug, dealSlug, onClose, onReviewAdded }) {
@@ -14,8 +14,9 @@ export default function ReviewModal({ countrySlug, dealSlug, onClose, onReviewAd
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios
-      .post(`/api/destinations/countries/${countrySlug}/travel-deals/${dealSlug}/reviews/`, form)
+
+    axiosInstance
+      .post(`destinations/countries/${countrySlug}/travel-deals/${dealSlug}/reviews/`, form)
       .then((res) => {
         toast.success("Review submitted!");
         onReviewAdded(res.data); // notify parent
@@ -51,7 +52,9 @@ export default function ReviewModal({ countrySlug, dealSlug, onClose, onReviewAd
             onChange={(e) => setForm({ ...form, rating: parseInt(e.target.value) })}
           >
             {[5, 4, 3, 2, 1].map((n) => (
-              <option key={n} value={n}>{n} Star{n > 1 ? "s" : ""}</option>
+              <option key={n} value={n}>
+                {n} Star{n > 1 ? "s" : ""}
+              </option>
             ))}
           </select>
           <input
@@ -69,7 +72,9 @@ export default function ReviewModal({ countrySlug, dealSlug, onClose, onReviewAd
           />
           <div className="modal-buttons">
             <button type="submit">Submit</button>
-            <button type="button" onClick={onClose}>Cancel</button>
+            <button type="button" onClick={onClose}>
+              Cancel
+            </button>
           </div>
         </form>
       </div>

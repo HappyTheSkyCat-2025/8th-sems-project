@@ -8,7 +8,7 @@ import Reviewplaces from "./destdescription/reviewplaces";
 import Dates from "./destdescription/dates";
 import Foot from "../pages/foot";
 import "../pagescss/destdescription.css";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 export default function DestDescription() {
   const { country, dealId: dealSlug } = useParams();
@@ -30,9 +30,9 @@ export default function DestDescription() {
     setLoading(true);
     setError(null);
 
-    const fetchDeal = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/`);
-    const fetchReviews = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/reviews/`);
-    const fetchDates = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/dates/`);
+    const fetchDeal = axiosInstance.get(`/destinations/countries/${country}/travel-deals/${dealSlug}/`);
+    const fetchReviews = axiosInstance.get(`/destinations/countries/${country}/travel-deals/${dealSlug}/reviews/`);
+    const fetchDates = axiosInstance.get(`/destinations/countries/${country}/travel-deals/${dealSlug}/dates/`);
 
     Promise.all([fetchDeal, fetchReviews, fetchDates])
       .then(([dealRes, reviewsRes, datesRes]) => {
@@ -85,7 +85,6 @@ export default function DestDescription() {
       <Feat data={dealData} />
       <Included data={dealData} />
       <div ref={datesRef}>
-        {/* Pass dealData.id to Dates */}
         <Dates data={dates} dealId={dealData.id} />
       </div>
       <Reviewplaces data={dealData} reviews={reviews} setReviews={setReviews} />

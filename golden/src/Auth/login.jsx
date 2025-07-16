@@ -1,7 +1,8 @@
+// src/Components/Auth/Login.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import axiosInstance from "../utils/axiosInstance";
+import { toast } from "react-toastify";
 import "../styles/login.css";
 import loginBg from "../assets/login.jpg";
 
@@ -21,40 +22,16 @@ const Login = () => {
 
     try {
       // 1. Login and get tokens
-      const response = await fetch("http://127.0.0.1:8000/api/token/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await axiosInstance.post("/token/", formData);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error(data.detail || "Invalid credentials.");
-        setLoading(false);
-        return;
-      }
-
-      localStorage.setItem("access_token", data.access);
-      localStorage.setItem("refresh_token", data.refresh);
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
 
       // 2. Fetch user profile with access token
-      const profileResponse = await fetch("http://127.0.0.1:8000/api/accounts/profile/", {
-        headers: {
-          Authorization: `Bearer ${data.access}`,
-        },
-      });
-
-      const profileData = await profileResponse.json();
-
-      if (!profileResponse.ok) {
-        toast.error("Failed to fetch user profile.");
-        setLoading(false);
-        return;
-      }
+      const profileResponse = await axiosInstance.get("/accounts/profile/");
 
       // 3. Redirect based on superuser status
-      if (profileData.is_superuser) {
+      if (profileResponse.data.is_superuser) {
         toast.success("Welcome Admin! Redirecting...");
         setTimeout(() => navigate("/admin"), 1500);
       } else {
@@ -62,85 +39,85 @@ const Login = () => {
         setTimeout(() => navigate("/"), 1500);
       }
     } catch (error) {
-      toast.error("An error occurred during login.");
+      // handle error message from backend or fallback
+      const errorMsg =
+        error.response?.data?.detail || "Invalid credentials or server error.";
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
-      <ToastContainer autoClose={3000} position="top-center" />
+    <div className="login-full-wrapper">
+      <div className="background-angle"></div>
 
-      <div className="login-full-wrapper">
-        <div className="background-angle"></div>
-
-        <div className="login-box">
-          {/* Left: Background image with quote */}
-          <div
-            className="login-image"
-            style={{ backgroundImage: `url(${loginBg})` }}
-          >
-            <div className="quote">
-              DISCOVER THE WORLD <br /> WITH GOLDEN LEAF TRAVELS
-            </div>
+      <div className="login-box">
+        {/* Left: Background image with quote */}
+        <div
+          className="login-image"
+          style={{ backgroundImage: `url(${loginBg})` }}
+        >
+          <div className="quote">
+            DISCOVER THE WORLD <br /> WITH GOLDEN LEAF TRAVELS
           </div>
+        </div>
 
-          {/* Right: Login form */}
-          <div className="login-form">
-            <h2 className="brand-title">GOLDEN LEAF TRAVELS</h2>
+        {/* Right: Login form */}
+        <div className="login-form">
+          <h2 className="brand-title">GOLDEN LEAF TRAVELS</h2>
 
-            <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+
+            <div className="password-field">
               <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={formData.email}
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
                 onChange={handleChange}
                 required
               />
-
-              <div className="password-field">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-                <span
-                  className="toggle-password"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <i
-                    className={`fas ${
-                      showPassword ? "fa-eye-slash" : "fa-eye"
-                    }`}
-                  ></i>
-                </span>
-              </div>
-
-              <Link to="/forgot-password" className="forgot-link">
-                Forgot Your Password?
-              </Link>
-
-              <button type="submit" disabled={loading}>
-                {loading ? "Logging in..." : "LOG IN"}
-              </button>
-            </form>
-
-            <div className="register-text">
-              Don’t have an account?{" "}
-              <Link to="/register" className="register-link">
-                Register
-              </Link>
+              <span
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ cursor: "pointer" }}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                <i
+                  className={`fas ${
+                    showPassword ? "fa-eye-slash" : "fa-eye"
+                  }`}
+                ></i>
+              </span>
             </div>
+
+            <Link to="/forgot-password" className="forgot-link">
+              Forgot Your Password?
+            </Link>
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Logging in..." : "LOG IN"}
+            </button>
+          </form>
+
+          <div className="register-text">
+            Don’t have an account?{" "}
+            <Link to="/register" className="register-link">
+              Register
+            </Link>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

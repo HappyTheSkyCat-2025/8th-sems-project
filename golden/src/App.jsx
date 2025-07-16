@@ -20,6 +20,7 @@ import VerifyOTP from "./Auth/VerifyOTP";
 import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
 import Profile from "./Auth/profile";
+import ChangePassword from "./Auth/ChangePassword";
 import MyWishlist from "./pages/MyWishlist";
 
 // Home page sections
@@ -80,6 +81,7 @@ function Layout() {
     "/verify-otp",
     "/forgot-password",
     "/reset-password",
+    "/change-password",
     "/payment/payment1",
     "/payment/payment2",
     "/payment/payment3",
@@ -138,6 +140,7 @@ function Layout() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/my-wishlist" element={<MyWishlist />} />
 
         {/* Payment Routes */}

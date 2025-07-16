@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import "../pagescss/destination.css";
 
 // Section components
@@ -18,7 +18,9 @@ export default function DestinationPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`/api/destinations/countries/${country}/`)
+    setLoading(true);
+
+    axiosInstance.get(`/destinations/countries/${country}/`)
       .then((res) => {
         setData(res.data);
         setLoading(false);
@@ -62,9 +64,11 @@ export default function DestinationPage() {
           <h3>{data.subtitle}</h3>
         </div>
       </div>
-<div id="overview">
+
+      <div id="overview">
         <OverviewSection data={data} />
       </div>
+
       {/* Top Tabs */}
       <nav className="top-tabs">
         <ul>
@@ -78,8 +82,6 @@ export default function DestinationPage() {
       </nav>
 
       {/* Sections */}
-      
- 
       <div id="travel-deals">
         <DealsSection data={{ deals: data.deals, title: data.name }} />
       </div>

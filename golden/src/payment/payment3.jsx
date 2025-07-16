@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { SiPaypal, SiCashapp, SiStripe } from "react-icons/si";
 import "react-toastify/dist/ReactToastify.css";
 
 import StepIndicator from "../components/StepIndicator";
 import StripePayment from "./StripePayment";
 import PayPalPayment from "./PayPalPayment";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import "./payment3.css";
 
 export default function Payment3() {
@@ -29,9 +29,7 @@ export default function Payment3() {
   useEffect(() => {
     async function fetchBooking() {
       try {
-        const res = await axios.get(`/api/payments/bookings/${id}/`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axiosInstance.get(`/api/payments/bookings/${id}/`);
         setBooking(res.data);
       } catch (err) {
         setError("Failed to load booking.");
@@ -40,7 +38,7 @@ export default function Payment3() {
       }
     }
     fetchBooking();
-  }, [id, token]);
+  }, [id]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div style={{ color: "red" }}>{error}</div>;
@@ -58,21 +56,18 @@ export default function Payment3() {
   const handleManualPayment = async () => {
     setPaying(true);
     try {
-      await axios.put(
+      await axiosInstance.put(
         `/api/payments/bookings/${id}/update-payment/`,
         {
           payment_method: "manual",
           payment_amount: amount,
           transaction_id: null,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       toast.success("Cash payment confirmed!");
       setTimeout(() => navigate("/thank-you"), 1500);
     } catch (err) {
-      toast.error("Payment failed: " + (err.response?.data?.detail || ""));
+      toast.error("Payment failed: " + (err.response?.data?.detail || "Unknown error"));
     } finally {
       setPaying(false);
     }
@@ -80,41 +75,35 @@ export default function Payment3() {
 
   const onStripeSuccess = async (chargeId) => {
     try {
-      await axios.put(
+      await axiosInstance.put(
         `/api/payments/bookings/${id}/update-payment/`,
         {
           payment_method: "stripe",
           payment_amount: amount,
           transaction_id: chargeId,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       toast.success("Stripe payment confirmed!");
       setTimeout(() => navigate("/thank-you"), 1500);
     } catch (err) {
-      toast.error("Stripe update failed: " + (err.response?.data?.detail || ""));
+      toast.error("Stripe update failed: " + (err.response?.data?.detail || "Unknown error"));
     }
   };
 
   const onPayPalSuccess = async (paypalTransactionId) => {
     try {
-      await axios.put(
+      await axiosInstance.put(
         `/api/payments/bookings/${id}/update-payment/`,
         {
           payment_method: "paypal",
           payment_amount: amount,
           transaction_id: paypalTransactionId,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       toast.success("PayPal payment confirmed!");
       setTimeout(() => navigate("/thank-you"), 1500);
     } catch (err) {
-      toast.error("PayPal update failed: " + (err.response?.data?.detail || ""));
+      toast.error("PayPal update failed: " + (err.response?.data?.detail || "Unknown error"));
     }
   };
 
@@ -289,7 +278,6 @@ export default function Payment3() {
         <a href="#">Data collection notice</a>
       </div>
 
-      <ToastContainer />
     </div>
   );
 }

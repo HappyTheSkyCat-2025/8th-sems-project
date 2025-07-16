@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import StepIndicator from "../components/StepIndicator";
 import "../payment/payment2.css";
 
@@ -28,12 +28,9 @@ export default function Payment2() {
       try {
         setLoading(true);
         setError(null);
-        const resp = await axios.get(`/api/payments/bookings/${id}/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
-          },
-        });
+        const resp = await axiosInstance.get(`/api/payments/bookings/${id}/`);
         setBooking(resp.data);
+
         // Convert snake_case to camelCase for frontend state:
         setRoomOption(resp.data.room_option || "shared");
         setAddTransfer(resp.data.add_transfer || false);
@@ -60,11 +57,7 @@ export default function Payment2() {
         donation: donation,
       };
 
-      await axios.patch(`/api/payments/bookings/${id}/update/`, updateData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`,
-        },
-      });
+      await axiosInstance.patch(`/api/payments/bookings/${id}/update/`, updateData);
 
       // Pass camelCase keys in navigation state (frontend)
       const extrasForState = {

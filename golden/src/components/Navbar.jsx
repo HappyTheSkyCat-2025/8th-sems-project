@@ -12,7 +12,7 @@ import {
 import { IoLanguageOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Divide as Hamburger } from "hamburger-react";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import logo from "../assets/logo1.png";
 import baliImage from "../assets/bali.jpg";
 import "../styles/Navbar.css";
@@ -45,7 +45,7 @@ export default function Navbar() {
 
   // fetch destination data
   useEffect(() => {
-    axios.get("/api/destinations/").then((res) => {
+    axiosInstance.get("destinations/").then((res) => {
       const regionList = res.data.regions.map((r) => r.region_name);
       const map = {};
       res.data.regions.forEach((r) => {
@@ -59,14 +59,14 @@ export default function Navbar() {
       setActiveRegion(regionList[0] || null);
     });
 
-    axios.get("/api/destinations/travel-types/").then((res) => {
+    axiosInstance.get("destinations/travel-types/").then((res) => {
       const { types, options = {} } = res.data;
       setTravelTypes(types);
       setTravelOptions(options);
       setActiveTravelType(types[0] || null);
     });
 
-    axios.get("/api/destinations/deals/").then((res) => {
+    axiosInstance.get("destinations/deals/").then((res) => {
       const { categories, offers = {} } = res.data;
       setDealCategories(categories);
       setDealItems(offers);

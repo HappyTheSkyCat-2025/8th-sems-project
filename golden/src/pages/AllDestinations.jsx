@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 import "../styles/AllDestinations.css";
 
 export default function AllDestinations() {
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
-    axios
-      .get("/api/destinations/countries/")
+    axiosInstance
+      .get("/destinations/countries/") // Make API call using axiosInstance
       .then((res) => setCountries(res.data.results)) // ✅ Use results
       .catch((err) => console.error("Failed to load countries", err));
   }, []);
@@ -18,7 +18,7 @@ export default function AllDestinations() {
       <div className="breadcrumb">
         <Link to="/" className="breadcrumb-link">Home</Link> <span>›</span> <span>Destinations</span>
       </div>
- 
+
       <h1 className="page-title">Explore All Destinations</h1>
 
       <div className="destination-grid">

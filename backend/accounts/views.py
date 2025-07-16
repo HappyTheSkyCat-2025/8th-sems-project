@@ -22,6 +22,7 @@ User = get_user_model()
 # 🔐 Registration with OTP Email Verification
 # -------------------------------
 
+
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -83,16 +84,16 @@ class VerifyOTPView(APIView):
             return Response({"message": "Account already activated"}, status=status.HTTP_200_OK)
 
         user.is_active = True
-        user.is_email_verified = True  # Optional if you track email verification
+        user.is_email_verified = True  # Optional, if you track it separately
         user.save()
 
         UserOTP.objects.filter(user=user, otp_type='email_verification').delete()
 
-        return Response({"message": "Email verified, account activated"}, status=status.HTTP_200_OK)
+        return Response({"message": "Account activated"}, status=status.HTTP_200_OK)
 
 
 # -------------------------------
-# 👤 User Profile (Get/Update)
+# 👤 User Profile (Get/Update)Email verified, account
 # -------------------------------
 
 class UserProfileView(generics.RetrieveUpdateAPIView):

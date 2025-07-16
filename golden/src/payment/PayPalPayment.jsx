@@ -1,9 +1,9 @@
 import React from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
+import "./PayPalPayment.css";
 
 const PayPalPayment = ({ amount, onSuccess, onError }) => {
-  const token = localStorage.getItem("access_token");
 
   // Handler for payment approval
   const handleApprove = async (data, actions) => {
@@ -12,11 +12,9 @@ const PayPalPayment = ({ amount, onSuccess, onError }) => {
       const order = await actions.order.capture();
       const orderID = order.id;
 
-      // Verify payment with backend
-      const res = await axios.post(
+      const res = await axiosInstance.post(
         "/api/payments/paypal/verify/",
-        { orderID },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { orderID }
       );
 
       if (res.data.status === "success") {
@@ -41,7 +39,7 @@ const PayPalPayment = ({ amount, onSuccess, onError }) => {
         style={{ layout: "vertical" }}
         createOrder={(data, actions) => {
           return actions.order.create({
-            purchase_units: [{ amount: { value: amount.toString() } }],
+            purchase_units: [{ amount: { value: amount.toString() } }], // Amount as a string
           });
         }}
         onApprove={handleApprove}
