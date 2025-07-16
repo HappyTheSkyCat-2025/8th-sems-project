@@ -29,7 +29,7 @@ export default function Payment3() {
   useEffect(() => {
     async function fetchBooking() {
       try {
-        const res = await axiosInstance.get(`/api/payments/bookings/${id}/`);
+        const res = await axiosInstance.get(`/payments/bookings/${id}/`);
         setBooking(res.data);
       } catch (err) {
         setError("Failed to load booking.");
@@ -57,7 +57,7 @@ export default function Payment3() {
     setPaying(true);
     try {
       await axiosInstance.put(
-        `/api/payments/bookings/${id}/update-payment/`,
+        `/payments/bookings/${id}/update-payment/`,
         {
           payment_method: "manual",
           payment_amount: amount,
@@ -76,7 +76,7 @@ export default function Payment3() {
   const onStripeSuccess = async (chargeId) => {
     try {
       await axiosInstance.put(
-        `/api/payments/bookings/${id}/update-payment/`,
+        `/payments/bookings/${id}/update-payment/`,
         {
           payment_method: "stripe",
           payment_amount: amount,
@@ -93,7 +93,7 @@ export default function Payment3() {
   const onPayPalSuccess = async (paypalTransactionId) => {
     try {
       await axiosInstance.put(
-        `/api/payments/bookings/${id}/update-payment/`,
+        `/payments/bookings/${id}/update-payment/`,
         {
           payment_method: "paypal",
           payment_amount: amount,

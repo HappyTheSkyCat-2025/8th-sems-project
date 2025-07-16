@@ -1,7 +1,6 @@
 import React from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import axiosInstance from "../utils/axiosInstance";
-import "./PayPalPayment.css";
 
 const PayPalPayment = ({ amount, onSuccess, onError }) => {
 
@@ -13,7 +12,7 @@ const PayPalPayment = ({ amount, onSuccess, onError }) => {
       const orderID = order.id;
 
       const res = await axiosInstance.post(
-        "/api/payments/paypal/verify/",
+        "/payments/paypal/verify/",
         { orderID }
       );
 

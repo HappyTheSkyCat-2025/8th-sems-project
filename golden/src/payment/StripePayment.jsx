@@ -28,7 +28,7 @@ const CheckoutForm = ({ amount, onSuccess, onError }) => {
     try {
       // Fetching client secret from backend
       const { data } = await axiosInstance.post(
-        "/api/payments/stripe/create-intent/", 
+        "/payments/stripe/create-intent/", 
         { amount }
       );
 

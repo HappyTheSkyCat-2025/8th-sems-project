@@ -28,7 +28,7 @@ export default function Payment2() {
       try {
         setLoading(true);
         setError(null);
-        const resp = await axiosInstance.get(`/api/payments/bookings/${id}/`);
+        const resp = await axiosInstance.get(`/payments/bookings/${id}/`);
         setBooking(resp.data);
 
         // Convert snake_case to camelCase for frontend state:
@@ -57,7 +57,7 @@ export default function Payment2() {
         donation: donation,
       };
 
-      await axiosInstance.patch(`/api/payments/bookings/${id}/update/`, updateData);
+      await axiosInstance.patch(`/payments/bookings/${id}/update/`, updateData);
 
       // Pass camelCase keys in navigation state (frontend)
       const extrasForState = {
