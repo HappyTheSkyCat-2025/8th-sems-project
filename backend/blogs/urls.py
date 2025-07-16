@@ -7,6 +7,7 @@ from .views import (
     toggle_like,
     toggle_comment_like,
     CategoryListView,
+    BlogMapDataView,  # ✅ Imported the new map view
 )
 
 urlpatterns = [
@@ -20,4 +21,7 @@ urlpatterns = [
     path('comments/<int:comment_id>/toggle-like/', toggle_comment_like, name='toggle-comment-like'),
 
     path('categories/', CategoryListView.as_view(), name='category-list'),
+
+    # New API endpoint for map integration
+    path('map/data/', BlogMapDataView.as_view(), name='blog-map-data'),
 ]
