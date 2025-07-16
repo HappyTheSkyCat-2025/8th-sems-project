@@ -1,13 +1,22 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Region, Country, TravelDeal, Review, Article, FAQ
+from .models import Region, Country, TravelDeal, TravelImage, Review, Article, FAQ
 from .models import TravelType, DealCategory, DealOffer
-from .models import CountryOverview, CountryLearnMoreTopic
+from .models import CountryOverview, CountryLearnMoreTopic, TravelDealDate
 
 admin.site.register(Region)
 admin.site.register(Country)
-admin.site.register(TravelDeal)
+
+class TravelImageInline(admin.TabularInline):
+    model = TravelImage
+    extra = 1
+
+@admin.register(TravelDeal)
+class TravelDealAdmin(admin.ModelAdmin):
+    inlines = [TravelImageInline]
+    prepopulated_fields = {"slug": ("title",)}
+
 admin.site.register(Review)
 admin.site.register(Article)
 admin.site.register(FAQ)
@@ -16,3 +25,5 @@ admin.site.register(DealCategory)
 admin.site.register(DealOffer)
 admin.site.register(CountryOverview)
 admin.site.register(CountryLearnMoreTopic)
+
+admin.site.register(TravelDealDate)

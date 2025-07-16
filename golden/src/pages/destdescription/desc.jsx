@@ -1,50 +1,77 @@
+// src/pages/destdescription/desc.jsx
 import React from "react";
 import {
+  FaStar,
   FaUserFriends,
   FaMapSigns,
   FaGlobe,
   FaUsers,
   FaLanguage,
-  FaStar,
   FaFileDownload,
   FaPhoneAlt,
 } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
-import img2 from "../../assets/img2.jpg";
-import bali from "../../assets/bali.jpg";
 import "../../pagescss/desc.css";
 
-export default function Desc({ onViewDatesClick }) {
+export default function Desc({ data, onViewDatesClick }) {
+  const rating = data.average_rating || 0;
+
+  const renderStars = (rating) => {
+    const filledStars = Math.round(rating);
+    return (
+      <>
+        {[...Array(5)].map((_, i) =>
+          i < filledStars ? (
+            <FaStar key={i} className="star filled" />
+          ) : (
+            <FaStar key={i} className="star empty" />
+          )
+        )}
+      </>
+    );
+  };
+
+  const scrollToReviewSection = () => {
+    const reviewSection = document.getElementById("review-section");
+    if (reviewSection) {
+      reviewSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="trip-section">
       <div className="trip-header">
-        <h1>place</h1>
+        <h1>{data.title}</h1>
         <p>
-          <strong>15 days</strong> · <FaStar className="star" /> 5.0{" "}
-          <span className="review-count">455 reviews</span> · From Hanoi to Ho
-          Chi Minh City
+          <strong>{data.days} days</strong> · {renderStars(rating)}{" "}
+          <span className="review-count">
+            {rating.toFixed(1)} ({data.review_count || 0} reviews)
+          </span>{" "}
+          · {data.country?.name || "Unknown"}
+          <button className="leave-review-btn" onClick={scrollToReviewSection}>
+            Leave a Review
+          </button>
         </p>
       </div>
 
-      {/* Wrap gallery and booking box side by side */}
       <div className="trip-content">
-        {/* Left side - Gallery */}
+        {/* Gallery */}
         <div className="trip-gallery">
           <div className="top-gallery">
-            <img src={img2} alt="culture" />
-            <img src={bali} alt="temple" />
+            {data.gallery?.slice(0, 2).map((img, i) => (
+              <img key={i} src={img.image} alt={`${data.title} ${i + 1}`} />
+            ))}
           </div>
-
           <div className="bottom-imgs">
-            <img src={bali} alt="Rice fields" />
-            <img src={img2} alt="Market scene" />
+            {data.gallery?.slice(2, 5).map((img, i) => (
+              <img key={i} src={img.image} alt={`${data.title} ${i + 3}`} />
+            ))}
             <div className="testimonial">
               <p>
-                She was articulate about every detail of the trip from providing
-                information to her consistent, wonderful personality and kindness!
+                “The guide was exceptional, and the trip was well organized.”
               </p>
               <div className="testimonial-footer">
-                <span>Amanda · Travelled in December</span>
+                <span>Priya · Travelled in May</span>
                 <span>
                   <FaStar className="star" /> 5.0
                 </span>
@@ -53,17 +80,16 @@ export default function Desc({ onViewDatesClick }) {
           </div>
         </div>
 
-        {/* Right side - Booking & Plan */}
+        {/* Booking Box */}
         <div className="trip-info-box">
           <h3>
-            From <strong>EUR £4562</strong>
+            From <strong>{data.price}</strong>
           </h3>
 
           <button className="wishlist-btn">
             Add to my wishlist <CiHeart />
           </button>
 
-          {/* Scroll to DatesSection on click */}
           <button className="book-btn" onClick={onViewDatesClick}>
             View Dates And Book
           </button>
@@ -80,27 +106,25 @@ export default function Desc({ onViewDatesClick }) {
         </div>
       </div>
 
-      {/* Bottom icons grid */}
+      {/* Bottom Icons */}
       <div className="trip-icons">
         <div>
-          <FaUserFriends /> Platinum Operator: Hoi An Express
+          <FaUserFriends /> Platinum Operator
         </div>
         <div>
-          <FaUsers /> Group Tour: Join a group and forge lifelong friendships
+          <FaUsers /> Group Tour
         </div>
         <div>
-          <FaLanguage /> Guided in English
+          <FaLanguage /> English Guided
         </div>
         <div>
-          <FaMapSigns /> Age range 1 to 99
+          <FaMapSigns /> Age 1 to 99
         </div>
         <div>
-          <FaGlobe /> In-depth Cultural: Immerse yourself in rich history and
-          local traditions
+          <FaGlobe /> Cultural Experience
         </div>
         <div>
-          <FaMapSigns /> Partially Guided: Independent travel with selected
-          excursions
+          <FaMapSigns /> Partial Guided
         </div>
         <div>
           <FaUsers /> Group Size 2 - 15

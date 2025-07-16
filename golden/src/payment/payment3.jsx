@@ -1,13 +1,128 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { FaCcVisa } from "react-icons/fa6";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import { SiPaypal, SiCashapp, SiStripe } from "react-icons/si";
+import "react-toastify/dist/ReactToastify.css";
+
 import StepIndicator from "../components/StepIndicator";
+import StripePayment from "./StripePayment";
+import PayPalPayment from "./PayPalPayment";
+import axios from "axios";
 import "./payment3.css";
 
 export default function Payment3() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const location = useLocation();
+  const token = localStorage.getItem("access_token");
+
+  // Extras from navigation state (camelCase keys)
+  const extras = location.state?.extras || {};
+  const [booking, setBooking] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [paying, setPaying] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cash");
   const [showTrip, setShowTrip] = useState(false);
   const [showRooms, setShowRooms] = useState(false);
+
+  useEffect(() => {
+    async function fetchBooking() {
+      try {
+        const res = await axios.get(`/api/payments/bookings/${id}/`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setBooking(res.data);
+      } catch (err) {
+        setError("Failed to load booking.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBooking();
+  }, [id, token]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div style={{ color: "red" }}>{error}</div>;
+  if (!booking) return <div>No booking found.</div>;
+
+  const { travel_deal = {}, date_option = {} } = booking;
+
+  // Calculate costs based on extras (camelCase)
+  const tripCost = parseFloat(date_option.discounted_price) || 0;
+  const roomCost = extras.roomOption === "private" ? 345 : 0;
+  const donationCost = extras.donation ? 23 : 0;
+  const amount = (tripCost + roomCost + donationCost).toFixed(2);
+
+  // === CALLBACKS ===
+  const handleManualPayment = async () => {
+    setPaying(true);
+    try {
+      await axios.put(
+        `/api/payments/bookings/${id}/update-payment/`,
+        {
+          payment_method: "manual",
+          payment_amount: amount,
+          transaction_id: null,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success("Cash payment confirmed!");
+      setTimeout(() => navigate("/thank-you"), 1500);
+    } catch (err) {
+      toast.error("Payment failed: " + (err.response?.data?.detail || ""));
+    } finally {
+      setPaying(false);
+    }
+  };
+
+  const onStripeSuccess = async (chargeId) => {
+    try {
+      await axios.put(
+        `/api/payments/bookings/${id}/update-payment/`,
+        {
+          payment_method: "stripe",
+          payment_amount: amount,
+          transaction_id: chargeId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success("Stripe payment confirmed!");
+      setTimeout(() => navigate("/thank-you"), 1500);
+    } catch (err) {
+      toast.error("Stripe update failed: " + (err.response?.data?.detail || ""));
+    }
+  };
+
+  const onPayPalSuccess = async (paypalTransactionId) => {
+    try {
+      await axios.put(
+        `/api/payments/bookings/${id}/update-payment/`,
+        {
+          payment_method: "paypal",
+          payment_amount: amount,
+          transaction_id: paypalTransactionId,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success("PayPal payment confirmed!");
+      setTimeout(() => navigate("/thank-you"), 1500);
+    } catch (err) {
+      toast.error("PayPal update failed: " + (err.response?.data?.detail || ""));
+    }
+  };
+
+  const paymentOptions = [
+    { id: "cash", label: "Cash", icon: <SiCashapp size={28} /> },
+    { id: "paypal", label: "PayPal", icon: <SiPaypal size={28} /> },
+    { id: "stripe", label: "Stripe", icon: <SiStripe size={28} /> },
+  ];
 
   return (
     <div className="payment3-container">
@@ -23,9 +138,7 @@ export default function Payment3() {
             For bookings close to departure date, full payment is required to request your place with our local
             operators. This usually takes 2 to 4 business days, but may take longer due to high demand.
           </p>
-          <p>
-            Please wait for confirmation before booking flights or non-refundable travel arrangements.
-          </p>
+          <p>Please wait for confirmation before booking flights or non-refundable travel arrangements.</p>
         </div>
       </div>
 
@@ -38,37 +151,45 @@ export default function Payment3() {
           </div>
 
           <h3 className="section-heading">Payment options</h3>
-          <label className="radio-option">
-            <input type="radio" name="payment" defaultChecked /> Pay in full <strong>EUR€2,675.00</strong>
-          </label>
+          {paymentOptions.map((opt) => (
+            <button
+              key={opt.id}
+              className={`payment-option-btn ${paymentMethod === opt.id ? "selected" : ""}`}
+              onClick={() => setPaymentMethod(opt.id)}
+            >
+              {opt.icon} {opt.label}
+            </button>
+          ))}
 
           <h3 className="section-heading">Payment details</h3>
-          <div className="card-logos">
-            <FaCcVisa size={28} color="#1a1f71" />
-            <span className="mastercard">Mastercard</span>
-          </div>
+          {paymentMethod === "cash" && (
+            <>
+              <p>Please pay cash on arrival.</p>
+              <button
+                className="btn btn-success w-100 mt-2"
+                onClick={handleManualPayment}
+                disabled={paying}
+              >
+                {paying ? "Processing..." : "Confirm Cash Payment"}
+              </button>
+            </>
+          )}
 
-          <form className="card-form">
-            <label>
-              Cardholder name
-              <input type="text" placeholder="Cardholder name" />
-            </label>
-            <label>
-              Card number
-              <input type="text" placeholder="Card number" />
-            </label>
-            <div className="card-row">
-              <label>
-                Expiry date
-                <input type="text" placeholder="MM/YY" />
-              </label>
-              <label>
-                CVV/CVC
-                <input type="text" placeholder="123" />
-              </label>
-            </div>
-            <button type="button" className="promo-code-btn">I have a promo code</button>
-          </form>
+          {paymentMethod === "stripe" && (
+            <StripePayment
+              amount={amount}
+              onSuccess={onStripeSuccess}
+              onError={(msg) => toast.error(msg)}
+            />
+          )}
+
+          {paymentMethod === "paypal" && (
+            <PayPalPayment
+              amount={amount}
+              onSuccess={onPayPalSuccess}
+              onError={(msg) => toast.error(msg)}
+            />
+          )}
 
           {/* Agreements */}
           <div className="checkboxes">
@@ -89,51 +210,56 @@ export default function Payment3() {
         {/* RIGHT */}
         <div className="booking-summary">
           <h3>Booking summary</h3>
-          <div className="trip-name">Classic Vietnam</div>
-          <div className="duration">15 days</div>
+          <div className="trip-name">{travel_deal.title || "Trip Name"}</div>
+          <div className="duration">{travel_deal.days ? `${travel_deal.days} days` : ""}</div>
 
           <div className="details">
             <p>
               <strong>Start</strong>
               <br />
-              26 Jul 2025
+              {date_option.start_date
+                ? new Date(date_option.start_date).toLocaleDateString()
+                : "N/A"}{" "}
               <br />
-              Ho Chi Minh City, VIETNAM
+              {travel_deal.start_location || ""}
             </p>
             <p>
               <strong>Finish</strong>
               <br />
-              09 Aug 2025
+              {date_option.end_date
+                ? new Date(date_option.end_date).toLocaleDateString()
+                : "N/A"}{" "}
               <br />
-              Hanoi, VIETNAM
+              {travel_deal.end_location || ""}
             </p>
           </div>
 
-          {/* Dropdown trip */}
           <div className="summary-dropdown" onClick={() => setShowTrip(!showTrip)}>
             <span>Trip</span>
             <span>{showTrip ? "▲" : "▼"}</span>
           </div>
-          {showTrip && <div className="dropdown-content">Trip amount: EUR €2,000.00</div>}
+          {showTrip && <div className="dropdown-content">Trip amount: EUR €{tripCost.toFixed(2)}</div>}
 
           <div className="summary-dropdown" onClick={() => setShowRooms(!showRooms)}>
             <span>Room options</span>
             <span>{showRooms ? "▲" : "▼"}</span>
           </div>
-          {showRooms && <div className="dropdown-content">Private Room +675.00</div>}
+          {showRooms && extras.roomOption === "private" && (
+            <div className="dropdown-content">Private Room +345.00</div>
+          )}
 
           <div className="total breakdown">
             <div>Total</div>
-            <div>EUR €2,675.00</div>
+            <div>EUR €{amount}</div>
           </div>
 
           <div className="final-total pay-now">
             <span>Pay now</span>
-            <strong>EUR €2,675.00</strong>
+            <strong>EUR €{amount}</strong>
           </div>
 
-          <div className="how-to-credit">
-            <span title="How to redeem credit">ⓘ</span> How to redeem credit
+          <div className="how-to-credit" title="How to redeem credit">
+            <span>ⓘ</span> How to redeem credit
           </div>
         </div>
       </div>
@@ -152,8 +278,9 @@ export default function Payment3() {
 
       {/* Footer Buttons */}
       <div className="form-actions">
-        <button className="btn-back" onClick={() => navigate(-1)}>Back</button>
-        <button className="btn-paynow">Pay Now</button>
+        <button className="btn-back" onClick={() => navigate(-1)}>
+          Back
+        </button>
       </div>
 
       <div className="footer-links">
@@ -161,6 +288,8 @@ export default function Payment3() {
         <a href="#">Booking conditions</a>
         <a href="#">Data collection notice</a>
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

@@ -11,14 +11,15 @@ import "../pagescss/destdescription.css";
 import axios from "axios";
 
 export default function DestDescription() {
-  const { country, dealId } = useParams();
+  const { country, dealId: dealSlug } = useParams();
   const datesRef = useRef(null);
 
   const [dealData, setDealData] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [dates, setDates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Scroll handler for "View Dates And Book" button
   const scrollToDates = () => {
     if (datesRef.current) {
       datesRef.current.scrollIntoView({ behavior: "smooth" });
@@ -29,42 +30,65 @@ export default function DestDescription() {
     setLoading(true);
     setError(null);
 
-    axios
-      .get(`/api/destinations/countries/${country}/travel-deals/${dealId}/`)
-      .then((response) => {
-        setDealData(response.data);
+    const fetchDeal = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/`);
+    const fetchReviews = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/reviews/`);
+    const fetchDates = axios.get(`/api/destinations/countries/${country}/travel-deals/${dealSlug}/dates/`);
+
+    Promise.all([fetchDeal, fetchReviews, fetchDates])
+      .then(([dealRes, reviewsRes, datesRes]) => {
+        setDealData(dealRes.data);
+
+        const reviewsData = Array.isArray(reviewsRes.data)
+          ? reviewsRes.data
+          : reviewsRes.data.results || [];
+        setReviews(reviewsData);
+
+        const datesData = Array.isArray(datesRes.data)
+          ? datesRes.data
+          : datesRes.data.results || [];
+        setDates(datesData);
       })
       .catch(() => {
-        setError("Failed to load deal data.");
+        setError("Failed to load travel deal, reviews, or dates.");
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [country, dealId]);
+  }, [country, dealSlug]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>Loading travel deal...</div>;
   if (error) return <div>{error}</div>;
-  if (!dealData) return <div>No data found.</div>;
+  if (!dealData) return <div>No travel deal found.</div>;
+
+  const reviewCount = reviews.length;
+  const averageRating = reviewCount
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
+    : 0;
+
+  const descData = {
+    ...dealData,
+    review_count: reviewCount,
+    average_rating: averageRating,
+  };
 
   return (
     <div className="dest-description-container">
-      {/* Breadcrumb */}
       <nav className="breadcrumb">
         <Link to="/">Home</Link> &gt;{" "}
-        <Link to="/AllDestinations">Destinations</Link> &gt;{" "}
+        <Link to="/alldestinations">Destinations</Link> &gt;{" "}
         <Link to={`/destinations/${country}`}>{country}</Link> &gt;{" "}
-        <span>{dealData.title || dealId}</span>
+        <span>{dealData.title}</span>
       </nav>
 
-      {/* Pass dealData as props to children */}
-      <Desc data={dealData} onViewDatesClick={scrollToDates} />
+      <Desc data={descData} onViewDatesClick={scrollToDates} />
       <Places data={dealData} />
       <Feat data={dealData} />
       <Included data={dealData} />
       <div ref={datesRef}>
-        <Dates data={dealData} />
+        {/* Pass dealData.id to Dates */}
+        <Dates data={dates} dealId={dealData.id} />
       </div>
-      <Reviewplaces data={dealData} />
+      <Reviewplaces data={dealData} reviews={reviews} setReviews={setReviews} />
       <Foot />
     </div>
   );

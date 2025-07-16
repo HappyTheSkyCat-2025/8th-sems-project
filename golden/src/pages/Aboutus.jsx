@@ -1,63 +1,81 @@
-import React from 'react';
-import '../styles/AboutUs.css';
-import img2 from '../assets/img2.jpg';
-import bali from '../assets/bali.jpg';
-import image3 from '../assets/img2.jpg';
-import image4 from '../assets/bali.jpg';
-import image5 from '../assets/img2.jpg';
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
+
+import "../styles/aboutUs.css";
+import OurPurpose from "./aboutus/ourpurpose";
+import OurStory from "./aboutus/ourstory";
+import Why from "./aboutus/why";
+import Guides from "./aboutus/guides";
+import GoodTimes from "./aboutus/goodtimes"; 
+import Foot from "../pages/foot";
+
+import heroImg from "../assets/bali.jpg";
 
 export default function AboutUs() {
+  const handleClick = (id) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    // optional scroll tracking logic here if needed in future
+    const handleScroll = () => {};
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="about-container">
-      <section className="intro">
-        <h1>About Golden Leaf Travels</h1>
-        <p>
-          Golden Leaf Travels is more than just a travel company – it's a passion project crafted to bring unforgettable travel experiences to every wanderer. 
-          From peaceful escapes in nature to thrilling cultural journeys, we design travel that leaves a lasting golden impression.
-        </p>
-        <img src={img2} alt="Golden Journey" className="about-main-img" />
-      </section>
+      {/* ── breadcrumb ───────────────────── */}
+      <nav className="breadcrumb">
+        <Link to="/">Home</Link> <span className="arrow">›</span> <span>About us</span>
+      </nav>
 
-      <section className="our-story">
-        <h2>Our Story</h2>
-        <p>
-          Founded by a group of passionate explorers, Golden Leaf began as a dream to connect people with the beauty of the world. 
-          With roots in Nepal, our journeys are deeply personal – we believe every trip should awaken the soul and broaden the heart.
-        </p>
-        <div className="img-grid">
-          <img src={bali} alt="Bali Adventure" />
-          <img src={image3} alt="Local Culture" />
+      {/* ── hero section ─────────────────── */}
+      <div className="about-hero" style={{ backgroundImage: `url(${heroImg})` }}>
+        <div className="hero-text">
+          <h1 className="hero-heading">About Golden Leaf Travels</h1>
+          <p className="hero-subtitle">Small group tours</p>
         </div>
-      </section>
+      </div>
 
-      <section className="mission">
-        <h2>Our Mission</h2>
-        <p>
-          To offer handcrafted travel experiences that are immersive, sustainable, and culturally rich. 
-          We aim to empower local communities while giving travelers meaningful and transformative journeys.
-        </p>
-        <img src={image4} alt="Mission Driven Travel" className="wide-img" />
-      </section>
-
-      <section className="vision">
-        <h2>Our Vision</h2>
-        <p>
-          We envision a world where travel is a path to understanding, empathy, and global harmony. 
-          Our goal is to lead in responsible tourism while continuously surprising and delighting our travelers.
-        </p>
-        <img src={image5} alt="Travel Vision" className="wide-img" />
-      </section>
-
-      <section className="why-us">
-        <h2>Why Travel With Golden Leaf?</h2>
+      {/* ── top-tabs navigation ──────────── */}
+      <nav className="top-tabs">
         <ul>
-          <li>🌿 Expertly curated travel experiences</li>
-          <li>🌍 Authentic local guides and cultural immersion</li>
-          <li>✨ Tailored journeys for solo travelers, couples, and families</li>
-          <li>💼 Trusted by thousands across the globe</li>
-          <li>♻️ Eco-conscious and community-based tourism model</li>
+          {[
+            ["purpose", "Our purpose"],
+            ["story", "Our Story"],
+            ["why", "Why Golden Leaf"],
+            ["guides", "Our Team"],
+          ].map(([id, label]) => (
+            <li key={id}>
+              <button className="tab-button" onClick={() => handleClick(id)}>
+                {label}
+              </button>
+            </li>
+          ))}
         </ul>
-      </section>
+      </nav>
+
+      {/* ── Description paragraph ─────────── */}
+      <div className="tabs-description">
+        <p>
+          Wild Frontiers is an award-winning adventure travel company, founded in 1998 by travel writer Jonny Bealby.
+          We specialise in stylish and original small group tours and tailor-made holidays worldwide.
+          <br /><br />
+          We are firm believers that travelling is all about the experience and it’s in the details – the places you stay,
+          the transport and route that gets you there, and the people you meet along the way – that make the trip;
+          we therefore specialise in drawing on our own extensive local knowledge and array of contacts
+          to give our clients the very best experience possible.
+        </p>
+      </div>
+
+      {/* ── Connected sections ────────────── */}
+      <section id="purpose"><OurPurpose /></section>
+      <section id="story"><OurStory /></section>
+      <section id="why"><Why /></section>
+      <section id="guides"><Guides /></section>
+      <section id="good-times"><GoodTimes /></section>
+      <section id="foot"><Foot /></section>
     </div>
   );
 }
