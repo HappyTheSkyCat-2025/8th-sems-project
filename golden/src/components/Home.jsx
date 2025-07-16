@@ -1,4 +1,6 @@
+// src/components/Home.jsx
 import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ReactDOM from 'react-dom';
 import { MapPin, Search, Calendar, AlertCircle } from 'lucide-react';
 import DatePicker from 'react-datepicker';
@@ -13,6 +15,7 @@ export default function Home() {
 
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
+  const navigate = useNavigate(); // ← used for navigation
 
   const PopperContainer = ({ children, containerRef }) => {
     return containerRef?.current
@@ -45,6 +48,10 @@ export default function Home() {
     if (!startDate) {
       setEndDateError('Please select start date first');
     }
+  };
+
+  const handleSearch = () => {
+    navigate("/search"); // Navigate to Search page
   };
 
   return (
@@ -82,7 +89,9 @@ export default function Home() {
                     onKeyDown={(e) => e.preventDefault()}
                     minDate={new Date()}
                     popperPlacement="bottom-start"
-                    popperContainer={(props) => <PopperContainer {...props} containerRef={startDateRef} />}
+                    popperContainer={(props) => (
+                      <PopperContainer {...props} containerRef={startDateRef} />
+                    )}
                   />
                 </div>
 
@@ -101,12 +110,14 @@ export default function Home() {
                     onKeyDown={(e) => e.preventDefault()}
                     minDate={startDate || new Date()}
                     popperPlacement="bottom-start"
-                    popperContainer={(props) => <PopperContainer {...props} containerRef={endDateRef} />}
+                    popperContainer={(props) => (
+                      <PopperContainer {...props} containerRef={endDateRef} />
+                    )}
                   />
                 </div>
               </div>
 
-              <button className="search-btn">
+              <button className="search-btn" onClick={handleSearch}>
                 Search <Search size={16} />
               </button>
             </div>
@@ -123,3 +134,4 @@ export default function Home() {
     </section>
   );
 }
+ 

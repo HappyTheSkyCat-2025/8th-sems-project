@@ -18,7 +18,7 @@ export default function AllDestinations() {
       <div className="breadcrumb">
         <Link to="/" className="breadcrumb-link">Home</Link> <span>›</span> <span>Destinations</span>
       </div>
-
+ 
       <h1 className="page-title">Explore All Destinations</h1>
 
       <div className="destination-grid">

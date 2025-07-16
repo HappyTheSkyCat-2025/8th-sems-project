@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -37,6 +38,9 @@ import AllDestinations from "./pages/AllDestinations";
 import DestinationPage from "./pages/DestinationPage";
 import DestDescription from "./pages/destdescription";
 
+// Search Page
+import Search from "./components/search"; // Ensure this file is Search.jsx or match import case
+
 // Payment pages
 import Payment1 from "./payment/payment1";
 import Payment2 from "./payment/payment2";
@@ -47,36 +51,28 @@ import ThankYou from "./payment/ThankYou";
 import RequireAdmin from "./utils/RequireAdmin";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
-
 import RegionList from "./components/admin/regions/RegionList";
 import RegionForm from "./components/admin/regions/RegionForm";
-
 import CountryList from "./components/admin/countries/CountryList";
 import CountryForm from "./components/admin/countries/CountryForm";
-
 import TravelDealList from "./components/admin/travel-deals/TravelDealList";
 import TravelDealForm from "./components/admin/travel-deals/TravelDealForm";
-
 import FAQList from "./components/admin/faqs/FAQList";
 import FAQForm from "./components/admin/faqs/FAQForm";
-
 import ReviewList from "./components/admin/reviews/ReviewList";
 import ReviewForm from "./components/admin/reviews/ReviewForm";
-
 import CountryOverviewList from "./components/admin/country-overview/CountryOverviewList";
 import CountryOverviewForm from "./components/admin/country-overview/CountryOverviewForm";
-
 import LearnMoreTopicList from "./components/admin/learn-more-topics/LearnMoreTopicList";
 import LearnMoreTopicForm from "./components/admin/learn-more-topics/LearnMoreTopicForm";
 
 // Toastify
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function Layout() {
   const location = useLocation();
 
-  // Routes where navbar/footer are hidden
   const noLayoutRoutes = [
     "/login",
     "/register",
@@ -89,7 +85,6 @@ function Layout() {
     "/thank-you",
   ];
 
-  // Admin routes handled inside <Route path="/admin" /> block separately
   const adminRoutes = [
     "/admin",
     "/admin/regions",
@@ -98,10 +93,8 @@ function Layout() {
     "/admin/countries",
     "/admin/countries/create",
     "/admin/countries/:slug/edit",
-    // Add all your admin routes here similarly if needed
   ];
 
-  // Check if current path matches any no-layout or admin routes
   const hideLayout =
     noLayoutRoutes.some((path) =>
       matchPath({ path, end: false }, location.pathname)
@@ -115,7 +108,7 @@ function Layout() {
       {!hideLayout && <Navbar />}
 
       <Routes>
-        {/* === Public Routes === */}
+        {/* Public Home Page */}
         <Route
           path="/"
           element={
@@ -134,13 +127,10 @@ function Layout() {
         />
         <Route path="/alldestinations" element={<AllDestinations />} />
         <Route path="/destinations/:country" element={<DestinationPage />} />
-        <Route
-          path="/destinations/:country/deal/:dealId"
-          element={<DestDescription />}
-        />
+        <Route path="/destinations/:country/deal/:dealId" element={<DestDescription />} />
         <Route path="/about" element={<AboutUs />} />
 
-        {/* === Auth Routes === */}
+        {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
@@ -148,13 +138,16 @@ function Layout() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
 
-        {/* === Payment Routes === */}
+        {/* Payment Routes */}
         <Route path="/payment/payment1" element={<Payment1 />} />
         <Route path="/payment/payment2/:id" element={<Payment2 />} />
         <Route path="/payment/payment3/:id" element={<Payment3 />} />
         <Route path="/thank-you" element={<ThankYou />} />
 
-        {/* === Admin Routes === */}
+        {/* Search Route (after clicking Search button) */}
+        <Route path="/search" element={<Search />} />
+
+        {/* Admin Routes */}
         <Route
           path="/admin"
           element={
@@ -164,7 +157,6 @@ function Layout() {
           }
         >
           <Route index element={<AdminDashboard />} />
-
           <Route path="regions" element={<RegionList />} />
           <Route path="regions/create" element={<RegionForm />} />
           <Route path="regions/:id/edit" element={<RegionForm />} />

@@ -336,7 +336,7 @@
   display: none;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 900px) {
   .hamburger-wrapper {
     display: block;
     position: absolute;
