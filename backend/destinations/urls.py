@@ -58,4 +58,9 @@ urlpatterns = [
         'countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/<int:pk>/',
         views.TravelDealDateRetrieveUpdateDestroyAPIView.as_view(),
         name='travel-deal-date-detail'
-    ),]
+    ),
+    
+    # Wishlist CRUD
+    path('wishlist/', views.WishlistItemListCreateView.as_view(), name='wishlist-item-list-create'),
+    path('wishlist/<int:pk>/', views.WishlistItemDetailView.as_view(), name='wishlist-item-detail'),
+]

@@ -322,7 +322,14 @@ export default function Navbar() {
               <IoLanguageOutline size={20} />
             </div>
 
-            <Heart size={18} />
+            <Link
+              to="/my-wishlist"
+              aria-label="Go to Wishlist"
+              className="wishlist-icon"
+              style={{ color: "inherit", textDecoration: "none" }}
+            >
+              <Heart size={18} />
+            </Link>
             <div className="profile-dropdown">
               <User
                 size={18}

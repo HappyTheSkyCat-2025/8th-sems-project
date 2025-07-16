@@ -6,11 +6,12 @@ import {
   FaHeart,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 import "../../pagescss/deals.css";
 
 const INITIAL_VISIBLE = 3;
 
-// Utility to slugify titles for URLs
 const slugify = (str) =>
   str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -19,6 +20,7 @@ export default function DealsSection({ data = {} }) {
 
   const navigate = useNavigate();
   const [openGrp, setOpenGrp] = useState({ styles: true, themes: true });
+  // liked: object mapping dealId -> wishlistItemId (or undefined if not liked)
   const [liked, setLiked] = useState({});
   const [showAll, setShowAll] = useState(false);
   const [animate, setAnimate] = useState(false);
@@ -31,6 +33,80 @@ export default function DealsSection({ data = {} }) {
     themes: [],
     deals: { onSale: false, lastMinute: false },
   });
+
+  // Fetch user's wishlist on mount
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const res = await axios.get("/api/destinations/wishlist/", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        });
+        const dealMap = {};
+        res.data.results.forEach((item) => {
+          dealMap[item.deal] = item.id;
+        });
+        setLiked(dealMap);
+      } catch (err) {
+        console.error("Failed to fetch wishlist", err);
+        toast.error("Failed to load wishlist");
+      }
+    };
+    fetchWishlist();
+  }, []);
+
+  // Wishlist toggle
+  const toggleLike = async (dealId) => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      toast.info("Please log in to use wishlist");
+      navigate("/login");
+      return;
+    }
+
+    const wishlistId = liked[dealId];
+    if (wishlistId) {
+      // remove from wishlist
+      try {
+        await axios.delete(`/api/destinations/wishlist/${wishlistId}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setLiked((prev) => {
+          const next = { ...prev };
+          delete next[dealId];
+          return next;
+        });
+        toast.success("Removed from wishlist");
+      } catch (err) {
+        console.error("Error removing from wishlist", err);
+        toast.error("Failed to remove from wishlist");
+      }
+    } else {
+      // add to wishlist
+      try {
+        const res = await axios.post(
+          "/api/destinations/wishlist/",
+          { deal: dealId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setLiked((prev) => ({
+          ...prev,
+          [dealId]: res.data.id,
+        }));
+        toast.success("Added to wishlist");
+      } catch (err) {
+        console.error("Error adding to wishlist", err);
+        toast.error("Failed to add to wishlist");
+      }
+    }
+  };
 
   useEffect(() => {
     setAnimate(true);
@@ -59,8 +135,6 @@ export default function DealsSection({ data = {} }) {
     };
   }, [dealsArr]);
 
-  const toggleColl = (g) => setOpenGrp((p) => ({ ...p, [g]: !p[g] }));
-  const toggleLike = (id) => setLiked((p) => ({ ...p, [id]: !p[id] }));
   const handleCheck = (group, value) =>
     setFilters((p) => {
       if (group === "styles" || group === "themes") {
@@ -112,7 +186,7 @@ export default function DealsSection({ data = {} }) {
     <section className="deals-section" id="travel-deals">
       <h2>Top {data.title?.split(" ")[0]} Travel Deals</h2>
       <div className="deals-layout">
-        {/* Filter Sidebar */}
+        {/* Filters */}
         <aside className="filters">
           <h5 className="filters__title">Duration</h5>
           <div className="range-row">
@@ -172,10 +246,11 @@ export default function DealsSection({ data = {} }) {
             Last minute deals
           </label>
 
+          {/* Style filter */}
           <div className="collapsible">
             <button
               className="collapsible__header"
-              onClick={() => toggleColl("styles")}
+              onClick={() => setOpenGrp((p) => ({ ...p, styles: !p.styles }))}
             >
               <span>Styles</span>{" "}
               {openGrp.styles ? <FaChevronUp /> : <FaChevronDown />}
@@ -199,10 +274,11 @@ export default function DealsSection({ data = {} }) {
             </div>
           </div>
 
+          {/* Theme filter */}
           <div className="collapsible">
             <button
               className="collapsible__header"
-              onClick={() => toggleColl("themes")}
+              onClick={() => setOpenGrp((p) => ({ ...p, themes: !p.themes }))}
             >
               <span>Themes</span>{" "}
               {openGrp.themes ? <FaChevronUp /> : <FaChevronDown />}
@@ -227,7 +303,7 @@ export default function DealsSection({ data = {} }) {
           </div>
         </aside>
 
-        {/* Deals Cards Grid */}
+        {/* Deals Grid */}
         <div className={`deals-grid ${animate ? "reveal" : ""}`}>
           {display.map((d, i) => {
             const priceNum = parseInt(d.price.replace(/[^0-9]/g, "") || 0, 10);
@@ -296,7 +372,7 @@ export default function DealsSection({ data = {} }) {
         </div>
       </div>
 
-      {/* View More Button */}
+      {/* View More */}
       {filtered.length > INITIAL_VISIBLE && (
         <div className="view-more-wrapper">
           <button

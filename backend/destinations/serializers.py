@@ -4,7 +4,8 @@ from django.db.models import Avg
 from .models import (
     Region, Country, TravelDeal, TravelImage, Review, Article, FAQ,
     TravelOption, TravelType, DealCategory, DealOffer,
-    CountryOverview, CountryLearnMoreTopic, TravelDealDate
+    CountryOverview, CountryLearnMoreTopic, TravelDealDate,
+    WishlistItem
 )
 
 
@@ -61,6 +62,15 @@ class TravelDealSerializer(serializers.ModelSerializer):
             return round(avg_rating, 1) if avg_rating else 0
         return 0
 
+
+class WishlistItemSerializer(serializers.ModelSerializer):
+    deal_title = serializers.CharField(source='deal.title', read_only=True)
+    deal_image = serializers.ImageField(source='deal.image', read_only=True)
+    deal_country_slug = serializers.SlugField(source="deal.country.slug", read_only=True)
+
+    class Meta:
+        model = WishlistItem
+        fields = ['id', 'deal', 'deal_title', 'deal_image', 'deal_country_slug']
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

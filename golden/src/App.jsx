@@ -20,6 +20,7 @@ import VerifyOTP from "./Auth/VerifyOTP";
 import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
 import Profile from "./Auth/profile";
+import MyWishlist from "./pages/MyWishlist";
 
 // Home page sections
 import Home from "./components/Home";
@@ -137,6 +138,7 @@ function Layout() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/my-wishlist" element={<MyWishlist />} />
 
         {/* Payment Routes */}
         <Route path="/payment/payment1" element={<Payment1 />} />

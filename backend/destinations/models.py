@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
@@ -84,6 +85,19 @@ class TravelImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.deal.title}"
+
+
+
+class WishlistItem(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist_items')
+    deal = models.ForeignKey('TravelDeal', on_delete=models.CASCADE, related_name='wishlisted_by')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'deal')
+
+    def __str__(self):
+        return f"{self.user.email} → {self.deal.title}"
 
 class Review(models.Model):
     travel_deal = models.ForeignKey("TravelDeal", related_name="reviews", on_delete=models.CASCADE)

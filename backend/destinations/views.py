@@ -1,19 +1,20 @@
 from rest_framework import generics
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,
     TravelType, DealCategory, DealOffer,
-    CountryOverview, CountryLearnMoreTopic, TravelDealDate
+    CountryOverview, CountryLearnMoreTopic, TravelDealDate,
+    WishlistItem
 )
 from .serializers import (
     RegionSerializer, CountrySerializer, CountryDetailSerializer,
     TravelDealSerializer, ReviewSerializer, ArticleSerializer,
     FAQSerializer, TravelTypeSerializer, DealCategorySerializer,
     CountryOverviewSerializer, CountryLearnMoreTopicSerializer,
-    TravelDealDateSerializer
+    TravelDealDateSerializer, WishlistItemSerializer
 )
 from .permissions import IsSuperUserOrReadOnly
 
@@ -254,3 +255,20 @@ class TravelDealDateRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyA
             travel_deal__slug=deal_slug,
             travel_deal__country__slug=country_slug
         )
+
+class WishlistItemListCreateView(generics.ListCreateAPIView):
+    serializer_class = WishlistItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return WishlistItem.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class WishlistItemDetailView(generics.RetrieveDestroyAPIView):
+    serializer_class = WishlistItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return WishlistItem.objects.filter(user=self.request.user)

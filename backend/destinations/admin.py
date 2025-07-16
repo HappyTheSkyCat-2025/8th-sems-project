@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from .models import Region, Country, TravelDeal, TravelImage, Review, Article, FAQ
 from .models import TravelType, DealCategory, DealOffer
-from .models import CountryOverview, CountryLearnMoreTopic, TravelDealDate
+from .models import CountryOverview, CountryLearnMoreTopic, TravelDealDate, WishlistItem
 
 admin.site.register(Region)
 admin.site.register(Country)
@@ -27,3 +27,4 @@ admin.site.register(CountryOverview)
 admin.site.register(CountryLearnMoreTopic)
 
 admin.site.register(TravelDealDate)
+admin.site.register(WishlistItem)
