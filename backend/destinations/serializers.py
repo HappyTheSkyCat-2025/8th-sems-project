@@ -5,7 +5,7 @@ from .models import (
     Region, Country, TravelDeal, TravelImage, Review, Article, FAQ,
     TravelOption, TravelType, DealCategory, DealOffer,
     CountryOverview, CountryLearnMoreTopic, TravelDealDate,
-    WishlistItem, Place
+    WishlistItem, Place, ItineraryDay
 )
 
 
@@ -77,6 +77,35 @@ class TravelDealSerializer(serializers.ModelSerializer):
             return round(avg_rating, 1) if avg_rating else 0
         return 0
 
+
+class TravelDealIncludedSerializer(serializers.ModelSerializer):
+    included = serializers.SerializerMethodField()
+    not_included = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TravelDeal
+        fields = ['included', 'not_included']
+
+    def get_included(self, obj):
+        return obj.included
+
+    def get_not_included(self, obj):
+        return obj.not_included
+
+
+class ItineraryDaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ItineraryDay
+        fields = [
+            'id',
+            'travel_deal',
+            'day_number',
+            'location',
+            'description',
+            'accommodation',
+            'meals',
+            'activities',
+        ]
 
 class WishlistItemSerializer(serializers.ModelSerializer):
     deal_title = serializers.CharField(source='deal.title', read_only=True)

@@ -5,16 +5,17 @@ from rest_framework.response import Response
 
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,
-    TravelType, DealCategory, DealOffer,
+    TravelType, DealCategory,
     CountryOverview, CountryLearnMoreTopic, TravelDealDate,
-    WishlistItem
+    WishlistItem, ItineraryDay, Place
 )
 from .serializers import (
     RegionSerializer, CountrySerializer, CountryDetailSerializer,
     TravelDealSerializer, ReviewSerializer, ArticleSerializer,
     FAQSerializer, TravelTypeSerializer, DealCategorySerializer,
     CountryOverviewSerializer, CountryLearnMoreTopicSerializer,
-    TravelDealDateSerializer, WishlistItemSerializer
+    TravelDealDateSerializer, WishlistItemSerializer, ItineraryDaySerializer,
+    PlaceSerializer, TravelDealIncludedSerializer
 )
 from .permissions import IsSuperUserOrReadOnly
 
@@ -71,6 +72,58 @@ class TravelDealRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
     def get_queryset(self):
         country_slug = self.kwargs.get('country_slug')
         return TravelDeal.objects.filter(country__slug=country_slug)
+
+# ====== Places ======
+class PlaceListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = PlaceSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        return Place.objects.all()
+    
+class PlaceRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PlaceSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        return Place.objects.all()
+    
+# ====== Itinerary Days ======
+class ItineraryDayListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = ItineraryDaySerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        deal_slug = self.kwargs['deal_slug']
+        return ItineraryDay.objects.filter(travel_deal__slug=deal_slug).order_by('day_number')
+
+    def perform_create(self, serializer):
+        deal_slug = self.kwargs['deal_slug']
+        deal = TravelDeal.objects.get(slug=deal_slug)
+        serializer.save(travel_deal=deal)
+
+class ItineraryDayRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ItineraryDay.objects.all()
+    serializer_class = ItineraryDaySerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+class TravelDealIncludedRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = TravelDealIncludedSerializer
+    lookup_field = 'slug'
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        country_slug = self.kwargs.get('country_slug')
+        return TravelDeal.objects.filter(country__slug=country_slug)
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        slug = self.kwargs.get('deal_slug')
+        try:
+            return queryset.get(slug=slug)
+        except TravelDeal.DoesNotExist:
+            raise NotFound("Travel deal not found")
 
 # ====== Reviews ======
 class ReviewListCreateAPIView(generics.ListCreateAPIView):

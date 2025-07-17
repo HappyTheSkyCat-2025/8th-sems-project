@@ -11,7 +11,7 @@ import "../pagescss/destdescription.css";
 import axiosInstance from "../utils/axiosInstance";
 
 export default function DestDescription() {
-  const { country, dealId: dealSlug } = useParams();
+  const { country, dealId } = useParams(); // Use consistent naming
   const datesRef = useRef(null);
 
   const [dealData, setDealData] = useState(null);
@@ -30,9 +30,15 @@ export default function DestDescription() {
     setLoading(true);
     setError(null);
 
-    const fetchDeal = axiosInstance.get(`/destinations/countries/${country}/travel-deals/${dealSlug}/`);
-    const fetchReviews = axiosInstance.get(`/destinations/countries/${country}/travel-deals/${dealSlug}/reviews/`);
-    const fetchDates = axiosInstance.get(`/destinations/countries/${country}/travel-deals/${dealSlug}/dates/`);
+    const fetchDeal = axiosInstance.get(
+      `/destinations/countries/${country}/travel-deals/${dealId}/`
+    );
+    const fetchReviews = axiosInstance.get(
+      `/destinations/countries/${country}/travel-deals/${dealId}/reviews/`
+    );
+    const fetchDates = axiosInstance.get(
+      `/destinations/countries/${country}/travel-deals/${dealId}/dates/`
+    );
 
     Promise.all([fetchDeal, fetchReviews, fetchDates])
       .then(([dealRes, reviewsRes, datesRes]) => {
@@ -54,7 +60,7 @@ export default function DestDescription() {
       .finally(() => {
         setLoading(false);
       });
-  }, [country, dealSlug]);
+  }, [country, dealId]);
 
   if (loading) return <div>Loading travel deal...</div>;
   if (error) return <div>{error}</div>;
@@ -82,8 +88,9 @@ export default function DestDescription() {
 
       <Desc data={descData} onViewDatesClick={scrollToDates} />
       <Places data={dealData} />
-      <Feat data={dealData} />
-      <Included data={dealData} />
+      {/* Pass country and dealId explicitly */}
+      <Feat country={country} dealId={dealId} />
+      <Included country={country} dealId={dealId} />
       <div ref={datesRef}>
         <Dates data={dates} dealId={dealData.id} />
       </div>

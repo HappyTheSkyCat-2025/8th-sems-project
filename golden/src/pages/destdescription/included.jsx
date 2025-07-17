@@ -1,16 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import includedData from "../../data/included";
+import axiosInstance from "../../utils/axiosInstance";
 import "../../pagescss/included.css";
 
-export default function WhatsIncluded() {
+export default function WhatsIncluded({ country, dealId }) {
+  const [included, setIncluded] = useState([]);
+  const [notIncluded, setNotIncluded] = useState([]);
+
   const [expandedIncluded, setExpandedIncluded] = useState(null);
   const [showAllIncluded, setShowAllIncluded] = useState(false);
 
   const [expandedNotIncluded, setExpandedNotIncluded] = useState(null);
   const [showAllNotIncluded, setShowAllNotIncluded] = useState(false);
 
-  const { included, notIncluded } = includedData;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!country || !dealId) return;
+
+    const fetchIncludedData = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await axiosInstance.get(
+          `/destinations/countries/${country}/travel-deals/${dealId}/included/`
+        );
+        // Assuming your API returns { included: [...], not_included: [...] }
+        setIncluded(response.data.included || []);
+        setNotIncluded(response.data.not_included || []);
+      } catch (err) {
+        console.error("Error fetching included data:", err);
+        setError("Failed to load included/not included info.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIncludedData();
+  }, [country, dealId]);
 
   const toggleIncluded = (index) => {
     setExpandedIncluded(expandedIncluded === index ? null : index);
@@ -19,6 +48,9 @@ export default function WhatsIncluded() {
   const toggleNotIncluded = (index) => {
     setExpandedNotIncluded(expandedNotIncluded === index ? null : index);
   };
+
+  if (loading) return <div>Loading included information...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <section className="included-section">

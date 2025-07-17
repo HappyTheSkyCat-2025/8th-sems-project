@@ -4,6 +4,7 @@ from django.contrib import admin
 from .models import Region, Country, TravelDeal, TravelImage, Review, Article, FAQ
 from .models import TravelType, DealCategory, DealOffer
 from .models import CountryOverview, CountryLearnMoreTopic, TravelDealDate, Place
+from .models import ItineraryDay
 
 admin.site.register(Region)
 admin.site.register(Country)
@@ -16,7 +17,7 @@ class TravelImageInline(admin.TabularInline):
 class TravelDealAdmin(admin.ModelAdmin):
     inlines = [TravelImageInline]
     prepopulated_fields = {"slug": ("title",)}
-    filter_horizontal = ('places',)  # Enables nice widget for ManyToManyField 'places'
+    filter_horizontal = ('places',)
 
 admin.site.register(Review)
 admin.site.register(Article)
@@ -27,4 +28,5 @@ admin.site.register(DealOffer)
 admin.site.register(CountryOverview)
 admin.site.register(CountryLearnMoreTopic)
 admin.site.register(TravelDealDate)
-admin.site.register(Place)  # Also register Place model in admin
+admin.site.register(Place)
+admin.site.register(ItineraryDay)

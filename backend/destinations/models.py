@@ -1,4 +1,5 @@
 from django.conf import settings
+import json
 from django.db import models
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
@@ -81,6 +82,31 @@ class TravelDeal(models.Model):
     on_sale = models.BooleanField(default=False)
     last_minute = models.BooleanField(default=False)
 
+    included_json = models.TextField(blank=True, default='[]')
+    not_included_json = models.TextField(blank=True, default='[]')
+
+    @property
+    def included(self):
+        try:
+            return json.loads(self.included_json)
+        except json.JSONDecodeError:
+            return []
+
+    @included.setter
+    def included(self, value):
+        self.included_json = json.dumps(value)
+
+    @property
+    def not_included(self):
+        try:
+            return json.loads(self.not_included_json)
+        except json.JSONDecodeError:
+            return []
+
+    @not_included.setter
+    def not_included(self, value):
+        self.not_included_json = json.dumps(value)
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
@@ -97,6 +123,21 @@ class TravelImage(models.Model):
     def __str__(self):
         return f"Image for {self.deal.title}"
 
+
+class ItineraryDay(models.Model):
+    travel_deal = models.ForeignKey(TravelDeal, related_name='itinerary', on_delete=models.CASCADE)
+    day_number = models.PositiveIntegerField()
+    location = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    accommodation = models.CharField(max_length=200, blank=True)
+    activities = models.JSONField(default=list, blank=True)  # list of strings
+    meals = models.JSONField(default=list, blank=True)       # list of strings
+
+    class Meta:
+        ordering = ['day_number']
+
+    def __str__(self):
+        return f"{self.travel_deal.title} - Day {self.day_number}"
 
 
 class WishlistItem(models.Model):

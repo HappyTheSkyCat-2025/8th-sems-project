@@ -25,6 +25,21 @@ urlpatterns = [
     path('countries/<slug:slug>/travel-deals/', views.TravelDealListCreateAPIView.as_view(), name='travel-deal-list'),
     path('countries/<slug:country_slug>/travel-deals/<slug:slug>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
 
+    # places CRUD
+    path('countries/<slug:country_slug>/places/', views.PlaceListCreateAPIView.as_view(), name='place-list'),
+    path('countries/<slug:country_slug>/places/<int:pk>/', views.PlaceRetrieveUpdateDestroyAPIView.as_view(), name='place-detail'),
+
+    # itinerary days CRUD
+    path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/itinerary-days/', views.ItineraryDayListCreateAPIView.as_view(), name='itinerary-day-list'),
+    path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/itinerary-days/<int:pk>/', views.ItineraryDayRetrieveUpdateDestroyAPIView.as_view(), name='itinerary-day-detail'),
+
+
+    path(
+        'countries/<country_slug>/travel-deals/<deal_slug>/included/',
+        views.TravelDealIncludedRetrieveUpdateAPIView.as_view(),
+        name='traveldeal-included-detail'
+    ),
+
     # === Reviews CRUD ===
     path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
     path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/<int:pk>/', views.ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
