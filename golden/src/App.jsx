@@ -12,6 +12,7 @@ import {
 import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
 import ScrollToTop from "./components/ScrollToTop";
+import ChatBot from "./components/chatbot"; 
 
 // Auth pages
 import Login from "./Auth/login";
@@ -41,7 +42,7 @@ import DestinationPage from "./pages/DestinationPage";
 import DestDescription from "./pages/destdescription";
 
 // Search Page
-import Search from "./components/search"; // Ensure this file is Search.jsx or match import case
+import Search from "./components/search";
 
 // Payment pages
 import Payment1 from "./payment/payment1";
@@ -106,12 +107,22 @@ function Layout() {
       location.pathname.startsWith(path.replace(":id", "").replace(":slug", ""))
     );
 
+  const paymentPaths = [
+    "/payment/payment1",
+    "/payment/payment2",
+    "/payment/payment3",
+    "/thank-you",
+  ];
+
+  const showChatBot = !paymentPaths.some((path) =>
+    matchPath({ path, end: false }, location.pathname)
+  );
+
   return (
     <>
       {!hideLayout && <Navbar />}
 
       <Routes>
-        {/* Public Home Page */}
         <Route
           path="/"
           element={
@@ -149,7 +160,7 @@ function Layout() {
         <Route path="/payment/payment3/:id" element={<Payment3 />} />
         <Route path="/thank-you" element={<ThankYou />} />
 
-        {/* Search Route (after clicking Search button) */}
+        {/* Search Route */}
         <Route path="/search" element={<Search />} />
 
         {/* Admin Routes */}
@@ -165,7 +176,6 @@ function Layout() {
           <Route path="regions" element={<RegionList />} />
           <Route path="regions/create" element={<RegionForm />} />
           <Route path="regions/:id/edit" element={<RegionForm />} />
-
           <Route path="countries" element={<CountryList />} />
           <Route path="countries/create" element={<CountryForm />} />
           <Route path="countries/:slug/edit" element={<CountryForm />} />
@@ -193,6 +203,9 @@ function Layout() {
       </Routes>
 
       {!hideLayout && <Footer />}
+
+      {/* ✅ Show chatbot on all non-payment pages */}
+      {showChatBot && <ChatBot />}
     </>
   );
 }

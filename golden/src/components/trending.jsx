@@ -69,7 +69,7 @@ export default function TrendingTours() {
             </div>
           </div>
         ))}
-      </div>
+      </div> 
 
       <div className="trend-btn-wrapper">
         <button className="trend-view-btn">
