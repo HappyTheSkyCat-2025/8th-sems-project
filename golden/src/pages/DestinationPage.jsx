@@ -20,7 +20,8 @@ export default function DestinationPage() {
   useEffect(() => {
     setLoading(true);
 
-    axiosInstance.get(`/destinations/countries/${country}/`)
+    axiosInstance
+      .get(`/destinations/countries/${country}/`)
       .then((res) => {
         setData(res.data);
         setLoading(false);
@@ -42,11 +43,19 @@ export default function DestinationPage() {
         <div className="destination-content">
           <h2>Destination Not Found</h2>
           <p>Sorry, this destination is not in our records.</p>
-          <Link to="/" className="back-home">← Back to Home</Link>
+          <Link to="/" className="back-home">
+            ← Back to Home
+          </Link>
         </div>
       </div>
     );
   }
+
+  // Categorize articles properly
+  const inspirationalArticles = data.articles?.filter((a) => a.is_inspirational) || [];
+  const suggestedArticles = data.articles?.filter((a) => a.is_suggested) || [];
+  const regularArticles =
+    data.articles?.filter((a) => !a.is_inspirational && !a.is_suggested) || [];
 
   return (
     <div className="destination-wrapper">
@@ -58,7 +67,10 @@ export default function DestinationPage() {
       </nav>
 
       {/* Hero */}
-      <div className="hero-section" style={{ backgroundImage: `url(${data.image})` }}>
+      <div
+        className="hero-section"
+        style={{ backgroundImage: `url(${data.image})` }}
+      >
         <div className="hero-text">
           <h1>{data.name}</h1>
           <h3>{data.subtitle}</h3>
@@ -72,12 +84,24 @@ export default function DestinationPage() {
       {/* Top Tabs */}
       <nav className="top-tabs">
         <ul>
-          <li><a href="#overview">Overview</a></li>
-          <li><a href="#travel-deals">Travel Deals</a></li>
-          <li><a href="#trip-reviews">Trip Reviews</a></li>
-          <li><a href="#articles">Articles</a></li>
-          <li><a href="#faqs">FAQs</a></li>
-          <li><a href="#video">Video</a></li>
+          <li>
+            <a href="#overview">Overview</a>
+          </li>
+          <li>
+            <a href="#travel-deals">Travel Deals</a>
+          </li>
+          <li>
+            <a href="#trip-reviews">Trip Reviews</a>
+          </li>
+          <li>
+            <a href="#articles">Articles</a>
+          </li>
+          <li>
+            <a href="#faqs">FAQs</a>
+          </li>
+          <li>
+            <a href="#video">Video</a>
+          </li>
         </ul>
       </nav>
 
@@ -92,7 +116,9 @@ export default function DestinationPage() {
 
       <div id="articles">
         <ArticlesSection
-          articles={data.articles}
+          inspirations={inspirationalArticles}
+          suggestedArticles={suggestedArticles}
+          regularArticles={regularArticles}
           country={data.name}
           learnMoreTopics={data.learn_more_topics || []}
           glanceData={{ countryName: data.name, ...data.overview }}

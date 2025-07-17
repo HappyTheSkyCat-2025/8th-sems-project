@@ -132,7 +132,7 @@ export default function Desc({ data, onViewDatesClick }) {
         {/* Booking Box */}
         <div className="trip-info-box">
           <h3>
-            From <strong>{data.price}</strong>
+            From <strong>${data.price}</strong>
           </h3>
 
           <button

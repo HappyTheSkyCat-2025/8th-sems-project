@@ -3,8 +3,6 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "../../pagescss/places.css";
-import img1 from "../../assets/img2.jpg";
-import bali from "../../assets/bali.jpg";
 
 // Fix Leaflet marker icons (important!)
 delete L.Icon.Default.prototype._getIconUrl;
@@ -16,6 +14,9 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function Places({ data }) {
+  const places = data?.places || []; // <-- get places from data prop safely
+
+  // Map coordinates setup (optional, your existing code)
   const locationName = data?.city
     ? `${data.city}, ${data.country.name}`
     : data?.country?.name;
@@ -65,27 +66,15 @@ export default function Places({ data }) {
       <section className="places-section">
         <h2 className="places-title">Places You’ll See</h2>
         <div className="places-cards">
-          <div className="place-card">
-            <img src={img1} alt="Place 1" />
-            <div className="place-info">
-              <h4>Kyoto</h4>
-              <p>Japan</p>
+          {places.length === 0 && <p>No places available.</p>}
+          {places.map((place) => (
+            <div className="place-card" key={place.id}>
+              <img src={place.image} alt={place.name} />
+              <div className="place-info">
+                <h4>{place.name}</h4>
+              </div>
             </div>
-          </div>
-          <div className="place-card">
-            <img src={bali} alt="Place 2" />
-            <div className="place-info">
-              <h4>Chiang Mai</h4>
-              <p>Thailand</p>
-            </div>
-          </div>
-          <div className="place-card">
-            <img src={img1} alt="Place 3" />
-            <div className="place-info">
-              <h4>Hoi An</h4>
-              <p>Vietnam</p>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="map-section">
@@ -110,26 +99,17 @@ export default function Places({ data }) {
         </div>
       </section>
 
-      <div className="overview-full-width">
-        <div className="overview-section">
-          <h2 className="overview-title">Overview</h2>
-          <h3 className="overview-subtitle">
-            Discover the cultural charm, fresh food and dramatic landscapes of
-            Vietnam
-          </h3>
-          <p className="overview-description">
-            From south to north, Vietnam is a kaleidoscope of welcoming locals,
-            varied cuisine and diverse landscapes. Unlock the mysteries of the
-            Viet Minh in Ho Chi Minh City, explore the beautiful lakes and
-            boulevards of Hanoi, mingle with the locals while staying at a
-            Mekong Delta guesthouse, float to sleep on a traditional junk boat
-            in Halong Bay, and eat breakfast the local way in Hue. Experience
-            historical temples, laze on the spectacular coastline, gorge on
-            delicious banquets and explore lively cities – all with a touch of
-            comfort – on this 15-day Classic Vietnam adventure.
-          </p>
-        </div>
+    <div className="overview-full-width">
+      <div className="overview-section">
+        <h2 className="overview-title">Overview</h2>
+        <h3 className="overview-subtitle">
+          {data.subtitle || `Discover the unique charm and beauty of ${data.title}`}
+        </h3>
+        <p className="overview-description">
+          {data.description || "No description available for this travel deal."}
+        </p>
       </div>
+    </div>
     </>
   );
 }
