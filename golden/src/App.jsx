@@ -40,6 +40,8 @@ import AboutUs from "./pages/Aboutus";
 import AllDestinations from "./pages/AllDestinations";
 import DestinationPage from "./pages/DestinationPage";
 import DestDescription from "./pages/destdescription";
+import Blogs from "./pages/blogs"; 
+
 
 // Search Page
 import Search from "./components/search";
@@ -159,6 +161,7 @@ function Layout() {
         <Route path="/payment/payment2/:id" element={<Payment2 />} />
         <Route path="/payment/payment3/:id" element={<Payment3 />} />
         <Route path="/thank-you" element={<ThankYou />} />
+<Route path="/blogs" element={<Blogs />} />
 
         {/* Search Route */}
         <Route path="/search" element={<Search />} />

@@ -141,7 +141,6 @@ export default function Navbar() {
 
           <nav className="navbar-links">
             {/* Destinations */}
-            {/* Destinations */}
             <div
               className="dropdown"
               onMouseEnter={() => setShowDestinations(true)}
