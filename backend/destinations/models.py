@@ -56,12 +56,21 @@ class DealOffer(models.Model):
     def __str__(self):
         return self.name
 
+class Place(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to="places/", blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
 class TravelDeal(models.Model):
     country = models.ForeignKey(Country, related_name="deals", on_delete=models.CASCADE)
+    places = models.ManyToManyField(Place, related_name="deals", blank=True)
     city = models.CharField(max_length=100, blank=True, null=True)
     map_zoom = models.PositiveIntegerField(default=5)
     title = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True, null=True)
+    subtitle = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(unique=True, blank=True)
     days = models.PositiveIntegerField()
     price = models.CharField(max_length=20)
     image = models.ImageField(upload_to="deals/cover/", null=True, blank=True)
@@ -119,6 +128,10 @@ class Article(models.Model):
     location = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to='articles/', blank=True, null=True)
+
+    # NEW FIELDS
+    is_inspirational = models.BooleanField(default=False)  # for "Get inspired"
+    is_suggested = models.BooleanField(default=False)      # for "You might also like"
 
     def __str__(self):
         return f"{self.title} ({self.country.name})"

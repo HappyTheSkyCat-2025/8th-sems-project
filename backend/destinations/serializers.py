@@ -5,7 +5,7 @@ from .models import (
     Region, Country, TravelDeal, TravelImage, Review, Article, FAQ,
     TravelOption, TravelType, DealCategory, DealOffer,
     CountryOverview, CountryLearnMoreTopic, TravelDealDate,
-    WishlistItem
+    WishlistItem, Place
 )
 
 
@@ -43,19 +43,34 @@ class TravelImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image']
 
 
+class PlaceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Place
+        fields = ['id', 'name', 'image']
+
 class TravelDealSerializer(serializers.ModelSerializer):
     themes = JSONListField()
     country = CountrySerializer(read_only=True)
-    country_id = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), write_only=True, source='country')
+    country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), write_only=True, source='country'
+    )
     gallery = TravelImageSerializer(many=True, read_only=True)
     average_rating = serializers.SerializerMethodField()
+
+    # Add places with nested read and writable ids
+    places = PlaceSerializer(many=True, read_only=True)
+    place_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Place.objects.all(),
+        write_only=True,
+        source='places'
+    )
 
     class Meta:
         model = TravelDeal
         fields = "__all__"
 
     def get_average_rating(self, obj):
-        # Get all reviews related to this travel deal
         reviews = obj.reviews.all()
         if reviews.exists():
             avg_rating = reviews.aggregate(avg=Avg('rating'))['avg']
@@ -137,29 +152,39 @@ class CountryDetailSerializer(serializers.ModelSerializer):
     learn_more_topics = CountryLearnMoreTopicSerializer(many=True, read_only=True)
     region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
 
+    # 🔥 New fields
+    inspirations = serializers.SerializerMethodField()
+    suggested_articles = serializers.SerializerMethodField()
+
     class Meta:
         model = Country
         fields = [
             "id", "name", "slug", "subtitle", "section_title",
-            "description", "image", "video_url",
-            "region", "deals", "reviews", "articles", "faqs",
+            "description", "image", "video_url", "region",
+            "deals", "reviews", "articles", "faqs",
             "overview", "learn_more_topics",
+            "inspirations", "suggested_articles",  # 👈 include here
         ]
 
     def get_deals(self, obj):
         return TravelDealSerializer(obj.deals.all(), many=True, context=self.context).data
 
     def get_reviews(self, obj):
-        # Aggregate reviews from all deals of this country
         deals = obj.deals.all()
         reviews = Review.objects.filter(travel_deal__in=deals)
         return ReviewSerializer(reviews, many=True).data
 
     def get_articles(self, obj):
-        return ArticleSerializer(obj.articles.all(), many=True).data
+        return ArticleSerializer(obj.articles.all(), many=True, context=self.context).data
 
     def get_faqs(self, obj):
         return FAQSerializer(obj.faqs.all(), many=True).data
+
+    def get_inspirations(self, obj):
+        return ArticleSerializer(obj.articles.filter(is_inspirational=True), many=True, context=self.context).data
+
+    def get_suggested_articles(self, obj):
+        return ArticleSerializer(obj.articles.filter(is_suggested=True), many=True, context=self.context).data
 
 
 # --- TravelOption and TravelType Serializers ---
