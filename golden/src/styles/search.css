@@ -4,12 +4,10 @@
   padding-bottom: 60px;
 }
 
-/* Breadcrumb */
 .breadcrumb {
   width: 100%;
   background-color: #fff;
   border-top: 1px solid #eee;
-  border-bottom: 0px solid #ddd;
   padding: 10px 30px;
   font-size: 0.95rem;
   color: #555;
@@ -20,7 +18,7 @@
   font-weight: 400;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   position: relative;
-  z-index: 999; 
+  z-index: 999;
 }
 .breadcrumb a {
   color: var(--primary-color);
@@ -31,7 +29,6 @@
   color: #aaa;
 }
 
-/* Results header */
 .search-results-header {
   padding-left: 90px;
   margin-bottom: 10px;
@@ -42,13 +39,14 @@
   font-weight: 600;
 }
 
-/* Search bar */
 .search-bar-wrapper1 {
   width: 100%;
   max-width: 1000px;
   margin: 10px auto 30px;
   padding: 0 90px;
   box-sizing: border-box;
+  position: relative;
+  z-index: 2;
 }
 .search-bar-container1 {
   border-radius: 40px;
@@ -76,7 +74,6 @@
   width: 100%;
 }
 
-/* Date pickers */
 .date-inline-box {
   display: flex;
   align-items: center;
@@ -105,7 +102,6 @@
   background-color: #ccc;
 }
 
-/* Search Button */
 .search-btn {
   background-color: var(--highlight-color);
   color: white;
@@ -124,16 +120,9 @@
   background-color: var(--primary-dark);
 }
 
-/* Error */
-.search-bar-wrapper1 {
-  position: relative; /* This is critical for positioning the error popup */
-  z-index: 2;
-}
-
-/* Error popup */
 .error-popup {
   position: absolute;
-  top: 110%; /* Just below the bar */
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   background: #d93025;
@@ -148,15 +137,12 @@
   animation: fadeIn 0.3s ease forwards;
 }
 
-
-/* Filters & Grid Layout */
 .search-layout {
   display: flex;
   gap: 30px;
   padding: 0 90px;
 }
 
-/* Filters */
 .search-filters {
   flex: 0 0 240px;
   background: #fff;
@@ -192,7 +178,6 @@
   accent-color: goldenrod;
 }
 
-/* Grid */
 .search-grid {
   flex: 1;
   display: grid;
@@ -213,6 +198,7 @@
   height: 300px;
   background-size: cover;
   background-position: center;
+  position: relative;
 }
 .search-ribbon {
   position: absolute;
@@ -272,7 +258,6 @@
   color: #222;
 }
 
-/* Pagination */
 .search-pagination {
   display: flex;
   justify-content: flex-end;
@@ -290,7 +275,6 @@
   color: #d4a017;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .search-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -300,7 +284,7 @@
   .search-layout {
     flex-direction: column;
     padding: 0 20px;
-  } 
+  }
   .search-bar-wrapper1 {
     padding: 0 20px;
   }

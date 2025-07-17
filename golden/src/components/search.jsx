@@ -1,4 +1,3 @@
-// Search.jsx
 import React, { useState, useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { MapPin, Calendar, Search as SearchIcon, AlertCircle } from "lucide-react";
@@ -42,15 +41,7 @@ export default function Search() {
 
   const filteredResults = useMemo(() => {
     return allResults.filter((item) => {
-      const {
-        durationMin,
-        durationMax,
-        priceMin,
-        priceMax,
-        sale,
-        styles,
-        themes,
-      } = filters;
+      const { durationMin, durationMax, priceMin, priceMax, sale, styles, themes } = filters;
       if (durationMin && item.days < durationMin) return false;
       if (durationMax && item.days > durationMax) return false;
       if (priceMin && item.priceNum < priceMin) return false;
@@ -62,10 +53,7 @@ export default function Search() {
     });
   }, [filters, allResults]);
 
-  const paginatedResults = filteredResults.slice(
-    (page - 1) * perPage,
-    page * perPage
-  );
+  const paginatedResults = filteredResults.slice((page - 1) * perPage, page * perPage);
 
   const updateFilter = (type, value) => {
     setPage(1);
@@ -117,14 +105,15 @@ export default function Search() {
       </div>
 
       <h2 className="search-results-header">
-        <span>{filteredResults.length}</span> trips found for <span className="keyword">"thailand"</span>
+        <span>{filteredResults.length}</span> trips found for <span className="keyword">"Nepal"</span>
       </h2>
 
+      {/* Search Bar */}
       <div className="search-bar-wrapper1">
         <div className="search-bar-container1">
           <div className="search-box1">
             <MapPin size={18} className="icon" />
-            <input type="text" placeholder="thailand" />
+            <input type="text" placeholder="" />
           </div>
 
           <div className="vertical-separator"></div>
@@ -138,6 +127,7 @@ export default function Search() {
                 placeholderText="Start date"
                 className="inline-datepicker"
                 minDate={new Date()}
+                onKeyDown={(e) => e.preventDefault()}
               />
             </div>
 
@@ -152,6 +142,7 @@ export default function Search() {
                 placeholderText="End date"
                 className="inline-datepicker"
                 minDate={startDate || new Date()}
+                onKeyDown={(e) => e.preventDefault()}
               />
             </div>
           </div>
@@ -161,6 +152,7 @@ export default function Search() {
           </button>
         </div>
 
+        {/* Error message popup */}
         {endDateError && (
           <div className="error-popup" role="alert">
             <AlertCircle size={16} />
@@ -169,7 +161,9 @@ export default function Search() {
         )}
       </div>
 
+      {/* Filter + Results */}
       <div className="search-layout">
+        {/* Filters */}
         <aside className="search-filters">
           <h5>Duration</h5>
           <div className="range-row">
@@ -228,6 +222,7 @@ export default function Search() {
           ))}
         </aside>
 
+        {/* Results */}
         <div className="search-grid">
           {paginatedResults.map((result) => (
             <div className="search-card" key={result.id}>
@@ -253,6 +248,7 @@ export default function Search() {
         </div>
       </div>
 
+      {/* Pagination */}
       <div className="search-pagination">
         <span className="icon-btn" onClick={() => setPage((p) => Math.max(1, p - 1))}>◀</span>
         <span>Page {page} of {Math.ceil(filteredResults.length / perPage)}</span>

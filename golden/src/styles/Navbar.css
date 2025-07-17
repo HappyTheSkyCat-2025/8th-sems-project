@@ -256,6 +256,56 @@
 .contact-btn:hover {
   background-color: var(--primary-dark);
 }
+/*about us*/
+.dropdown {
+  position: relative;
+}
+
+/* Toggle with Icon */
+.dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #333;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 8px 12px;
+  transition: color 0.3s ease;
+}
+
+
+
+
+/* Dropdown Menu Styling */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 160px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  padding: 8px 0;
+  border-radius: 6px;
+  display: none;
+  z-index: 1001;
+}
+
+/* Show on Hover */
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+/* Dropdown Link Items */
+.dropdown-link {
+  display: block;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
 
 /* Search */
 .search-icon {
@@ -308,6 +358,12 @@
 .search-close-btn:hover {
   color: var(--primary-color);
 }
+.wishlist-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
 
 /* Animations */
 @keyframes fadeIn {
@@ -334,7 +390,7 @@
 /* Mobile Hamburger icon wrapper */
 .hamburger-wrapper {
   display: none;
-}
+} 
 
 @media (max-width: 900px) {
   .hamburger-wrapper {

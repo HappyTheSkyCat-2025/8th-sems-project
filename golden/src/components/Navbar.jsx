@@ -7,8 +7,8 @@ import {
   User,
   Search,
   Phone,
-  Globe,
 } from "lucide-react";
+import { RiArrowDropDownLine } from "react-icons/ri";
 import { IoLanguageOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Divide as Hamburger } from "hamburger-react";
@@ -303,9 +303,19 @@ export default function Navbar() {
               )}
             </div>
 
-            <Link to="/about" className="link-item plain-link">
-              About Us
-            </Link>
+            <div className="dropdown link-item">
+              <span className="dropdown-toggle">
+                About Us 
+              </span>
+              <div className="dropdown-menu">
+                <Link to="/about" className="dropdown-link">
+                  Our Stories
+                </Link>
+                <Link to="/blogs" className="dropdown-link">
+                  Blogs
+                </Link>
+              </div>
+            </div>
           </nav>
 
           {/* Desktop Icons */}
