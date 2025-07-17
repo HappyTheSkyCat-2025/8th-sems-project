@@ -1,5 +1,4 @@
 from rest_framework import generics, permissions
-from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -98,22 +97,3 @@ def toggle_comment_like(request, comment_id):
         comment.likes.add(user)
         liked = True
     return Response({'liked': liked, 'likes_count': comment.likes.count()})
-
-# ✅ New view for map integration: serve blogs with coordinates only
-class BlogMapDataView(APIView):
-    """
-    Returns blog data with latitude and longitude for map use.
-    """
-    def get(self, request):
-        blogs = Blog.objects.exclude(latitude=None).exclude(longitude=None)
-        data = [
-            {
-                'id': blog.id,
-                'title': blog.title,
-                'slug': blog.slug,
-                'latitude': blog.latitude,
-                'longitude': blog.longitude,
-            }
-            for blog in blogs
-        ]
-        return Response(data)

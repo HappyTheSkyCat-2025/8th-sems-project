@@ -3,7 +3,18 @@ import "../../pagescss/places.css";
 import img1 from "../../assets/img2.jpg";
 import bali from "../../assets/bali.jpg";
 
-export default function Places() {
+export default function Places({ data }) {
+  // Build location string for map iframe
+  const location = data?.city
+    ? encodeURIComponent(`${data.city}, ${data.country.name}`)
+    : encodeURIComponent(data?.country?.name || "");
+
+  // Use map_zoom from data or fallback to 5
+  const zoom = data?.map_zoom || 5;
+
+  // Google Maps embed URL (public embed, no API key needed)
+  const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyCtjLO8Wck6hjPYM5LScc2pG6y6NUy7ms0&q=${location}&zoom=${zoom}`;
+
   return (
     <>
       <section className="places-section">
@@ -34,8 +45,8 @@ export default function Places() {
 
         <div className="map-section">
           <iframe
-            title="Vietnam Map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25236238.54028298!2d92.01779528222458!3d14.04389801206408!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752ef7510e0c65%3A0x9f94d49d6edb9474!2sVietnam!5e0!3m2!1sen!2snp!4v1720614979401!5m2!1sen!2snp"
+            title={`${data?.city || data?.country?.name} Map`}
+            src={mapSrc}
             width="100%"
             height="450"
             style={{ border: 0, borderRadius: "16px" }}

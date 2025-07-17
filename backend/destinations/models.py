@@ -58,6 +58,8 @@ class DealOffer(models.Model):
 
 class TravelDeal(models.Model):
     country = models.ForeignKey(Country, related_name="deals", on_delete=models.CASCADE)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    map_zoom = models.PositiveIntegerField(default=5)
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True, null=True)
     days = models.PositiveIntegerField()
