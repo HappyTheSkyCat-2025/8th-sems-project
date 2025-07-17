@@ -1,0 +1,120 @@
+.blog-container {
+  font-family: 'Georgia', serif;
+  background-color: #fff;
+  color: #333;
+}
+
+/* Breadcrumb full width */
+.breadcrumb {
+  width: 100%;
+  background: #fff;
+  padding: 12px 30px;
+  font-size: 0.95rem;
+  color: #777;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #e2e2e2;
+}
+
+.breadcrumb a {
+  color: var(--primary-color, #007B7F);
+  text-decoration: none;
+}
+
+.breadcrumb .arrow {
+  color: #999;
+}
+
+/* 850px inner layout */
+.blog-inner {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background-color: #fff;
+}
+
+/* Banner section */
+.top-banner {
+  display: flex;
+  align-items: flex-start; /* Align top */
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.banner-image {
+  width: 230px;
+  height: 230px;
+  object-fit: cover;
+  border-radius: 40px;
+}
+
+.banner-title {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #1e1e1e;
+  line-height:40px;
+  white-space: pre-line;
+  margin: 0;
+  margin-left: 100px;
+}
+.banner-title span {
+  display: block;
+}
+
+.indent-2 {
+  margin-left: 20px;
+}
+
+.indent-1 {
+  margin-left: 10px;
+}
+
+.indent-0 {
+  margin-left: 0;
+}
+/* Paragraph + image aligned */
+.text-image-aligned {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+.text-side {
+  flex: 2;
+}
+
+.image-side {
+  flex: 1;
+  height: 450px;
+}
+
+.aligned-image {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* Paragraph text */
+.blog-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+}
+
+/* 3-column layout at bottom */
+.bottom-columns {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.bottom-columns p {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.8;
+}
