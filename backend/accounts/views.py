@@ -2,10 +2,13 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.contrib.auth import get_user_model
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import UserOTP
 from .serializers import (
@@ -17,6 +20,41 @@ from .serializers import (
 )
 
 User = get_user_model()
+
+class GoogleLoginView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        token = request.data.get("token")
+        if not token:
+            return Response({"error": "Token missing"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # verify with Google
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            )
+        except ValueError:
+            return Response({"error": "Invalid Google token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        email = idinfo["email"]
+        username = idinfo.get("name", email.split("@")[0])
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={"username": username, "is_active": True},
+        )
+        if created:
+            user.set_unusable_password()
+            user.save()
+
+        # issue JWTs
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "user": {"id": user.id, "email": user.email, "username": user.username},
+        })
 
 # -------------------------------
 # 🔐 Registration with OTP Email Verification

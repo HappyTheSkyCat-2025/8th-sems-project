@@ -160,6 +160,8 @@ PAYPAL_SECRET = config('PAYPAL_SECRET')
 OPENWEATHER_API_KEY = config('OPENWEATHER_API_KEY')
 EXCHANGE_RATE_API_KEY = config('EXCHANGE_RATE_API_KEY')
 
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+
 # ---------------------------
 # 🆔 Default Primary Key
 # ---------------------------
