@@ -20,7 +20,7 @@ const ResetPassword = () => {
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value.trim(),
+      [e.target.name]: e.target.value.trim(), 
     }));
   };
 

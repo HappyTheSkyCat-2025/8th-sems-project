@@ -1,182 +1,130 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
+import otpImage from "../assets/otp.png";
+import "../styles/otp1.css";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: localStorage.getItem("registered_email") || "",
-    otp: "",
-  });
+  const email = localStorage.getItem("reset_email");
+  const [otp, setOtp] = useState(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
+  const inputsRef = useRef([]);
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value.trim(),
-    }));
+  const handleChange = (element, index) => {
+    const value = element.value.replace(/\D/, "");
+    if (!value) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (index < 5 && value) {
+      inputsRef.current[index + 1]?.focus();
+    }
+  };
+
+  const handleBackspace = (e, index) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const otpCode = otp.join("");
 
-    if (!formData.email || !formData.otp) {
-      toast.error("Please enter both email and OTP");
-      return;
+    if (otpCode.length !== 6) {
+      return toast.error("Please enter a valid 6-digit code.");
     }
 
     setLoading(true);
-
     try {
-      const response = await axiosInstance.post("/accounts/verify-otp/", {
-        email: formData.email,
-        otp: formData.otp,
+      await axiosInstance.post("/accounts/password-reset/verify/", {
+        email,
+        otp: otpCode,
       });
 
-      toast.success(response.data.message || "Email verified successfully!");
-      localStorage.removeItem("registered_email");
-      setTimeout(() => navigate("/login"), 2000);
+      toast.success("OTP verified! Proceed to reset password.");
+      navigate("/reset-password");
     } catch (error) {
-      const errMsg =
-        error.response?.data?.error || error.response?.data?.detail || "Invalid OTP or email";
-      toast.error(errMsg);
+      toast.error(error.response?.data?.error || "Invalid or expired code.");
     } finally {
       setLoading(false);
     }
   };
 
-  const inputStyle = {
-    width: "100%",
-    padding: "0.75rem 1rem",
-    borderRadius: "0.6rem",
-    border: "1.5px solid #ced4da",
-    marginBottom: "1.5rem",
-    fontSize: "1rem",
-    transition: "border-color 0.3s ease",
-    outline: "none",
+  const handleResend = async () => {
+    try {
+      await axiosInstance.post("/accounts/password-reset/request/", { email });
+      toast.success("New OTP sent to your email.");
+    } catch {
+      toast.error("Failed to resend OTP. Try again later.");
+    }
   };
 
   return (
-    <div
-      style={{
-        minHeight: "80vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#f5f7fa",
-        padding: "1rem",
-      }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          background: "#fff",
-          padding: "2.5rem 3rem",
-          borderRadius: "1rem",
-          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
-          width: "100%",
-          maxWidth: "400px",
-          fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        }}
-        noValidate
-      >
-        <h2
-          style={{
-            marginBottom: "1.5rem",
-            color: "#2c3e50",
-            fontWeight: "700",
-            textAlign: "center",
-          }}
-        >
-          Verify Your Email
-        </h2>
+    <div className="otp-container">
+      <div className="otp-wrapper">
+        <div className="otp-image">
+          <img src={otpImage} alt="OTP Visual" />
+        </div>
 
-        <label htmlFor="email" style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#34495e" }}>
-          Email Address
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Enter your registered email"
-          required
-          disabled={!!formData.email}
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "#007bff")}
-          onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
-        />
+        <div className="otp-form-card">
+          <h2>Reset Password</h2>
 
-        <label htmlFor="otp" style={{ display: "block", marginBottom: "0.5rem", fontWeight: "600", color: "#34495e" }}>
-          OTP Code
-        </label>
-        <input
-          type="text"
-          id="otp"
-          name="otp"
-          value={formData.otp}
-          onChange={handleChange}
-          placeholder="Enter 6-digit OTP"
-          maxLength={6}
-          required
-          pattern="\d{6}"
-          title="Please enter exactly 6 digits"
-          autoComplete="one-time-code"
-          style={{ ...inputStyle, marginBottom: "2rem" }}
-          onFocus={(e) => (e.target.style.borderColor = "#007bff")}
-          onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
-        />
+          <div className="otp-steps">
+            <div className="otp-step done">
+              <div className="circle">1</div>
+              <span>Email</span>
+            </div>
+            <div className="otp-line highlight" />
+            <div className="otp-step active">
+              <div className="circle">2</div>
+              <span>Verify</span>
+            </div>
+            <div className="otp-line" />
+            <div className="otp-step">
+              <div className="circle">3</div>
+              <span>Reset</span>
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: "0.85rem",
-            backgroundColor: "#007bff",
-            color: "#fff",
-            fontWeight: "700",
-            fontSize: "1.1rem",
-            borderRadius: "0.8rem",
-            border: "none",
-            cursor: loading ? "not-allowed" : "pointer",
-            boxShadow: "0 4px 12px rgba(0, 123, 255, 0.4)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: "0.6rem",
-            transition: "background-color 0.25s ease",
-          }}
-          onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = "#0056b3")}
-          onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = "#007bff")}
-          aria-live="polite"
-        >
-          {loading && (
-            <svg style={{ width: "20px", height: "20px", animation: "spin 1s linear infinite" }} viewBox="0 0 50 50" aria-hidden="true">
-              <circle
-                cx="25"
-                cy="25"
-                r="20"
-                fill="none"
-                stroke="#fff"
-                strokeWidth="5"
-                strokeLinecap="round"
-                strokeDasharray="90,150"
-              />
-            </svg>
-          )}
-          {loading ? "Verifying..." : "Verify Email"}
-        </button>
+          <p className="otp-desc">
+            We’ve sent a 6-digit verification code to <b>{email}</b>
+          </p>
 
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </form>
+          <form onSubmit={handleSubmit} className="otp-input-form">
+            <div className="otp-inputs">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  type="text"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleChange(e.target, index)}
+                  onKeyDown={(e) => handleBackspace(e, index)}
+                  ref={(el) => (inputsRef.current[index] = el)}
+                />
+              ))}
+            </div>
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Verifying..." : "Verify Code"}
+            </button>
+          </form>
+
+          <div className="otp-resend">
+            Didn’t receive a code?
+            <span onClick={handleResend}> Resend</span>
+          </div>
+
+          <div className="otp-bottom">
+            Remember your password? <a href="/login">Sign in</a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
