@@ -4,6 +4,7 @@ import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 import "../styles/forgetpassword.css";
 import beachImage from "../assets/forgetpassword.jpg";
+
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -21,7 +22,8 @@ const ForgotPassword = () => {
       );
       toast.success(response.data.message || "OTP sent to your email!");
       localStorage.setItem("reset_email", email);
-      setTimeout(() => navigate("/verify-otp"), 1000); 
+      // Navigate to verify-otp page WITH ?mode=reset query param
+      setTimeout(() => navigate("/verify-otp?mode=reset"), 1000);
     } catch (error) {
       toast.error(
         error.response?.data?.error || "An error occurred. Please try again."

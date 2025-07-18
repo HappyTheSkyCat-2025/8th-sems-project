@@ -69,65 +69,76 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
 
-            otp = get_random_string(length=6, allowed_chars='0123456789')
-            UserOTP.objects.create(user=user, otp=otp, otp_type='email_verification')
+            otp_code = get_random_string(length=6, allowed_chars='0123456789')
+            UserOTP.objects.create(user=user, otp=otp_code, otp_type='email_verification')
 
             subject = "Your OTP Code"
-            message = f"Hello {user.username},\n\nYour OTP code is: {otp}\n\nThank you!"
+            message = (
+                f"Hello {user.username},\n\n"
+                f"Your OTP code is: {otp_code}\n\n"
+                f"Please enter this code to verify your email and activate your account.\n\n"
+                "Thank you!"
+            )
             from_email = settings.DEFAULT_FROM_EMAIL
             recipient_list = [user.email]
 
             try:
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             except Exception as e:
-                user.delete()  # Remove user if email fails
+                # Cleanup user if email sending fails
+                user.delete()
                 return Response(
-                    {"error": f"Failed to send email: {str(e)}"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    {"error": f"Failed to send OTP email: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-            return Response({"message": "OTP sent to email"}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Registration successful. OTP sent to your email."}, status=status.HTTP_201_CREATED)
 
+        # Provide more detailed error info if possible
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # -------------------------------
-# OTP verification for email activation
+# OTP verification
 # -------------------------------
 
-class VerifyOTPView(APIView):
+class UnifiedOTPVerifyView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         email = request.data.get("email")
         otp = request.data.get("otp")
+        mode = request.data.get("mode")  # either "register" or "reset"
 
-        if not email or not otp:
-            return Response({"error": "Email and OTP are required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not email or not otp or mode not in ("register", "reset"):
+            return Response({"error": "Missing or invalid data."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        otp_qs = UserOTP.objects.filter(user=user, otp=otp, otp_type='email_verification').order_by('-created_at')
-        if not otp_qs.exists():
-            return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
+        otp_type = "email_verification" if mode == "register" else "password_reset"
 
-        otp_obj = otp_qs.first()
-        if otp_obj.is_expired():
-            return Response({"error": "OTP expired"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_otp = UserOTP.objects.filter(user=user, otp=otp, otp_type=otp_type).latest("created_at")
+        except UserOTP.DoesNotExist:
+            return Response({"error": "Invalid or expired OTP."}, status=status.HTTP_400_BAD_REQUEST)
 
-        if user.is_active:
-            return Response({"message": "Account already activated"}, status=status.HTTP_200_OK)
+        if user_otp.is_expired():
+            return Response({"error": "OTP expired."}, status=status.HTTP_400_BAD_REQUEST)
 
-        user.is_active = True
-        user.is_email_verified = True  # Optional, if you track it separately
-        user.save()
+        if mode == "register":
+            if user.is_active:
+                return Response({"message": "Account already verified."}, status=status.HTTP_200_OK)
+            user.is_active = True
+            user.is_email_verified = True
+            user.save()
+            UserOTP.objects.filter(user=user, otp_type='email_verification').delete()
+            return Response({"message": "Account successfully activated."}, status=status.HTTP_200_OK)
 
-        UserOTP.objects.filter(user=user, otp_type='email_verification').delete()
-
-        return Response({"message": "Account activated"}, status=status.HTTP_200_OK)
+        elif mode == "reset":
+            return Response({"message": "OTP verified. Proceed to reset password."}, status=status.HTTP_200_OK)
 
 
 # -------------------------------
@@ -222,34 +233,6 @@ class PasswordResetConfirmView(APIView):
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data['email']
-            otp = serializer.validated_data['otp']
-            new_password = serializer.validated_data['new_password']
-
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                return Response({"error": "Invalid email or OTP"}, status=status.HTTP_400_BAD_REQUEST)
-
-            otp_qs = UserOTP.objects.filter(user=user, otp=otp, otp_type='password_reset').order_by('-created_at')
-            if not otp_qs.exists():
-                return Response({"error": "Invalid OTP"}, status=status.HTTP_400_BAD_REQUEST)
-
-            otp_obj = otp_qs.first()
-            if otp_obj.is_expired():
-                return Response({"error": "OTP expired"}, status=status.HTTP_400_BAD_REQUEST)
-
-            # Validate new password strength
-            try:
-                validate_password(new_password, user=user)
-            except Exception as e:
-                return Response({"error": list(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-            user.set_password(new_password)
-            user.save()
-
-            UserOTP.objects.filter(user=user, otp_type='password_reset').delete()
-
+            serializer.save()  # Handles password change
             return Response({"message": "Password has been reset successfully."})
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

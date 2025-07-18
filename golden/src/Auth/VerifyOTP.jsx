@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
@@ -7,10 +7,25 @@ import "../styles/otp1.css";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
-  const email = localStorage.getItem("reset_email");
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const mode = searchParams.get("mode") || "register"; // 'register' or 'reset'
+
+  // Fix: get email from correct localStorage key based on mode
+  const email = mode === "reset"
+    ? localStorage.getItem("reset_email")
+    : localStorage.getItem("registered_email");
+
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [loading, setLoading] = useState(false);
   const inputsRef = useRef([]);
+
+  useEffect(() => {
+    if (!email) {
+      toast.error("Email not found. Please restart the process.");
+      navigate(mode === "reset" ? "/forgot-password" : "/register");
+    }
+  }, [email, navigate, mode]);
 
   const handleChange = (element, index) => {
     const value = element.value.replace(/\D/, "");
@@ -41,15 +56,21 @@ const VerifyOTP = () => {
 
     setLoading(true);
     try {
-      await axiosInstance.post("/accounts/password-reset/verify/", {
+      const response = await axiosInstance.post("/accounts/verify-otp/", {
         email,
         otp: otpCode,
+        mode, // 'register' or 'reset'
       });
 
-      toast.success("OTP verified! Proceed to reset password.");
-      navigate("/reset-password");
+      toast.success(response.data.message || "OTP verified.");
+
+      if (mode === "reset") {
+        navigate("/reset-password", { state: { email } });
+      } else {
+        navigate("/login");
+      }
     } catch (error) {
-      toast.error(error.response?.data?.error || "Invalid or expired code.");
+      toast.error(error.response?.data?.error || "Invalid or expired OTP.");
     } finally {
       setLoading(false);
     }
@@ -57,8 +78,12 @@ const VerifyOTP = () => {
 
   const handleResend = async () => {
     try {
-      await axiosInstance.post("/accounts/password-reset/request/", { email });
-      toast.success("New OTP sent to your email.");
+      const endpoint =
+        mode === "reset"
+          ? "/accounts/password-reset/request/"
+          : "/accounts/register/";
+      await axiosInstance.post(endpoint, { email });
+      toast.success("A new OTP has been sent to your email.");
     } catch {
       toast.error("Failed to resend OTP. Try again later.");
     }
@@ -72,10 +97,10 @@ const VerifyOTP = () => {
         </div>
 
         <div className="otp-form-card">
-          <h2>Reset Password</h2>
+          <h2>{mode === "reset" ? "Reset Password" : "Verify Account"}</h2>
 
           <div className="otp-steps">
-            <div className="otp-step done">
+            <div className={`otp-step ${mode === "reset" ? "done" : "active"}`}>
               <div className="circle">1</div>
               <span>Email</span>
             </div>
@@ -87,12 +112,12 @@ const VerifyOTP = () => {
             <div className="otp-line" />
             <div className="otp-step">
               <div className="circle">3</div>
-              <span>Reset</span>
+              <span>{mode === "reset" ? "Reset" : "Done"}</span>
             </div>
           </div>
 
           <p className="otp-desc">
-            We’ve sent a 6-digit verification code to <b>{email}</b>
+            We’ve sent a 6-digit code to <b>{email}</b>
           </p>
 
           <form onSubmit={handleSubmit} className="otp-input-form">
@@ -106,6 +131,10 @@ const VerifyOTP = () => {
                   onChange={(e) => handleChange(e.target, index)}
                   onKeyDown={(e) => handleBackspace(e, index)}
                   ref={(el) => (inputsRef.current[index] = el)}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="one-time-code"
+                  aria-label={`OTP digit ${index + 1}`}
                 />
               ))}
             </div>
@@ -117,7 +146,18 @@ const VerifyOTP = () => {
 
           <div className="otp-resend">
             Didn’t receive a code?
-            <span onClick={handleResend}> Resend</span>
+            <span
+              onClick={handleResend}
+              role="button"
+              tabIndex={0}
+              style={{
+                cursor: "pointer",
+                color: "#007bff",
+                marginLeft: "5px",
+              }}
+            >
+              Resend
+            </span>
           </div>
 
           <div className="otp-bottom">

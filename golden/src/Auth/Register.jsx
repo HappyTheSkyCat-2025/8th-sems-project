@@ -57,10 +57,11 @@ const Register = () => {
         password2: formData.confirmPassword,
       });
 
+      // Save email as registered_email so VerifyOTP can find it on register mode
       localStorage.setItem("registered_email", formData.email);
       toast.success("Registration successful! Check your email for OTP.");
       setFormData({ username: "", email: "", password: "", confirmPassword: "" });
-      setTimeout(() => navigate("/verify-otp"), 2000);
+      setTimeout(() => navigate("/verify-otp?mode=register"), 2000);
     } catch (error) {
       const msgs = error.response?.data
         ? Object.values(error.response.data).flat().join(" ")
@@ -188,9 +189,7 @@ const Register = () => {
             </div>
 
             {/* Terms Checkbox */}
-            <div
-              style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}
-            >
+            <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
               <input
                 type="checkbox"
                 id="terms"

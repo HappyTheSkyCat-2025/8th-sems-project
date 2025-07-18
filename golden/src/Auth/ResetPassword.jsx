@@ -1,26 +1,40 @@
-// src/Components/Auth/ResetPassword.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
-  const savedEmail = localStorage.getItem("reset_email") || "";
+  const location = useLocation();
+
+  const [email, setEmail] = useState("");
 
   const [formData, setFormData] = useState({
-    email: savedEmail,
-    otp: "",
     newPassword: "",
     confirmPassword: "",
   });
 
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    // Prefer state over localStorage
+    const emailFromState = location.state?.email;
+    const emailFromStorage = localStorage.getItem("reset_email");
+
+    if (emailFromState) {
+      setEmail(emailFromState);
+    } else if (emailFromStorage) {
+      setEmail(emailFromStorage);
+    } else {
+      toast.error("Email not found. Please restart the reset process.");
+      navigate("/forgot-password");
+    }
+  }, [location.state, navigate]);
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value.trim(), 
+      [e.target.name]: e.target.value.trim(),
     }));
   };
 
@@ -32,8 +46,9 @@ const ResetPassword = () => {
       return;
     }
 
-    if (!formData.email || !formData.otp) {
-      toast.error("Email and OTP are required.");
+    if (!email) {
+      toast.error("No email found. Please restart the password reset process.");
+      navigate("/forgot-password");
       return;
     }
 
@@ -41,46 +56,24 @@ const ResetPassword = () => {
 
     try {
       const response = await axiosInstance.post("/accounts/password-reset/confirm/", {
-        email: formData.email,
-        otp: formData.otp,
+        email,
         new_password: formData.newPassword,
       });
 
       toast.success(response.data.message || "Password reset successful!");
       localStorage.removeItem("reset_email");
 
-      setFormData({
-        email: "",
-        otp: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-
       setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
       const data = error.response?.data;
-      // Flatten any errors and join them, fallback to generic message
       const errorMessage =
         data && typeof data === "object"
-          ? Object.values(data)
-              .flat()
-              .join(" ")
+          ? Object.values(data).flat().join(" ")
           : "Failed to reset password.";
       toast.error(errorMessage || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
-  };
-
-  const inputStyle = {
-    width: "100%",
-    padding: "0.75rem 1rem",
-    borderRadius: "0.6rem",
-    border: "1.5px solid #ced4da",
-    marginBottom: "1.5rem",
-    fontSize: "1rem",
-    transition: "border-color 0.3s ease",
-    outline: "none",
   };
 
   return (
@@ -119,59 +112,6 @@ const ResetPassword = () => {
         </h2>
 
         <label
-          htmlFor="email"
-          style={{
-            display: "block",
-            marginBottom: "0.5rem",
-            fontWeight: "600",
-            color: "#34495e",
-          }}
-        >
-          Email Address
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Enter your registered email"
-          required
-          disabled={!!savedEmail}
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "#007bff")}
-          onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
-        />
-
-        <label
-          htmlFor="otp"
-          style={{
-            display: "block",
-            marginBottom: "0.5rem",
-            fontWeight: "600",
-            color: "#34495e",
-          }}
-        >
-          OTP Code
-        </label>
-        <input
-          type="text"
-          id="otp"
-          name="otp"
-          value={formData.otp}
-          onChange={handleChange}
-          placeholder="Enter 6-digit OTP"
-          maxLength={6}
-          required
-          pattern="\d{6}"
-          title="Please enter exactly 6 digits"
-          autoComplete="one-time-code"
-          style={{ ...inputStyle, marginBottom: "1.5rem" }}
-          onFocus={(e) => (e.target.style.borderColor = "#007bff")}
-          onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
-        />
-
-        <label
           htmlFor="newPassword"
           style={{
             display: "block",
@@ -190,9 +130,15 @@ const ResetPassword = () => {
           onChange={handleChange}
           placeholder="Enter new password"
           required
-          style={inputStyle}
-          onFocus={(e) => (e.target.style.borderColor = "#007bff")}
-          onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
+          style={{
+            width: "100%",
+            padding: "0.75rem 1rem",
+            borderRadius: "0.6rem",
+            border: "1.5px solid #ced4da",
+            marginBottom: "1.5rem",
+            fontSize: "1rem",
+            outline: "none",
+          }}
         />
 
         <label
@@ -214,9 +160,15 @@ const ResetPassword = () => {
           onChange={handleChange}
           placeholder="Confirm new password"
           required
-          style={{ ...inputStyle, marginBottom: "2rem" }}
-          onFocus={(e) => (e.target.style.borderColor = "#007bff")}
-          onBlur={(e) => (e.target.style.borderColor = "#ced4da")}
+          style={{
+            width: "100%",
+            padding: "0.75rem 1rem",
+            borderRadius: "0.6rem",
+            border: "1.5px solid #ced4da",
+            marginBottom: "2rem",
+            fontSize: "1rem",
+            outline: "none",
+          }}
         />
 
         <button
@@ -239,13 +191,21 @@ const ResetPassword = () => {
             gap: "0.6rem",
             transition: "background-color 0.25s ease",
           }}
-          onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = "#0056b3")}
-          onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = "#007bff")}
+          onMouseEnter={(e) =>
+            !loading && (e.target.style.backgroundColor = "#0056b3")
+          }
+          onMouseLeave={(e) =>
+            !loading && (e.target.style.backgroundColor = "#007bff")
+          }
           aria-live="polite"
         >
           {loading && (
             <svg
-              style={{ width: "20px", height: "20px", animation: "spin 1s linear infinite" }}
+              style={{
+                width: "20px",
+                height: "20px",
+                animation: "spin 1s linear infinite",
+              }}
               viewBox="0 0 50 50"
               aria-hidden="true"
             >
@@ -263,13 +223,6 @@ const ResetPassword = () => {
           )}
           {loading ? "Resetting..." : "Reset Password"}
         </button>
-
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
       </form>
     </div>
   );
