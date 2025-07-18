@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
+import { GoogleLogin } from "@react-oauth/google";
 import "../styles/login.css";
 import loginBg from "../assets/login.jpg";
 
@@ -21,25 +22,26 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // 1. Login and get tokens
+      // 1. Email/password login
       const response = await axiosInstance.post("/token/", formData);
+      const { access, refresh } = response.data;
 
-      localStorage.setItem("access_token", response.data.access);
-      localStorage.setItem("refresh_token", response.data.refresh);
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      axiosInstance.defaults.headers.Authorization = `Bearer ${access}`;
 
-      // 2. Fetch user profile with access token
+      // 2. Fetch profile
       const profileResponse = await axiosInstance.get("/accounts/profile/");
 
-      // 3. Redirect based on superuser status
+      // 3. Redirect
       if (profileResponse.data.is_superuser) {
         toast.success("Welcome Admin! Redirecting...");
-        setTimeout(() => navigate("/admin"), 1500);
+        navigate("/admin");
       } else {
         toast.success("Login successful! Redirecting...");
-        setTimeout(() => navigate("/"), 1500);
+        navigate("/");
       }
     } catch (error) {
-      // handle error message from backend or fallback
       const errorMsg =
         error.response?.data?.detail || "Invalid credentials or server error.";
       toast.error(errorMsg);
@@ -48,12 +50,31 @@ const Login = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      const res = await axiosInstance.post("/accounts/google-login/", {
+        token: credentialResponse.credential,
+      });
+      const { access, refresh } = res.data;
+
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      axiosInstance.defaults.headers.Authorization = `Bearer ${access}`;
+
+      toast.success("Logged in with Google!");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Google login failed");
+    }
+  };
+
   return (
     <div className="login-full-wrapper">
       <div className="background-angle"></div>
 
       <div className="login-box">
-        {/* Left: Background image with quote */}
+        {/* Left: Background image */}
         <div
           className="login-image"
           style={{ backgroundImage: `url(${loginBg})` }}
@@ -96,7 +117,7 @@ const Login = () => {
                   className={`fas ${
                     showPassword ? "fa-eye-slash" : "fa-eye"
                   }`}
-                ></i>
+                />
               </span>
             </div>
 
@@ -108,6 +129,14 @@ const Login = () => {
               {loading ? "Logging in..." : "LOG IN"}
             </button>
           </form>
+
+          {/* Google Sign‑In */}
+          <div style={{ marginTop: 16, textAlign: "center" }}>
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => toast.error("Google sign‑in failed")}
+            />
+          </div>
 
           <div className="register-text">
             Don’t have an account?{" "}

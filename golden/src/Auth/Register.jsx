@@ -1,8 +1,10 @@
+// src/Components/Auth/Register.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { GoogleLogin } from "@react-oauth/google";
 import "../styles/register.css";
 
 const Register = () => {
@@ -35,7 +37,6 @@ const Register = () => {
     }
 
     setLoading(true);
-
     try {
       const response = await axiosInstance.post("/accounts/register/", {
         username: formData.username,
@@ -44,28 +45,40 @@ const Register = () => {
         password2: formData.confirmPassword,
       });
 
-      // Save registered email to localStorage for OTP verification page
       localStorage.setItem("registered_email", formData.email);
-
       toast.success("Registration successful! Please check your email for OTP.");
-
-      // Clear form (optional)
       setFormData({ username: "", email: "", password: "", confirmPassword: "" });
-
-      // Redirect to OTP verification page after short delay
       setTimeout(() => navigate("/verify-otp"), 2000);
     } catch (error) {
       console.error("Registration error:", error);
-      // Handle detailed error messages from backend (may be object or array)
       if (error.response?.data) {
-        const data = error.response.data;
-        const errorMessages = Object.values(data)
-          .flat()
-          .join(" ");
-        toast.error(`Registration failed: ${errorMessages}`);
+        const msgs = Object.values(error.response.data).flat().join(" ");
+        toast.error(`Registration failed: ${msgs}`);
       } else {
         toast.error("An error occurred during registration.");
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    try {
+      const res = await axiosInstance.post("/accounts/google-login/", {
+        token: credentialResponse.credential,
+      });
+      const { access, refresh } = res.data;
+
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+      axiosInstance.defaults.headers.Authorization = `Bearer ${access}`;
+
+      toast.success("Signed up with Google!");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Google signup failed");
     } finally {
       setLoading(false);
     }
@@ -75,6 +88,7 @@ const Register = () => {
     <div className="register-container">
       <div className="register-card">
         <h2>Create your account</h2>
+
         <form onSubmit={handleSubmit} noValidate>
           {/* Username */}
           <div className="form-group">
@@ -164,6 +178,15 @@ const Register = () => {
         </form>
 
         <hr />
+
+        {/* Google Sign‑Up */}
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => toast.error("Google signup failed")}
+          />
+        </div>
+
         <p className="bottom-text">
           Already have an account? <Link to="/login">Login here</Link>
         </p>
