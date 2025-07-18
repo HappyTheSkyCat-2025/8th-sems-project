@@ -1,31 +1,28 @@
-// src/components/Home.jsx
-import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ReactDOM from 'react-dom';
-import { MapPin, Search, Calendar, AlertCircle } from 'lucide-react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import '../styles/Home.css';
-import homevid1 from '../assets/homevid1.mp4';
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import ReactDOM from "react-dom";
+import { MapPin, Search, Calendar, AlertCircle } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "../styles/Home.css";
+import homevid1 from "../assets/homevid1.mp4";
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [endDateError, setEndDateError] = useState('');
+  const [endDateError, setEndDateError] = useState("");
 
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
-  const navigate = useNavigate(); // ← used for navigation
+  const navigate = useNavigate();
 
-  const PopperContainer = ({ children, containerRef }) => {
-    return containerRef?.current
-      ? ReactDOM.createPortal(children, containerRef.current)
-      : null;
-  };
+  const PopperContainer = ({ children, containerRef }) =>
+    containerRef?.current ? ReactDOM.createPortal(children, containerRef.current) : null;
 
   const onStartDateChange = (date) => {
     setStartDate(date);
-    setEndDateError('');
+    setEndDateError("");
     if (endDate && date && endDate < date) {
       setEndDate(null);
     }
@@ -33,25 +30,27 @@ export default function Home() {
 
   const onEndDateChange = (date) => {
     if (!startDate) {
-      setEndDateError('Please select start date first');
+      setEndDateError("Please select start date first");
       return;
     }
     if (date < startDate) {
-      setEndDateError('End date cannot be before start date');
+      setEndDateError("End date cannot be before start date");
       return;
     }
     setEndDate(date);
-    setEndDateError('');
+    setEndDateError("");
   };
 
   const onEndCalendarOpen = () => {
-    if (!startDate) {
-      setEndDateError('Please select start date first');
-    }
+    if (!startDate) setEndDateError("Please select start date first");
   };
 
   const handleSearch = () => {
-    navigate("/search"); // Navigate to Search page
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set("query", searchQuery.trim());
+    if (startDate) params.set("start_date", startDate.toISOString().split("T")[0]);
+    if (endDate) params.set("end_date", endDate.toISOString().split("T")[0]);
+    navigate(`/search?${params.toString()}`);
   };
 
   return (
@@ -59,7 +58,6 @@ export default function Home() {
       <video autoPlay muted loop className="home-video">
         <source src={homevid1} type="video/mp4" />
       </video>
-
       <div className="overlay">
         <div className="home-content">
           <h1 className="hero-title">Find Your Perfect Journey</h1>
@@ -71,7 +69,12 @@ export default function Home() {
             <div className="search-bar-container">
               <div className="search-box">
                 <MapPin size={18} className="icon" />
-                <input type="text" placeholder="Search" />
+                <input
+                  type="text"
+                  placeholder="Search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
 
               <div className="vertical-separator"></div>
@@ -134,4 +137,3 @@ export default function Home() {
     </section>
   );
 }
- 

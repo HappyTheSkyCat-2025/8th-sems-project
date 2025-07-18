@@ -78,4 +78,7 @@ urlpatterns = [
     # Wishlist CRUD
     path('wishlist/', views.WishlistItemListCreateView.as_view(), name='wishlist-item-list-create'),
     path('wishlist/<int:pk>/', views.WishlistItemDetailView.as_view(), name='wishlist-item-detail'),
+
+    # Search API
+    path('search-deals/', views.TravelDealSearchAPIView.as_view(), name='search-deals'),
 ]

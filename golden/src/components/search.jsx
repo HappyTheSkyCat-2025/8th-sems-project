@@ -1,12 +1,17 @@
-import React, { useState, useRef, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { MapPin, Calendar, Search as SearchIcon, AlertCircle } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
 import DatePicker from "react-datepicker";
+import { MapPin, Calendar, Search as SearchIcon, AlertCircle } from "lucide-react";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/search.css";
-import bali from "../assets/bali.jpg";
+
+const slugify = (str) =>
+  str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export default function Search() {
+  const [results, setResults] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [endDateError, setEndDateError] = useState("");
@@ -17,43 +22,89 @@ export default function Search() {
     priceMin: "",
     priceMax: "",
     sale: false,
-    lastMinute: false,
     styles: [],
     themes: [],
   });
 
   const perPage = 15;
-  const startDateRef = useRef(null);
-  const endDateRef = useRef(null);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const allResults = new Array(75).fill(0).map((_, i) => ({
-    id: i + 1,
-    title: `Classic Vietnam ${i + 1}`,
-    image: bali,
-    days: (i % 15) + 5,
-    priceNum: 1000 + (i % 5) * 500,
-    price: `$${1000 + (i % 5) * 500}`,
-    tag: i % 3 === 0 ? "ON SALE" : null,
-    style: ["Basic", "Original", "Premium"][i % 3],
-    theme: ["Trekking", "Family", "Food"][i % 3],
-    description: "10 days of cultural immersion in Vietnam’s hidden gems.",
-  }));
+  // Read query params on mount & populate states
+  useEffect(() => {
+    const sd = searchParams.get("start_date");
+    const ed = searchParams.get("end_date");
+    const q = searchParams.get("query");
+    if (sd) setStartDate(new Date(sd));
+    if (ed) setEndDate(new Date(ed));
+    if (q) setSearchQuery(q);
+  }, [searchParams]);
 
-  const filteredResults = useMemo(() => {
-    return allResults.filter((item) => {
-      const { durationMin, durationMax, priceMin, priceMax, sale, styles, themes } = filters;
-      if (durationMin && item.days < durationMin) return false;
-      if (durationMax && item.days > durationMax) return false;
-      if (priceMin && item.priceNum < priceMin) return false;
-      if (priceMax && item.priceNum > priceMax) return false;
-      if (sale && item.tag !== "ON SALE") return false;
-      if (styles.length && !styles.includes(item.style)) return false;
-      if (themes.length && !themes.includes(item.theme)) return false;
-      return true;
+  const shouldSearch =
+    searchQuery.trim() ||
+    startDate ||
+    endDate ||
+    filters.durationMin ||
+    filters.durationMax ||
+    filters.priceMin ||
+    filters.priceMax ||
+    filters.sale ||
+    filters.styles.length > 0 ||
+    filters.themes.length > 0;
+
+  // Fetch deals data
+  const fetchDeals = async () => {
+    const params = {
+      start_date: startDate?.toISOString().split("T")[0],
+      end_date: endDate?.toISOString().split("T")[0],
+      min_duration: filters.durationMin,
+      max_duration: filters.durationMax,
+      min_price: filters.priceMin,
+      max_price: filters.priceMax,
+      sale: filters.sale,
+      style: filters.styles,
+      theme: filters.themes,
+      query: searchQuery.trim() || undefined,
+    };
+
+    try {
+      const res = await axiosInstance.get("/destinations/search-deals/", { params });
+      setResults(res.data.results || res.data);
+      setPage(1);
+    } catch (err) {
+      console.error("Failed to fetch deals:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (shouldSearch) {
+      fetchDeals();
+    } else {
+      setResults([]);
+    }
+  }, [startDate, endDate, filters, searchQuery]);
+
+  const norm = (v = "") => v.toLowerCase().trim();
+
+  const { styleList, styleCount, themeList, themeCount } = useMemo(() => {
+    const sC = {};
+    const tC = {};
+    results.forEach((d) => {
+      const sKey = norm(d.style);
+      if (sKey) sC[sKey] = (sC[sKey] || 0) + 1;
+
+      (d.themes || []).forEach((t) => {
+        const tKey = norm(t);
+        if (tKey) tC[tKey] = (tC[tKey] || 0) + 1;
+      });
     });
-  }, [filters, allResults]);
-
-  const paginatedResults = filteredResults.slice((page - 1) * perPage, page * perPage);
+    return {
+      styleList: Object.keys(sC),
+      styleCount: sC,
+      themeList: Object.keys(tC),
+      themeCount: tC,
+    };
+  }, [results]);
 
   const updateFilter = (type, value) => {
     setPage(1);
@@ -64,10 +115,36 @@ export default function Search() {
           : [...prev[type], value];
         return { ...prev, [type]: updated };
       });
+    } else if (type === "sale") {
+      setFilters((prev) => ({ ...prev, sale: !prev.sale }));
     } else {
       setFilters((prev) => ({ ...prev, [type]: value }));
     }
   };
+
+  const filteredResults = useMemo(() => {
+    return results.filter((d) => {
+      const priceNum = Number(d.price);
+      const duration = d.days;
+
+      const priceOk =
+        (!filters.priceMin || priceNum >= Number(filters.priceMin)) &&
+        (!filters.priceMax || priceNum <= Number(filters.priceMax));
+      const durationOk =
+        (!filters.durationMin || duration >= Number(filters.durationMin)) &&
+        (!filters.durationMax || duration <= Number(filters.durationMax));
+      const saleOk = !filters.sale || d.on_sale === true;
+      const styleOk =
+        filters.styles.length === 0 || filters.styles.includes(norm(d.style));
+      const themeOk =
+        filters.themes.length === 0 ||
+        (d.themes || []).some((t) => filters.themes.includes(norm(t)));
+
+      return priceOk && durationOk && saleOk && styleOk && themeOk;
+    });
+  }, [results, filters]);
+
+  const paginatedResults = filteredResults.slice((page - 1) * perPage, page * perPage);
 
   const onStartDateChange = (date) => {
     setStartDate(date);
@@ -91,9 +168,12 @@ export default function Search() {
   };
 
   const onEndCalendarOpen = () => {
-    if (!startDate) {
-      setEndDateError("Please select start date first");
-    }
+    if (!startDate) setEndDateError("Please select start date first");
+  };
+
+  const truncateText = (text, maxLength = 100) => {
+    if (!text) return "";
+    return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
   };
 
   return (
@@ -105,21 +185,25 @@ export default function Search() {
       </div>
 
       <h2 className="search-results-header">
-        <span>{filteredResults.length}</span> trips found for <span className="keyword">"Nepal"</span>
+        <span>{filteredResults.length}</span> trips found
       </h2>
 
-      {/* Search Bar */}
       <div className="search-bar-wrapper1">
         <div className="search-bar-container1">
           <div className="search-box1">
             <MapPin size={18} className="icon" />
-            <input type="text" placeholder="" />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
           <div className="vertical-separator"></div>
 
           <div className="date-inline-box">
-            <div className="date-inline-field" ref={startDateRef}>
+            <div className="date-inline-field">
               <Calendar size={16} className="calendar-icon" />
               <DatePicker
                 selected={startDate}
@@ -133,7 +217,7 @@ export default function Search() {
 
             <span className="separator">—</span>
 
-            <div className="date-inline-field end-date-wrapper" ref={endDateRef}>
+            <div className="date-inline-field end-date-wrapper">
               <Calendar size={16} className="calendar-icon" />
               <DatePicker
                 selected={endDate}
@@ -147,12 +231,11 @@ export default function Search() {
             </div>
           </div>
 
-          <button className="search-btn">
+          <button className="search-btn" onClick={fetchDeals}>
             <SearchIcon size={16} /> Search
           </button>
         </div>
 
-        {/* Error message popup */}
         {endDateError && (
           <div className="error-popup" role="alert">
             <AlertCircle size={16} />
@@ -161,21 +244,23 @@ export default function Search() {
         )}
       </div>
 
-      {/* Filter + Results */}
       <div className="search-layout">
-        {/* Filters */}
         <aside className="search-filters">
           <h5>Duration</h5>
           <div className="range-row">
             <input
               type="number"
               placeholder="Min"
-              onChange={(e) => updateFilter("durationMin", Number(e.target.value))}
+              value={filters.durationMin}
+              onChange={(e) => updateFilter("durationMin", e.target.value)}
+              min={0}
             />
             <input
               type="number"
               placeholder="Max"
-              onChange={(e) => updateFilter("durationMax", Number(e.target.value))}
+              value={filters.durationMax}
+              onChange={(e) => updateFilter("durationMax", e.target.value)}
+              min={0}
             />
           </div>
 
@@ -184,12 +269,16 @@ export default function Search() {
             <input
               type="number"
               placeholder="$ Min"
-              onChange={(e) => updateFilter("priceMin", Number(e.target.value))}
+              value={filters.priceMin}
+              onChange={(e) => updateFilter("priceMin", e.target.value)}
+              min={0}
             />
             <input
               type="number"
               placeholder="$ Max"
-              onChange={(e) => updateFilter("priceMax", Number(e.target.value))}
+              value={filters.priceMax}
+              onChange={(e) => updateFilter("priceMax", e.target.value)}
+              min={0}
             />
           </div>
 
@@ -197,62 +286,107 @@ export default function Search() {
           <label>
             <input
               type="checkbox"
-              onChange={() => updateFilter("sale", !filters.sale)}
-            /> Trips on sale
+              checked={filters.sale}
+              onChange={() => updateFilter("sale")}
+            />
+            Trips on sale
           </label>
 
           <h5>Styles</h5>
-          {["Basic", "Original", "Premium"].map((style) => (
+          {styleList.map((style) => (
             <label key={style}>
               <input
                 type="checkbox"
+                checked={filters.styles.includes(style)}
                 onChange={() => updateFilter("styles", style)}
-              /> {style}
+              />
+              {style.charAt(0).toUpperCase() + style.slice(1)}{" "}
+              <span className="count">{styleCount[style]}</span>
             </label>
           ))}
 
           <h5>Themes</h5>
-          {["Trekking", "Family", "Food"].map((theme) => (
+          {themeList.map((theme) => (
             <label key={theme}>
               <input
                 type="checkbox"
+                checked={filters.themes.includes(theme)}
                 onChange={() => updateFilter("themes", theme)}
-              /> {theme}
+              />
+              {theme.charAt(0).toUpperCase() + theme.slice(1)}{" "}
+              <span className="count">{themeCount[theme]}</span>
             </label>
           ))}
         </aside>
 
-        {/* Results */}
         <div className="search-grid">
-          {paginatedResults.map((result) => (
-            <div className="search-card" key={result.id}>
-              <div
-                className="search-card-img"
-                style={{ backgroundImage: `url(${result.image})` }}
-              >
-                {result.tag && <span className="search-ribbon">{result.tag}</span>}
-              </div>
-              <div className="search-card-content">
-                <h3>{result.title}</h3>
-                <p className="excerpt">{result.description}</p>
-                <div className="search-card-footer">
-                  <button className="details-btn">See Details</button>
-                  <div className="price-info">
-                    <span className="old-price">${result.priceNum + 400}</span>
-                    <span className="new-price">{result.price}</span>
+          {!shouldSearch ? (
+            <p className="search-placeholder">Start typing to search for trips or destinations.</p>
+          ) : paginatedResults.length > 0 ? (
+            paginatedResults.map((result) => (
+              <div className="search-card" key={result.id}>
+                <div
+                  className="search-card-img"
+                  style={{
+                    backgroundImage: `url(${result.image || "https://via.placeholder.com/300"})`,
+                  }}
+                >
+                  {result.on_sale && <span className="search-ribbon">ON SALE</span>}
+                </div>
+                <div className="search-card-content">
+                  <h3>{result.title}</h3>
+                  <p className="excerpt">{truncateText(result.description)}</p>
+                  <div className="search-card-footer">
+                    <button
+                      className="details-btn"
+                      onClick={() =>
+                        navigate(
+                          `/destinations/${result.country?.slug || "unknown"}/deal/${slugify(
+                            result.title
+                          )}`
+                        )
+                      }
+                    >
+                      See Details
+                    </button>
+                    <div className="price-info">
+                      <span className="old-price">${Number(result.price) + 400}</span>
+                      <span className="new-price">${result.price}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>No trips found.</p>
+          )}
         </div>
       </div>
 
-      {/* Pagination */}
       <div className="search-pagination">
-        <span className="icon-btn" onClick={() => setPage((p) => Math.max(1, p - 1))}>◀</span>
-        <span>Page {page} of {Math.ceil(filteredResults.length / perPage)}</span>
-        <span className="icon-btn" onClick={() => setPage((p) => Math.min(Math.ceil(filteredResults.length / perPage), p + 1))}>▶</span>
+        <button
+          className="icon-btn"
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+          aria-label="Previous page"
+        >
+          ◀
+        </button>
+        <span>
+          Page {page} of {Math.ceil(filteredResults.length / perPage) || 1}
+        </span>
+        <button
+          className="icon-btn"
+          onClick={() =>
+            setPage((p) =>
+              Math.min(Math.ceil(filteredResults.length / perPage), p + 1)
+            )
+          }
+          disabled={page === Math.ceil(filteredResults.length / perPage)}
+          aria-label="Next page"
+        >
+          ▶
+        </button>
       </div>
     </section>
   );

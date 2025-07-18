@@ -1,4 +1,7 @@
 from rest_framework import generics
+from rest_framework.generics import ListAPIView
+from django.db.models import Q
+from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
@@ -325,3 +328,55 @@ class WishlistItemDetailView(generics.RetrieveDestroyAPIView):
 
     def get_queryset(self):
         return WishlistItem.objects.filter(user=self.request.user)
+
+
+
+class TravelDealSearchAPIView(ListAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = TravelDealSerializer
+
+    def get_queryset(self):
+        queryset = TravelDeal.objects.all()
+        request = self.request
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+        min_price = request.query_params.get("min_price")
+        max_price = request.query_params.get("max_price")
+        min_duration = request.query_params.get("min_duration")
+        max_duration = request.query_params.get("max_duration")
+        sale = request.query_params.get("sale")
+        style = request.query_params.getlist("style")
+        theme = request.query_params.getlist("theme")
+        query = request.query_params.get("query")
+
+        # 🔍 Search query filtering
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(description__icontains=query) |
+                Q(country__name__icontains=query)
+            )
+
+        # ⏳ Date filtering using TravelDealDate
+        if start_date and end_date:
+            queryset = queryset.filter(
+                dates__start_date__gte=start_date,
+                dates__end_date__lte=end_date
+            ).distinct()
+
+        if min_duration:
+            queryset = queryset.filter(days__gte=min_duration)
+        if max_duration:
+            queryset = queryset.filter(days__lte=max_duration)
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
+        if sale == "true":
+            queryset = queryset.filter(on_sale=True)
+        if style:
+            queryset = queryset.filter(style__in=style)
+        if theme:
+            queryset = queryset.filter(themes__overlap=theme)
+
+        return queryset
