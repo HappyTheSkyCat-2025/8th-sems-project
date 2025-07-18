@@ -1,153 +1,132 @@
-// src/Components/Auth/Login.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
-import { GoogleLogin } from "@react-oauth/google";
+import loginImg from "../assets/login.png";
 import "../styles/login.css";
-import loginBg from "../assets/login.jpg";
- 
-const Login = () => {
+
+export default function Login() {
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      // 1. Email/password login
-      const response = await axiosInstance.post("/token/", formData);
-      const { access, refresh } = response.data;
-
+      const res = await axiosInstance.post("/token/", formData);
+      const { access, refresh } = res.data;
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
       axiosInstance.defaults.headers.Authorization = `Bearer ${access}`;
-
-      // 2. Fetch profile
-      const profileResponse = await axiosInstance.get("/accounts/profile/");
-
-      // 3. Redirect
-      if (profileResponse.data.is_superuser) {
-        toast.success("Welcome Admin! Redirecting...");
-        navigate("/admin");
-      } else {
-        toast.success("Login successful! Redirecting...");
-        navigate("/");
-      }
-    } catch (error) {
-      const errorMsg =
-        error.response?.data?.detail || "Invalid credentials or server error.";
-      toast.error(errorMsg);
+      toast.success("Login successful!");
+      navigate("/");
+    } catch {
+      toast.error("Invalid Email or Password");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
+  const handleGoogleSuccess = async (res) => {
     try {
-      const res = await axiosInstance.post("/accounts/google-login/", {
-        token: credentialResponse.credential,
+      const response = await axiosInstance.post("/accounts/google-login/", {
+        token: res.credential,
       });
-      const { access, refresh } = res.data;
-
+      const { access, refresh } = response.data;
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
       axiosInstance.defaults.headers.Authorization = `Bearer ${access}`;
-
-      toast.success("Logged in with Google!");
+      toast.success("Google Login Successful!");
       navigate("/");
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Google login failed");
     }
   };
 
   return (
-    <div className="login-full-wrapper">
-      <div className="background-angle"></div>
-
-      <div className="login-box">
-        {/* Left: Background image */}
-        <div
-          className="login-image"
-          style={{ backgroundImage: `url(${loginBg})` }}
-        >
-          <div className="quote">
-            DISCOVER THE WORLD <br /> WITH GOLDEN LEAF TRAVELS
-          </div>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-image">
+          <img src={loginImg} alt="Login" />
         </div>
 
-        {/* Right: Login form */}
-        <div className="login-form">
-          <h2 className="brand-title">GOLDEN LEAF TRAVELS</h2>
+        <div className="auth-form">
+          <h2 className="auth-title">Golden Leaf Travels</h2>
+          <p className="auth-subtitle">Sign in to continue</p>
 
           <form onSubmit={handleSubmit}>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+            {/* Email */}
+            <div className={`auth-group ${formData.email ? "filled" : ""}`}>
+              <span className="auth-icon">
+                <FaEnvelope />
+              </span>
+              <input
+                type="email"
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                autoComplete="off"
+                placeholder=" "
+              />
+              <label>Email</label>
+            </div>
 
-            <div className="password-field">
+            {/* Password */}
+            <div className={`auth-group ${formData.password ? "filled" : ""}`}>
+              <span className="auth-icon">
+                <FaLock />
+              </span>
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Password"
+                required
                 value={formData.password}
                 onChange={handleChange}
-                required
+                autoComplete="off"
+                placeholder=" "
               />
+              <label>Password</label>
               <span
-                className="toggle-password"
+                className="auth-eye-icon"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{ cursor: "pointer" }}
-                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                <i
-                  className={`fas ${
-                    showPassword ? "fa-eye-slash" : "fa-eye"
-                  }`}
-                />
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
 
-            <Link to="/forgot-password" className="forgot-link">
-              Forgot Your Password?
-            </Link>
+            <div className="auth-forgot">
+              <Link to="/forgot-password">Forgot password?</Link>
+            </div>
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Logging in..." : "LOG IN"}
+            <div className="auth-divider">
+              <span>or</span>
+            </div>
+
+            <div className="auth-google">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error("Google login failed")}
+              />
+            </div>
+
+            <button type="submit" className="auth-button" disabled={loading}>
+              {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
 
-          {/* Google Sign‑In */}
-          <div style={{ marginTop: 16, textAlign: "center" }}>
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => toast.error("Google sign‑in failed")}
-            />
-          </div>
-
-          <div className="register-text">
-            Don’t have an account?{" "}
-            <Link to="/register" className="register-link">
-              Register
-            </Link>
+          <div className="auth-footer">
+            Don’t have an account? <Link to="/register">Create account</Link>
           </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Login;
+}

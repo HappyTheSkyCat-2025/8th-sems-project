@@ -12,7 +12,7 @@ import {
 import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
 import ScrollToTop from "./components/ScrollToTop";
-import ChatBot from "./components/chatbot"; 
+import ChatBot from "./components/chatbot";
 
 // Auth pages
 import Login from "./Auth/login";
@@ -40,9 +40,8 @@ import AboutUs from "./pages/Aboutus";
 import AllDestinations from "./pages/AllDestinations";
 import DestinationPage from "./pages/DestinationPage";
 import DestDescription from "./pages/destdescription";
-import Blogs from "./pages/blogs"; 
+import Blogs from "./pages/blogs";
 import Write from "./pages/write";
-
 
 // Search Page
 import Search from "./components/search";
@@ -110,6 +109,15 @@ function Layout() {
       location.pathname.startsWith(path.replace(":id", "").replace(":slug", ""))
     );
 
+  const authRoutes = [
+    "/login",
+    "/register",
+    "/verify-otp",
+    "/forgot-password",
+    "/reset-password",
+    "/change-password",
+  ];
+
   const paymentPaths = [
     "/payment/payment1",
     "/payment/payment2",
@@ -117,7 +125,7 @@ function Layout() {
     "/thank-you",
   ];
 
-  const showChatBot = !paymentPaths.some((path) =>
+  const showChatBot = ![...authRoutes, ...paymentPaths].some((path) =>
     matchPath({ path, end: false }, location.pathname)
   );
 
@@ -144,7 +152,10 @@ function Layout() {
         />
         <Route path="/alldestinations" element={<AllDestinations />} />
         <Route path="/destinations/:country" element={<DestinationPage />} />
-        <Route path="/destinations/:country/deal/:dealId" element={<DestDescription />} />
+        <Route
+          path="/destinations/:country/deal/:dealId"
+          element={<DestDescription />}
+        />
         <Route path="/about" element={<AboutUs />} />
 
         {/* Auth Routes */}
@@ -162,10 +173,12 @@ function Layout() {
         <Route path="/payment/payment2/:id" element={<Payment2 />} />
         <Route path="/payment/payment3/:id" element={<Payment3 />} />
         <Route path="/thank-you" element={<ThankYou />} />
-<Route path="/blogs" element={<Blogs />} />
-<Route path="/write" element={<Write />} />
 
-        {/* Search Route */}
+        {/* Blogs */}
+        <Route path="/blogs" element={<Blogs />} />
+        <Route path="/write" element={<Write />} />
+
+        {/* Search */}
         <Route path="/search" element={<Search />} />
 
         {/* Admin Routes */}
@@ -185,31 +198,73 @@ function Layout() {
           <Route path="countries/create" element={<CountryForm />} />
           <Route path="countries/:slug/edit" element={<CountryForm />} />
 
-          <Route path="countries/:country_slug/travel-deals" element={<TravelDealList />} />
-          <Route path="countries/:country_slug/travel-deals/create" element={<TravelDealForm />} />
-          <Route path="countries/:country_slug/travel-deals/:slug/edit" element={<TravelDealForm />} />
+          <Route
+            path="countries/:country_slug/travel-deals"
+            element={<TravelDealList />}
+          />
+          <Route
+            path="countries/:country_slug/travel-deals/create"
+            element={<TravelDealForm />}
+          />
+          <Route
+            path="countries/:country_slug/travel-deals/:slug/edit"
+            element={<TravelDealForm />}
+          />
 
-          <Route path="countries/:country_slug/reviews" element={<ReviewList />} />
-          <Route path="countries/:country_slug/reviews/create" element={<ReviewForm />} />
-          <Route path="countries/:country_slug/reviews/:id/edit" element={<ReviewForm />} />
+          <Route
+            path="countries/:country_slug/reviews"
+            element={<ReviewList />}
+          />
+          <Route
+            path="countries/:country_slug/reviews/create"
+            element={<ReviewForm />}
+          />
+          <Route
+            path="countries/:country_slug/reviews/:id/edit"
+            element={<ReviewForm />}
+          />
 
           <Route path="countries/:country_slug/faqs" element={<FAQList />} />
-          <Route path="countries/:country_slug/faqs/create" element={<FAQForm />} />
-          <Route path="countries/:country_slug/faqs/:id/edit" element={<FAQForm />} />
+          <Route
+            path="countries/:country_slug/faqs/create"
+            element={<FAQForm />}
+          />
+          <Route
+            path="countries/:country_slug/faqs/:id/edit"
+            element={<FAQForm />}
+          />
 
-          <Route path="countries/:country_slug/overview" element={<CountryOverviewList />} />
-          <Route path="countries/:country_slug/overview/create" element={<CountryOverviewForm />} />
-          <Route path="countries/:country_slug/overview/:id/edit" element={<CountryOverviewForm />} />
+          <Route
+            path="countries/:country_slug/overview"
+            element={<CountryOverviewList />}
+          />
+          <Route
+            path="countries/:country_slug/overview/create"
+            element={<CountryOverviewForm />}
+          />
+          <Route
+            path="countries/:country_slug/overview/:id/edit"
+            element={<CountryOverviewForm />}
+          />
 
-          <Route path="countries/:country_slug/learn-more-topics" element={<LearnMoreTopicList />} />
-          <Route path="countries/:country_slug/learn-more-topics/create" element={<LearnMoreTopicForm />} />
-          <Route path="countries/:country_slug/learn-more-topics/:id/edit" element={<LearnMoreTopicForm />} />
+          <Route
+            path="countries/:country_slug/learn-more-topics"
+            element={<LearnMoreTopicList />}
+          />
+          <Route
+            path="countries/:country_slug/learn-more-topics/create"
+            element={<LearnMoreTopicForm />}
+          />
+          <Route
+            path="countries/:country_slug/learn-more-topics/:id/edit"
+            element={<LearnMoreTopicForm />}
+          />
         </Route>
       </Routes>
 
       {!hideLayout && <Footer />}
 
-      {/* ✅ Show chatbot on all non-payment pages */}
+      {/* ✅ Show chatbot only outside auth & payment pages */}
       {showChatBot && <ChatBot />}
     </>
   );
