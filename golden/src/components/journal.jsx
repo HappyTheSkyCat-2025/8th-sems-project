@@ -2,9 +2,16 @@ import React from "react";
 import journal from "../data/journal";
 import { FaCalendarAlt } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 import "../styles/journal.css";
 
 export default function Journal() {
+  const navigate = useNavigate();
+
+  const handleViewAll = () => {
+    navigate("/blogs"); 
+  };
+
   return (
     <section className="journal-section" style={{ position: "relative" }}>
       <h2 className="journal-title">Travel journal</h2>
@@ -31,7 +38,7 @@ export default function Journal() {
       </div>
 
       <div className="view-all-wrapper">
-        <button className="view-all-btn">
+        <button className="view-all-btn" onClick={handleViewAll}>
           View all articles <IoIosArrowForward />
         </button>
       </div>

@@ -313,6 +313,9 @@ export default function Navbar() {
                 <Link to="/blogs" className="dropdown-link">
                   Blogs
                 </Link>
+                <Link to="/write" className="dropdown-link">
+                  Write for us
+                </Link>
               </div>
             </div>
           </nav>

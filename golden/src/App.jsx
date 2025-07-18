@@ -41,6 +41,7 @@ import AllDestinations from "./pages/AllDestinations";
 import DestinationPage from "./pages/DestinationPage";
 import DestDescription from "./pages/destdescription";
 import Blogs from "./pages/blogs"; 
+import Write from "./pages/write";
 
 
 // Search Page
@@ -162,6 +163,7 @@ function Layout() {
         <Route path="/payment/payment3/:id" element={<Payment3 />} />
         <Route path="/thank-you" element={<ThankYou />} />
 <Route path="/blogs" element={<Blogs />} />
+<Route path="/write" element={<Write />} />
 
         {/* Search Route */}
         <Route path="/search" element={<Search />} />
