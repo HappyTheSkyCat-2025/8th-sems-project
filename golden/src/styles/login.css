@@ -18,7 +18,7 @@
   background-color: rgb(23, 24, 97);
   transform: skewX(70deg);
   z-index: 0;
-}
+} 
 
 /* Login Card */
 .login-box {
@@ -150,7 +150,7 @@
 .login-form form button {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(to right, #0d6efd, #6610f2);
+  background: var(--highlight-color);
   border: none;
   border-radius: 14px;
   color: white;
@@ -231,7 +231,7 @@
 
   .login-form form input {
     padding: 10px 12px;
-  }
+  } 
 
   .forgot-link {
     font-size: 0.8rem;
