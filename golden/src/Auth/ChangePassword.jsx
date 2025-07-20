@@ -18,7 +18,7 @@ const ChangePassword = () => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => { 
     e.preventDefault();
 
     if (formData.newPassword !== formData.confirmNewPassword) {
@@ -83,7 +83,7 @@ const ChangePassword = () => {
               onChange={handleChange}
               placeholder=" "
               className="form-control"
-              required
+              required 
             />
             <label htmlFor="newPassword">New Password</label>
           </div>

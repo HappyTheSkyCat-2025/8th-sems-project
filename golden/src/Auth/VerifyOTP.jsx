@@ -114,7 +114,7 @@ const VerifyOTP = () => {
               <div className="circle">3</div>
               <span>{mode === "reset" ? "Reset" : "Done"}</span>
             </div>
-          </div>
+          </div> 
 
           <p className="otp-desc">
             We’ve sent a 6-digit code to <b>{email}</b>

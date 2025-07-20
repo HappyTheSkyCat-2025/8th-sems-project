@@ -59,7 +59,7 @@ export default function Login() {
 
         <div className="auth-form">
           <h2 className="auth-title">Golden Leaf Travels</h2>
-          <p className="auth-subtitle">Sign in to continue</p>
+          <p className="auth-subtitle">Log in to continue</p>
 
           <form onSubmit={handleSubmit}>
             {/* Email */}
