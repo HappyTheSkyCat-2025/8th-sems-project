@@ -47,7 +47,7 @@
 .hero-title {
   font-size: 2.8rem;
   font-weight: 700;
-  margin: 0;
+  margin-top: 40px;
 }
 
 .hero-description {
@@ -55,10 +55,11 @@
   max-width: 700px;
   line-height: 1.6;
   margin: 0;
+  margin-bottom: 60px;
 }
 
 /* Wrapper for search bar + error */
-.search-bar-wrapper {
+.search-field-wrapper {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
@@ -69,7 +70,7 @@
 }
 
 /* Search Bar Container */
-.search-bar-container {
+.search-field-container {
   border-radius: 40px;
   padding: 10px 16px;
   display: flex;
@@ -83,7 +84,7 @@
 }
 
 /* Search box (location input) */
-.search-box {
+.search-boxes {
   display: flex;
   align-items: center;
   flex: 1.5 1 0;
@@ -95,7 +96,7 @@
   box-sizing: border-box;
 }
 
-.search-box input {
+.search-boxes input {
   border: none;
   outline: none;
   background: transparent;

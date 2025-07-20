@@ -65,9 +65,9 @@ export default function Home() {
             Explore handpicked destinations and customize your travel experiences. Where will you go next?
           </p>
 
-          <div className="search-bar-wrapper">
-            <div className="search-bar-container">
-              <div className="search-box">
+          <div className="search-field-wrapper">
+            <div className="search-field-container">
+              <div className="search-boxes">
                 <MapPin size={18} className="icon" />
                 <input
                   type="text"
