@@ -8,7 +8,6 @@ import {
   Search,
   Phone,
 } from "lucide-react";
-import { RiArrowDropDownLine } from "react-icons/ri";
 import { IoLanguageOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Divide as Hamburger } from "hamburger-react";
@@ -43,7 +42,6 @@ export default function Navbar() {
   const [mobileView, setMobileView] = useState("main");
   const [mobileActiveRegion, setMobileActiveRegion] = useState(null);
 
-  // fetch destination data
   useEffect(() => {
     axiosInstance.get("destinations/").then((res) => {
       const regionList = res.data.regions.map((r) => r.region_name);
@@ -94,6 +92,20 @@ export default function Navbar() {
     return () => (document.body.style.overflow = "auto");
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const dropdowns = document.querySelectorAll(".dropdown");
+      if (![...dropdowns].some((el) => el.contains(e.target))) {
+        setShowDestinations(false);
+        setShowWaysToTravel(false);
+        setShowDeals(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
@@ -143,8 +155,11 @@ export default function Navbar() {
             {/* Destinations */}
             <div
               className="dropdown"
-              onMouseEnter={() => setShowDestinations(true)}
-              onMouseLeave={() => setShowDestinations(false)}
+              onClick={() => {
+                setShowDestinations(!showDestinations);
+                setShowWaysToTravel(false);
+                setShowDeals(false);
+              }}
             >
               <span className="link-item">
                 Destinations <ChevronDown size={14} />
@@ -152,7 +167,6 @@ export default function Navbar() {
               {showDestinations && activeRegion && (
                 <div className="mega-menu-dest">
                   <div className="mega-columns">
-                    {/* Left Column - Regions */}
                     <div className="column">
                       <ul>
                         {regions.map((r) => (
@@ -166,8 +180,6 @@ export default function Navbar() {
                         ))}
                       </ul>
                     </div>
-
-                    {/* Middle Column - Countries */}
                     <div className="column">
                       <ul>
                         {(countriesByRegion[activeRegion] || []).map((c) => (
@@ -182,8 +194,6 @@ export default function Navbar() {
                         ))}
                       </ul>
                     </div>
-
-                    {/* Right Column - Image and CTA */}
                     <div className="column image-column">
                       <img src={baliImage} alt={activeRegion} />
                       <p className="image-description">
@@ -205,8 +215,11 @@ export default function Navbar() {
             {/* Ways to Travel */}
             <div
               className="dropdown"
-              onMouseEnter={() => setShowWaysToTravel(true)}
-              onMouseLeave={() => setShowWaysToTravel(false)}
+              onClick={() => {
+                setShowWaysToTravel(!showWaysToTravel);
+                setShowDestinations(false);
+                setShowDeals(false);
+              }}
             >
               <span className="link-item">
                 Ways to Travel <ChevronDown size={14} />
@@ -255,8 +268,11 @@ export default function Navbar() {
             {/* Deals */}
             <div
               className="dropdown"
-              onMouseEnter={() => setShowDeals(true)}
-              onMouseLeave={() => setShowDeals(false)}
+              onClick={() => {
+                setShowDeals(!showDeals);
+                setShowWaysToTravel(false);
+                setShowDestinations(false);
+              }}
             >
               <span className="link-item">
                 Deals <ChevronDown size={14} />
@@ -302,10 +318,9 @@ export default function Navbar() {
               )}
             </div>
 
+            {/* About Us */}
             <div className="dropdown link-item">
-              <span className="dropdown-toggle">
-                About Us 
-              </span>
+              <span className="dropdown-toggle">About Us</span>
               <div className="dropdown-menu">
                 <Link to="/about" className="dropdown-link">
                   Our Stories
@@ -333,13 +348,7 @@ export default function Navbar() {
             <div className="language-switch">
               <IoLanguageOutline size={20} />
             </div>
-
-            <Link
-              to="/my-wishlist"
-              aria-label="Go to Wishlist"
-              className="wishlist-icon"
-              style={{ color: "inherit", textDecoration: "none" }}
-            >
+            <Link to="/my-wishlist" className="wishlist-icon">
               <Heart size={18} />
             </Link>
             <div className="profile-dropdown">
@@ -366,7 +375,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Search bar */}
+        {/* Search Bar */}
         {showSearchBar && (
           <div className="search-bar-wrapper">
             <input
@@ -409,7 +418,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile view rendering (main, destinations, countries, ways, deals) */}
+        {/* Mobile Views */}
         {mobileView === "main" && (
           <ul className="mobile-menu-list">
             <li onClick={() => setMobileView("destinations")}>
