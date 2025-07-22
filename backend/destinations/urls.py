@@ -34,6 +34,7 @@ urlpatterns = [
     # -----------------------------
     # Travel Deals CRUD (Nested under Country)
     # -----------------------------
+    path('travel-deals/', views.TravelDealListAPIView.as_view(), name='travel-deal-list-all'),  # List all travel deals
     path('countries/<slug:slug>/travel-deals/', views.TravelDealListCreateAPIView.as_view(), name='travel-deal-list'),
     path('countries/<slug:country_slug>/travel-deals/<slug:slug>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
 

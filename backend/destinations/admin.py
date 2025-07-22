@@ -3,7 +3,7 @@ from .models import (
     Region, Country, TravelDeal, TravelImage, Review, Article, FAQ,
     TravelType, DealCategory, DealOffer,
     CountryOverview, CountryLearnMoreTopic, TravelDealDate, Place,
-    ItineraryDay,
+    ItineraryDay, WishlistItem
 )
 
 # -------------------------
@@ -130,3 +130,12 @@ class CountryLearnMoreTopicAdmin(admin.ModelAdmin):
     list_filter = ('country',)
     ordering = ('order',)
     search_fields = ('title', 'country__name')
+
+# -------------------------
+# Wishlist Item Admin
+# -------------------------
+@admin.register(WishlistItem)
+class WishlistItemAdmin(admin.ModelAdmin):
+    list_display = ('user', 'deal', 'added_at')
+    list_filter = ('user', 'added_at')
+    search_fields = ('user__username', 'deal__title')

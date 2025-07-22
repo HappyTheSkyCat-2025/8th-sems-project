@@ -1,3 +1,4 @@
+from django.db.models import Avg
 from rest_framework import generics
 from rest_framework.generics import ListAPIView
 from django.db.models import Q
@@ -67,6 +68,26 @@ class CountryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
 # ================================
 # Travel Deal Views
 # ================================
+class TravelDealListAPIView(generics.ListAPIView):
+    serializer_class = TravelDealSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        qs = TravelDeal.objects.all()
+
+        filter_type = self.request.query_params.get("filter", "").lower()
+        if filter_type == "popular":
+            # annotate average rating and order descending
+            qs = qs.annotate(avg_rating=Avg("reviews__rating")).order_by("-avg_rating", "-id")
+        elif filter_type == "new":
+            # order by newest (assuming 'id' or created timestamp available)
+            qs = qs.order_by("-id")
+        else:
+            # default order maybe by title or id
+            qs = qs.order_by("title")
+
+        return qs
+
 class TravelDealListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = TravelDealSerializer
     permission_classes = [IsSuperUserOrReadOnly]
