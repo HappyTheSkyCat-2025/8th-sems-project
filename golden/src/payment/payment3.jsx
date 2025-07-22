@@ -65,7 +65,7 @@ export default function Payment3() {
         }
       );
       toast.success("Cash payment confirmed!");
-      setTimeout(() => navigate("/thank-you"), 1500);
+      setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500); // Redirect with success param
     } catch (err) {
       toast.error("Payment failed: " + (err.response?.data?.detail || "Unknown error"));
     } finally {
@@ -84,7 +84,7 @@ export default function Payment3() {
         }
       );
       toast.success("Stripe payment confirmed!");
-      setTimeout(() => navigate("/thank-you"), 1500);
+      setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500); // Redirect with success param
     } catch (err) {
       toast.error("Stripe update failed: " + (err.response?.data?.detail || "Unknown error"));
     }
@@ -101,7 +101,7 @@ export default function Payment3() {
         }
       );
       toast.success("PayPal payment confirmed!");
-      setTimeout(() => navigate("/thank-you"), 1500);
+      setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500); // Redirect with success param
     } catch (err) {
       toast.error("PayPal update failed: " + (err.response?.data?.detail || "Unknown error"));
     }
@@ -277,7 +277,6 @@ export default function Payment3() {
         <a href="#">Booking conditions</a>
         <a href="#">Data collection notice</a>
       </div>
-
     </div>
   );
 }

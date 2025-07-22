@@ -22,6 +22,7 @@ import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
 import Profile from "./Auth/profile";
 import ChangePassword from "./Auth/ChangePassword";
+import BookingDetail from "./Auth/BookingDetail";
 import MyWishlist from "./pages/MyWishlist";
 
 // Home page sections
@@ -167,6 +168,7 @@ function Layout() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/my-wishlist" element={<MyWishlist />} />
+        <Route path="/bookings/:id" element={<BookingDetail />} />
 
         {/* Payment Routes */}
         <Route path="/payment/payment1" element={<Payment1 />} />

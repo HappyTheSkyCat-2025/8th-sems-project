@@ -117,3 +117,23 @@
 .see-details-btn:hover {
   background: #eab308;
 }
+
+.deal-link {
+  display: inline-block;
+  color: #1e3a8a;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: #e0f2fe;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.deal-link:hover {
+  background-color: #3b82f6;
+  color: white;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
