@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from destinations.models import TravelDeal, TravelDealDate
 
+
 class Booking(models.Model):
     PAYMENT_METHODS = [
         ("stripe", "Stripe"),
@@ -20,10 +21,12 @@ class Booking(models.Model):
         ('private', 'Private'),
     ]
 
+    # User and related travel deal info
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     travel_deal = models.ForeignKey(TravelDeal, on_delete=models.CASCADE)
     date_option = models.ForeignKey(TravelDealDate, on_delete=models.CASCADE)
 
+    # Personal details
     full_name = models.CharField(max_length=150)
     email = models.EmailField()
     phone = models.CharField(max_length=50)
@@ -33,7 +36,8 @@ class Booking(models.Model):
     state = models.CharField(max_length=100)
     postcode = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
-    
+
+    # Booking details
     travellers = models.PositiveIntegerField(default=1)
     room_option = models.CharField(max_length=20, choices=ROOM_CHOICES, default='shared')
 
@@ -42,13 +46,15 @@ class Booking(models.Model):
     flight_help = models.BooleanField(default=False)
     donation = models.BooleanField(default=False)
 
+    # Payment info
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, blank=True, null=True)
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="pending")
     payment_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     transaction_id = models.CharField(max_length=255, blank=True, null=True)
     payment_date = models.DateTimeField(blank=True, null=True)
 
-    status = models.CharField(max_length=20, default="pending")  # confirmed, canceled, etc.
+    # Booking status and timestamps
+    status = models.CharField(max_length=20, default="pending")  # e.g. confirmed, canceled, etc.
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -4,6 +4,11 @@ from django.utils import timezone
 from django.conf import settings
 from datetime import timedelta
 
+
+# ----------------------
+# Custom User Model
+# ----------------------
+
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
@@ -17,13 +22,22 @@ class User(AbstractUser):
     def __str__(self):
         return self.email or self.username
 
+
+# ----------------------
+# OTP Model
+# ----------------------
+
 class UserOTP(models.Model):
     OTP_TYPE_CHOICES = (
         ('email_verification', 'Email Verification'),
         ('password_reset', 'Password Reset'),
     )
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_otps')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='user_otps'
+    )
     otp = models.CharField(max_length=6)
     otp_type = models.CharField(max_length=20, choices=OTP_TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,8 +54,16 @@ class UserOTP(models.Model):
     def __str__(self):
         return f"{self.otp_type} OTP for {self.user.email}: {self.otp}"
 
+
+# ----------------------
+# Emergency Contact
+# ----------------------
+
 class EmergencyContact(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=20)
     email = models.EmailField()

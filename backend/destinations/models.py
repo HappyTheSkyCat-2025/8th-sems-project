@@ -1,14 +1,18 @@
 from django.conf import settings
-import json
 from django.db import models
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+import json
 
+# -------------------------
+# Region and Country Models
+# -------------------------
 class Region(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class Country(models.Model):
     region = models.ForeignKey(Region, related_name="countries", on_delete=models.CASCADE)
@@ -31,11 +35,16 @@ class Country(models.Model):
     def __str__(self):
         return f"{self.name} ({self.region.name})"
 
+
+# -------------------------
+# Travel Types and Options
+# -------------------------
 class TravelType(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class TravelOption(models.Model):
     travel_type = models.ForeignKey(TravelType, related_name="options", on_delete=models.CASCADE)
@@ -44,11 +53,16 @@ class TravelOption(models.Model):
     def __str__(self):
         return self.name
 
+
+# -------------------------
+# Deal Categories and Offers
+# -------------------------
 class DealCategory(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class DealOffer(models.Model):
     category = models.ForeignKey(DealCategory, related_name="offers", on_delete=models.CASCADE)
@@ -57,6 +71,10 @@ class DealOffer(models.Model):
     def __str__(self):
         return self.name
 
+
+# -------------------------
+# Place Model
+# -------------------------
 class Place(models.Model):
     name = models.CharField(max_length=100)
     image = models.ImageField(upload_to="places/", blank=True, null=True)
@@ -64,6 +82,10 @@ class Place(models.Model):
     def __str__(self):
         return self.name
 
+
+# -------------------------
+# Travel Deal and Related Models
+# -------------------------
 class TravelDeal(models.Model):
     country = models.ForeignKey(Country, related_name="deals", on_delete=models.CASCADE)
     places = models.ManyToManyField(Place, related_name="deals", blank=True)
@@ -82,6 +104,7 @@ class TravelDeal(models.Model):
     on_sale = models.BooleanField(default=False)
     last_minute = models.BooleanField(default=False)
 
+    # Stored as JSON string, accessed via properties below
     included_json = models.TextField(blank=True, default='[]')
     not_included_json = models.TextField(blank=True, default='[]')
 
@@ -140,9 +163,12 @@ class ItineraryDay(models.Model):
         return f"{self.travel_deal.title} - Day {self.day_number}"
 
 
+# -------------------------
+# Wishlist and Reviews
+# -------------------------
 class WishlistItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist_items')
-    deal = models.ForeignKey('TravelDeal', on_delete=models.CASCADE, related_name='wishlisted_by')
+    deal = models.ForeignKey(TravelDeal, on_delete=models.CASCADE, related_name='wishlisted_by')
     added_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -151,8 +177,9 @@ class WishlistItem(models.Model):
     def __str__(self):
         return f"{self.user.email} → {self.deal.title}"
 
+
 class Review(models.Model):
-    travel_deal = models.ForeignKey("TravelDeal", related_name="reviews", on_delete=models.CASCADE)
+    travel_deal = models.ForeignKey(TravelDeal, related_name="reviews", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     rating = models.IntegerField()
@@ -163,6 +190,10 @@ class Review(models.Model):
     def __str__(self):
         return f"Review by {self.name} on {self.travel_deal.title} - {self.rating}/5"
 
+
+# -------------------------
+# Articles and FAQs
+# -------------------------
 class Article(models.Model):
     country = models.ForeignKey(Country, related_name="articles", on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -170,12 +201,13 @@ class Article(models.Model):
     description = models.TextField()
     image = models.ImageField(upload_to='articles/', blank=True, null=True)
 
-    # NEW FIELDS
+    # Flags for special sections
     is_inspirational = models.BooleanField(default=False)  # for "Get inspired"
     is_suggested = models.BooleanField(default=False)      # for "You might also like"
 
     def __str__(self):
         return f"{self.title} ({self.country.name})"
+
 
 class FAQ(models.Model):
     country = models.ForeignKey(Country, related_name="faqs", on_delete=models.CASCADE)
@@ -183,8 +215,15 @@ class FAQ(models.Model):
     answer = models.TextField()
 
     def __str__(self):
-        return f"FAQ for {self.country.name}: {self.question[:50]}{'...' if len(self.question) > 50 else ''}"
+        preview = self.question[:50]
+        if len(self.question) > 50:
+            preview += '...'
+        return f"FAQ for {self.country.name}: {preview}"
 
+
+# -------------------------
+# Country Overview and Learn More Topics
+# -------------------------
 class CountryOverview(models.Model):
     country = models.OneToOneField(Country, related_name="overview", on_delete=models.CASCADE)
     capital = models.CharField(max_length=100)
@@ -198,6 +237,7 @@ class CountryOverview(models.Model):
     def __str__(self):
         return f"Overview of {self.country.name}"
 
+
 class CountryLearnMoreTopic(models.Model):
     country = models.ForeignKey(Country, related_name="learn_more_topics", on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
@@ -210,8 +250,11 @@ class CountryLearnMoreTopic(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.country.name}"
-    
 
+
+# -------------------------
+# Travel Deal Dates
+# -------------------------
 class TravelDealDate(models.Model):
     travel_deal = models.ForeignKey(TravelDeal, related_name="dates", on_delete=models.CASCADE)
     start_date = models.DateField()

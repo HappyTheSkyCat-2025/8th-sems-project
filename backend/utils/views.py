@@ -1,12 +1,18 @@
 import requests
 from datetime import datetime
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 from django.conf import settings
-from rest_framework import permissions
 
+
+# ----------------------------------------
+# Visa Checker API
+# ----------------------------------------
 class VisaCheckerAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         nationality = request.data.get('nationality')
         destination = request.data.get('destination')
@@ -33,7 +39,13 @@ class VisaCheckerAPI(APIView):
                 status=status.HTTP_503_SERVICE_UNAVAILABLE
             )
 
+
+# ----------------------------------------
+# Weather Forecast API
+# ----------------------------------------
 class WeatherForecastAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
     def post(self, request):
         city = request.data.get('city')
         if not city:
@@ -43,6 +55,7 @@ class WeatherForecastAPI(APIView):
         if not api_key:
             return Response({"error": "API key not configured."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+        # Get city coordinates
         geo_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
 
         try:
@@ -57,6 +70,7 @@ class WeatherForecastAPI(APIView):
         except requests.RequestException:
             return Response({"error": "Failed to connect to geocoding service."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
+        # Get weather forecast using coordinates
         forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}"
 
         try:
@@ -86,6 +100,10 @@ class WeatherForecastAPI(APIView):
         except requests.RequestException:
             return Response({"error": "Failed to connect to forecast service."}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
+
+# ----------------------------------------
+# Currency Exchange Rate API
+# ----------------------------------------
 class ExchangeRateAPIView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -95,12 +113,12 @@ class ExchangeRateAPIView(APIView):
         to_currency = request.data.get('to_currency')
 
         if not all([amount, from_currency, to_currency]):
-            return Response({'error': 'Missing required fields'}, status=400)
+            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             amount = float(amount)
         except (ValueError, TypeError):
-            return Response({'error': 'Invalid amount'}, status=400)
+            return Response({'error': 'Invalid amount'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             url = f'https://v6.exchangerate-api.com/v6/{settings.EXCHANGE_RATE_API_KEY}/latest/{from_currency.upper()}'
@@ -108,16 +126,19 @@ class ExchangeRateAPIView(APIView):
             data = response.json()
 
             if response.status_code != 200 or data.get('result') != 'success':
-                return Response({'error': data.get('error-type', 'API request failed')}, status=400)
+                return Response({'error': data.get('error-type', 'API request failed')}, status=status.HTTP_400_BAD_REQUEST)
 
             rates = data.get('conversion_rates', {})
             rate = rates.get(to_currency.upper())
 
             if rate is None:
-                return Response({'error': f'Currency {to_currency} not supported'}, status=400)
+                return Response({'error': f'Currency {to_currency} not supported'}, status=status.HTTP_400_BAD_REQUEST)
 
             result = round(amount * rate, 4)
             return Response({'result': result, 'rate': rate})
 
+        except requests.RequestException:
+            return Response({'error': 'Failed to connect to exchange rate service.'}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
         except Exception as e:
-            return Response({'error': str(e)}, status=500)
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

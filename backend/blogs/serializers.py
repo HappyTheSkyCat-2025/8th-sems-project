@@ -2,11 +2,18 @@ from rest_framework import serializers
 from django.conf import settings
 from .models import Category, Blog, Comment
 
+# -------------------------
+# Category Serializer
+# -------------------------
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ['id', 'name', 'slug']
 
+
+# -------------------------
+# Blog Serializer
+# -------------------------
 class BlogSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
     likes_count = serializers.IntegerField(source='likes.count', read_only=True)
@@ -26,8 +33,11 @@ class BlogSerializer(serializers.ModelSerializer):
         ]
 
     def get_author(self, obj):
-        # Basic author representation, can customize
-        return {'id': obj.author.id, 'username': obj.author.username}
+        # Return minimal author info
+        return {
+            'id': obj.author.id,
+            'username': obj.author.username,
+        }
 
     def get_is_liked(self, obj):
         request = self.context.get('request')
@@ -35,6 +45,10 @@ class BlogSerializer(serializers.ModelSerializer):
             return obj.likes.filter(id=request.user.id).exists()
         return False
 
+
+# -------------------------
+# Comment Serializer
+# -------------------------
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
     blog = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -48,10 +62,15 @@ class CommentSerializer(serializers.ModelSerializer):
             'id', 'blog', 'author', 'text', 'created_at', 'parent',
             'replies', 'is_liked', 'likes_count',
         ]
-        read_only_fields = ['blog', 'author', 'created_at', 'replies', 'is_liked', 'likes_count']
+        read_only_fields = [
+            'blog', 'author', 'created_at', 'replies', 'is_liked', 'likes_count'
+        ]
 
     def get_author(self, obj):
-        return {'id': obj.author.id, 'username': obj.author.username}
+        return {
+            'id': obj.author.id,
+            'username': obj.author.username,
+        }
 
     def get_replies(self, obj):
         queryset = obj.replies.all().order_by('created_at')

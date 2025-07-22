@@ -9,8 +9,14 @@ from .models import (
 )
 
 
-# Custom JSONListField to handle JSON list strings
+# -------------------------
+# Custom Field for JSON List
+# -------------------------
 class JSONListField(serializers.Field):
+    """
+    Custom field to handle JSON stored as list strings in the model.
+    Parses JSON strings into Python lists and vice versa.
+    """
     def to_internal_value(self, data):
         if isinstance(data, list):
             return data
@@ -29,8 +35,9 @@ class JSONListField(serializers.Field):
         return value
 
 
-# --- TravelDeal, Review, Article, FAQ Serializers ---
-
+# -------------------------
+# Basic Serializers
+# -------------------------
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
@@ -48,16 +55,22 @@ class PlaceSerializer(serializers.ModelSerializer):
         model = Place
         fields = ['id', 'name', 'image']
 
+
+# -------------------------
+# TravelDeal Serializer
+# -------------------------
 class TravelDealSerializer(serializers.ModelSerializer):
-    themes = JSONListField()
-    country = CountrySerializer(read_only=True)
-    country_id = serializers.PrimaryKeyRelatedField(
+    themes = JSONListField()  # Handle JSON list of themes
+    country = CountrySerializer(read_only=True)  # Nested read-only country
+    country_id = serializers.PrimaryKeyRelatedField(  # Write country by id
         queryset=Country.objects.all(), write_only=True, source='country'
     )
-    gallery = TravelImageSerializer(many=True, read_only=True)
+    gallery = TravelImageSerializer(many=True, read_only=True)  # Related images
+
+    # Average rating computed from related reviews
     average_rating = serializers.SerializerMethodField()
 
-    # Add places with nested read and writable ids
+    # Places nested read-only and writeable by ids
     places = PlaceSerializer(many=True, read_only=True)
     place_ids = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -78,6 +91,7 @@ class TravelDealSerializer(serializers.ModelSerializer):
         return 0
 
 
+# Serializer to expose included/not included JSON fields conveniently
 class TravelDealIncludedSerializer(serializers.ModelSerializer):
     included = serializers.SerializerMethodField()
     not_included = serializers.SerializerMethodField()
@@ -93,6 +107,9 @@ class TravelDealIncludedSerializer(serializers.ModelSerializer):
         return obj.not_included
 
 
+# -------------------------
+# Itinerary Day Serializer
+# -------------------------
 class ItineraryDaySerializer(serializers.ModelSerializer):
     class Meta:
         model = ItineraryDay
@@ -107,6 +124,10 @@ class ItineraryDaySerializer(serializers.ModelSerializer):
             'activities',
         ]
 
+
+# -------------------------
+# Wishlist Item Serializer
+# -------------------------
 class WishlistItemSerializer(serializers.ModelSerializer):
     deal_title = serializers.CharField(source='deal.title', read_only=True)
     deal_image = serializers.ImageField(source='deal.image', read_only=True)
@@ -116,6 +137,10 @@ class WishlistItemSerializer(serializers.ModelSerializer):
         model = WishlistItem
         fields = ['id', 'deal', 'deal_title', 'deal_image', 'deal_country_slug']
 
+
+# -------------------------
+# Review Serializer
+# -------------------------
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
@@ -123,20 +148,27 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ['travel_deal', 'submitted_on']
 
 
+# -------------------------
+# Article Serializer
+# -------------------------
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = "__all__"
 
 
+# -------------------------
+# FAQ Serializer
+# -------------------------
 class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ
         fields = "__all__"
 
 
-# --- Country Overview and Learn More Topic Serializers ---
-
+# -------------------------
+# Country Overview Serializer
+# -------------------------
 class CountryOverviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CountryOverview
@@ -146,6 +178,9 @@ class CountryOverviewSerializer(serializers.ModelSerializer):
         ]
 
 
+# -------------------------
+# Country Learn More Topic Serializer
+# -------------------------
 class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
@@ -160,8 +195,9 @@ class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
         return None
 
 
-# --- Region Serializer ---
-
+# -------------------------
+# Region Serializer
+# -------------------------
 class RegionSerializer(serializers.ModelSerializer):
     countries = serializers.StringRelatedField(many=True, read_only=True)
 
@@ -170,8 +206,9 @@ class RegionSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'countries']
 
 
-# --- CountryDetailSerializer ---
-
+# -------------------------
+# Detailed Country Serializer with nested relations
+# -------------------------
 class CountryDetailSerializer(serializers.ModelSerializer):
     deals = serializers.SerializerMethodField()
     reviews = serializers.SerializerMethodField()
@@ -181,7 +218,7 @@ class CountryDetailSerializer(serializers.ModelSerializer):
     learn_more_topics = CountryLearnMoreTopicSerializer(many=True, read_only=True)
     region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
 
-    # 🔥 New fields
+    # Additional filtered article lists
     inspirations = serializers.SerializerMethodField()
     suggested_articles = serializers.SerializerMethodField()
 
@@ -192,7 +229,7 @@ class CountryDetailSerializer(serializers.ModelSerializer):
             "description", "image", "video_url", "region",
             "deals", "reviews", "articles", "faqs",
             "overview", "learn_more_topics",
-            "inspirations", "suggested_articles",  # 👈 include here
+            "inspirations", "suggested_articles",
         ]
 
     def get_deals(self, obj):
@@ -216,8 +253,9 @@ class CountryDetailSerializer(serializers.ModelSerializer):
         return ArticleSerializer(obj.articles.filter(is_suggested=True), many=True, context=self.context).data
 
 
-# --- TravelOption and TravelType Serializers ---
-
+# -------------------------
+# Travel Option and Type Serializers with nested create/update
+# -------------------------
 class TravelOptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelOption
@@ -251,8 +289,9 @@ class TravelTypeSerializer(serializers.ModelSerializer):
         return instance
 
 
-# --- DealOffer and DealCategory Serializers ---
-
+# -------------------------
+# Deal Offer and Category Serializers with nested create/update
+# -------------------------
 class DealOfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = DealOffer
@@ -285,12 +324,19 @@ class DealCategorySerializer(serializers.ModelSerializer):
 
         return instance
 
+
+# -------------------------
+# TravelDealDate Serializer with validation on price fields
+# -------------------------
 class TravelDealDateSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelDealDate
         fields = '__all__'
 
     def validate(self, data):
+        """
+        Validate price fields and calculate discount percentage if applicable.
+        """
         original = data.get("original_price")
         discounted = data.get("discounted_price")
 

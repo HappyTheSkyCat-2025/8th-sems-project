@@ -5,10 +5,16 @@ from rest_framework.response import Response
 from .models import Blog, Comment, Category
 from .serializers import BlogSerializer, CommentSerializer, CategorySerializer
 
+# -------------------------
+# Category Views
+# -------------------------
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
 
+# -------------------------
+# Blog Views
+# -------------------------
 class BlogListCreateView(generics.ListCreateAPIView):
     serializer_class = BlogSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -26,6 +32,7 @@ class BlogListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+
 class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BlogSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -38,7 +45,10 @@ class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
         return {'request': self.request}
 
     def get_object(self):
-        blog = get_object_or_404(Blog.objects.prefetch_related('likes', 'comments__author'), slug=self.kwargs['slug'])
+        blog = get_object_or_404(
+            Blog.objects.prefetch_related('likes', 'comments__author'),
+            slug=self.kwargs['slug']
+        )
 
         session_key = f"viewed_blog_{blog.id}"
         if not self.request.session.get(session_key):
@@ -48,6 +58,9 @@ class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         return blog
 
+# -------------------------
+# Comment Views
+# -------------------------
 class CommentListCreateByBlogView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -72,6 +85,9 @@ class CommentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
             return [permissions.IsAuthenticated(), IsCommentAuthor()]
         return [permissions.AllowAny()]
 
+# -------------------------
+# Like Toggle API Views
+# -------------------------
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def toggle_like(request, blog_id):
@@ -84,6 +100,7 @@ def toggle_like(request, blog_id):
         blog.likes.add(user)
         liked = True
     return Response({'liked': liked, 'likes_count': blog.likes.count()})
+
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])

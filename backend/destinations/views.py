@@ -1,10 +1,10 @@
 from rest_framework import generics
 from rest_framework.generics import ListAPIView
 from django.db.models import Q
-from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,
@@ -22,7 +22,9 @@ from .serializers import (
 )
 from .permissions import IsSuperUserOrReadOnly
 
-# ====== Admin Stats View ======
+# ================================
+# Admin Dashboard
+# ================================
 class AdminStatsView(APIView):
     permission_classes = [IsAdminUser]
 
@@ -35,7 +37,9 @@ class AdminStatsView(APIView):
         }
         return Response(data)
 
-# ====== Regions ======
+# ================================
+# Region Views
+# ================================
 class RegionListCreateAPIView(generics.ListCreateAPIView):
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
@@ -46,7 +50,9 @@ class RegionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = RegionSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-# ====== Countries ======
+# ================================
+# Country Views
+# ================================
 class CountryListCreateAPIView(generics.ListCreateAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
@@ -58,7 +64,9 @@ class CountryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
     permission_classes = [IsSuperUserOrReadOnly]
     lookup_field = 'slug'
 
-# ====== Travel Deals ======
+# ================================
+# Travel Deal Views
+# ================================
 class TravelDealListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = TravelDealSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -75,41 +83,6 @@ class TravelDealRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
     def get_queryset(self):
         country_slug = self.kwargs.get('country_slug')
         return TravelDeal.objects.filter(country__slug=country_slug)
-
-# ====== Places ======
-class PlaceListCreateAPIView(generics.ListCreateAPIView):
-    serializer_class = PlaceSerializer
-    permission_classes = [IsSuperUserOrReadOnly]
-
-    def get_queryset(self):
-        return Place.objects.all()
-    
-class PlaceRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = PlaceSerializer
-    permission_classes = [IsSuperUserOrReadOnly]
-    lookup_field = 'pk'
-
-    def get_queryset(self):
-        return Place.objects.all()
-    
-# ====== Itinerary Days ======
-class ItineraryDayListCreateAPIView(generics.ListCreateAPIView):
-    serializer_class = ItineraryDaySerializer
-    permission_classes = [IsSuperUserOrReadOnly]
-
-    def get_queryset(self):
-        deal_slug = self.kwargs['deal_slug']
-        return ItineraryDay.objects.filter(travel_deal__slug=deal_slug).order_by('day_number')
-
-    def perform_create(self, serializer):
-        deal_slug = self.kwargs['deal_slug']
-        deal = TravelDeal.objects.get(slug=deal_slug)
-        serializer.save(travel_deal=deal)
-
-class ItineraryDayRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ItineraryDay.objects.all()
-    serializer_class = ItineraryDaySerializer
-    permission_classes = [IsSuperUserOrReadOnly]
 
 class TravelDealIncludedRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = TravelDealIncludedSerializer
@@ -128,7 +101,48 @@ class TravelDealIncludedRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
         except TravelDeal.DoesNotExist:
             raise NotFound("Travel deal not found")
 
-# ====== Reviews ======
+# ================================
+# Place Views
+# ================================
+class PlaceListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = PlaceSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        return Place.objects.all()
+
+class PlaceRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = PlaceSerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        return Place.objects.all()
+
+# ================================
+# Itinerary Day Views
+# ================================
+class ItineraryDayListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = ItineraryDaySerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+    def get_queryset(self):
+        deal_slug = self.kwargs['deal_slug']
+        return ItineraryDay.objects.filter(travel_deal__slug=deal_slug).order_by('day_number')
+
+    def perform_create(self, serializer):
+        deal_slug = self.kwargs['deal_slug']
+        deal = TravelDeal.objects.get(slug=deal_slug)
+        serializer.save(travel_deal=deal)
+
+class ItineraryDayRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ItineraryDay.objects.all()
+    serializer_class = ItineraryDaySerializer
+    permission_classes = [IsSuperUserOrReadOnly]
+
+# ================================
+# Review Views
+# ================================
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [AllowAny]
@@ -144,7 +158,6 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
         deal = TravelDeal.objects.get(slug=deal_slug)
         serializer.save(travel_deal=deal)
 
-
 class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -152,7 +165,9 @@ class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Review.objects.all()
 
-# ====== Articles ======
+# ================================
+# Article Views
+# ================================
 class ArticleListCreateAPIView(generics.ListCreateAPIView):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
@@ -163,7 +178,9 @@ class ArticleRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
     serializer_class = ArticleSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-# ====== FAQs ======
+# ================================
+# FAQ Views
+# ================================
 class FAQListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = FAQSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -184,7 +201,9 @@ class FAQRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
             return FAQ.objects.filter(country__slug=country_slug)
         return FAQ.objects.all()
 
-# ====== Public Read-only Destinations API ======
+# ================================
+# Public Read-Only Destinations API
+# ================================
 class DestinationsAPIView(APIView):
     permission_classes = [AllowAny]
 
@@ -199,7 +218,9 @@ class DestinationsAPIView(APIView):
             })
         return Response(data)
 
-# ====== Travel Types ======
+# ================================
+# Travel Type Views
+# ================================
 class TravelTypeListCreateAPIView(generics.ListCreateAPIView):
     queryset = TravelType.objects.prefetch_related('options').all()
     serializer_class = TravelTypeSerializer
@@ -217,7 +238,9 @@ class TravelTypeRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
     serializer_class = TravelTypeSerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-# ====== Deal Categories (Deals) ======
+# ================================
+# Deal Category Views
+# ================================
 class DealCategoryListCreateAPIView(generics.ListCreateAPIView):
     queryset = DealCategory.objects.prefetch_related('offers').all()
     serializer_class = DealCategorySerializer
@@ -235,7 +258,9 @@ class DealCategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPI
     serializer_class = DealCategorySerializer
     permission_classes = [IsSuperUserOrReadOnly]
 
-# ====== CountryOverview ======
+# ================================
+# Country Overview Views
+# ================================
 class CountryOverviewListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = CountryOverviewSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -256,7 +281,9 @@ class CountryOverviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroy
             return CountryOverview.objects.filter(country__slug=country_slug)
         return CountryOverview.objects.all()
 
-# ====== CountryLearnMoreTopic ======
+# ================================
+# Country Learn More Topic Views
+# ================================
 class CountryLearnMoreTopicListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = CountryLearnMoreTopicSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -277,6 +304,9 @@ class CountryLearnMoreTopicRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateD
             return CountryLearnMoreTopic.objects.filter(country__slug=country_slug)
         return CountryLearnMoreTopic.objects.all()
 
+# ================================
+# Travel Deal Date Views
+# ================================
 class TravelDealDateListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = TravelDealDateSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -298,7 +328,6 @@ class TravelDealDateListCreateAPIView(generics.ListCreateAPIView):
             raise NotFound("Travel deal not found.")
         serializer.save(travel_deal=deal)
 
-
 class TravelDealDateRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TravelDealDateSerializer
     permission_classes = [IsSuperUserOrReadOnly]
@@ -312,6 +341,9 @@ class TravelDealDateRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyA
             travel_deal__country__slug=country_slug
         )
 
+# ================================
+# Wishlist Views
+# ================================
 class WishlistItemListCreateView(generics.ListCreateAPIView):
     serializer_class = WishlistItemSerializer
     permission_classes = [IsAuthenticated]
@@ -329,8 +361,9 @@ class WishlistItemDetailView(generics.RetrieveDestroyAPIView):
     def get_queryset(self):
         return WishlistItem.objects.filter(user=self.request.user)
 
-
-
+# ================================
+# Search API for Travel Deals
+# ================================
 class TravelDealSearchAPIView(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = TravelDealSerializer
@@ -338,6 +371,8 @@ class TravelDealSearchAPIView(ListAPIView):
     def get_queryset(self):
         queryset = TravelDeal.objects.all()
         request = self.request
+
+        # Query params
         start_date = request.query_params.get("start_date")
         end_date = request.query_params.get("end_date")
         min_price = request.query_params.get("min_price")
@@ -349,7 +384,7 @@ class TravelDealSearchAPIView(ListAPIView):
         theme = request.query_params.getlist("theme")
         query = request.query_params.get("query")
 
-        # 🔍 Search query filtering
+        # Filter by search query
         if query:
             queryset = queryset.filter(
                 Q(title__icontains=query) |
@@ -357,23 +392,30 @@ class TravelDealSearchAPIView(ListAPIView):
                 Q(country__name__icontains=query)
             )
 
-        # ⏳ Date filtering using TravelDealDate
+        # Filter by date range (TravelDealDate)
         if start_date and end_date:
             queryset = queryset.filter(
                 dates__start_date__gte=start_date,
                 dates__end_date__lte=end_date
             ).distinct()
 
+        # Filter by duration (days)
         if min_duration:
             queryset = queryset.filter(days__gte=min_duration)
         if max_duration:
             queryset = queryset.filter(days__lte=max_duration)
+
+        # Filter by price range
         if min_price:
             queryset = queryset.filter(price__gte=min_price)
         if max_price:
             queryset = queryset.filter(price__lte=max_price)
+
+        # Filter by sale status
         if sale == "true":
             queryset = queryset.filter(on_sale=True)
+
+        # Filter by style and theme (array fields)
         if style:
             queryset = queryset.filter(style__in=style)
         if theme:

@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, password_validation
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from django.contrib.auth.password_validation import validate_password
+
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,6 +21,10 @@ from .serializers import (
 
 User = get_user_model()
 
+# ----------------------------------------
+# 🔐 Google OAuth Login
+# ----------------------------------------
+
 class GoogleLoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -29,7 +33,6 @@ class GoogleLoginView(APIView):
         if not token:
             return Response({"error": "Token missing"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # verify with Google
         try:
             idinfo = id_token.verify_oauth2_token(
                 token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
@@ -42,24 +45,28 @@ class GoogleLoginView(APIView):
 
         user, created = User.objects.get_or_create(
             email=email,
-            defaults={"username": username, "is_active": True},
+            defaults={"username": username, "is_active": True}
         )
+
         if created:
             user.set_unusable_password()
             user.save()
 
-        # issue JWTs
         refresh = RefreshToken.for_user(user)
         return Response({
             "refresh": str(refresh),
             "access": str(refresh.access_token),
-            "user": {"id": user.id, "email": user.email, "username": user.username},
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username
+            },
         })
 
-# -------------------------------
-# 🔐 Registration with OTP Email Verification
-# -------------------------------
 
+# ----------------------------------------
+# 🔐 Registration with OTP Email Verification
+# ----------------------------------------
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -76,7 +83,7 @@ class RegisterView(APIView):
             message = (
                 f"Hello {user.username},\n\n"
                 f"Your OTP code is: {otp_code}\n\n"
-                f"Please enter this code to verify your email and activate your account.\n\n"
+                "Please enter this code to verify your email and activate your account.\n\n"
                 "Thank you!"
             )
             from_email = settings.DEFAULT_FROM_EMAIL
@@ -85,22 +92,23 @@ class RegisterView(APIView):
             try:
                 send_mail(subject, message, from_email, recipient_list, fail_silently=False)
             except Exception as e:
-                # Cleanup user if email sending fails
-                user.delete()
+                user.delete()  # Cleanup user
                 return Response(
                     {"error": f"Failed to send OTP email: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-            return Response({"message": "Registration successful. OTP sent to your email."}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "Registration successful. OTP sent to your email."},
+                status=status.HTTP_201_CREATED
+            )
 
-        # Provide more detailed error info if possible
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# -------------------------------
-# OTP verification
-# -------------------------------
+# ----------------------------------------
+# ✅ Unified OTP Verification (Register / Reset)
+# ----------------------------------------
 
 class UnifiedOTPVerifyView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -108,7 +116,7 @@ class UnifiedOTPVerifyView(APIView):
     def post(self, request):
         email = request.data.get("email")
         otp = request.data.get("otp")
-        mode = request.data.get("mode")  # either "register" or "reset"
+        mode = request.data.get("mode")  # "register" or "reset"
 
         if not email or not otp or mode not in ("register", "reset"):
             return Response({"error": "Missing or invalid data."}, status=status.HTTP_400_BAD_REQUEST)
@@ -130,20 +138,19 @@ class UnifiedOTPVerifyView(APIView):
 
         if mode == "register":
             if user.is_active:
-                return Response({"message": "Account already verified."}, status=status.HTTP_200_OK)
+                return Response({"message": "Account already verified."})
             user.is_active = True
             user.is_email_verified = True
             user.save()
             UserOTP.objects.filter(user=user, otp_type='email_verification').delete()
-            return Response({"message": "Account successfully activated."}, status=status.HTTP_200_OK)
+            return Response({"message": "Account successfully activated."})
 
-        elif mode == "reset":
-            return Response({"message": "OTP verified. Proceed to reset password."}, status=status.HTTP_200_OK)
+        return Response({"message": "OTP verified. Proceed to reset password."})
 
 
-# -------------------------------
-# 👤 User Profile (Get/Update)Email verified, account
-# -------------------------------
+# ----------------------------------------
+# 👤 User Profile (Retrieve/Update)
+# ----------------------------------------
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
@@ -153,9 +160,9 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
-# -------------------------------
-# 🔄 Change Password
-# -------------------------------
+# ----------------------------------------
+# 🔄 Change Password (Authenticated)
+# ----------------------------------------
 
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -170,23 +177,22 @@ class ChangePasswordView(APIView):
             if not user.check_password(old_password):
                 return Response({"error": "Incorrect old password"}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Validate the new password strength
             try:
-                validate_password(new_password, user=user)
+                password_validation.validate_password(new_password, user=user)
             except Exception as e:
                 return Response({"error": list(e)}, status=status.HTTP_400_BAD_REQUEST)
 
             user.set_password(new_password)
             user.save()
 
-            return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+            return Response({"message": "Password changed successfully"})
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# -------------------------------
-# 🔐 Password Reset via OTP
-# -------------------------------
+# ----------------------------------------
+# 🔐 Password Reset: Request via OTP
+# ----------------------------------------
 
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -199,7 +205,7 @@ class PasswordResetRequestView(APIView):
             try:
                 user = User.objects.get(email=email)
             except User.DoesNotExist:
-                # Prevent email enumeration by always responding success
+                # Always return success to avoid email enumeration
                 return Response({"message": "If that email is registered, an OTP has been sent."})
 
             otp = get_random_string(length=6, allowed_chars='0123456789')
@@ -211,21 +217,19 @@ class PasswordResetRequestView(APIView):
                 f"Your password reset OTP is: {otp}\nIt expires in 10 minutes.\n\n"
                 f"If you didn't request this, please ignore this email."
             )
-            from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [user.email]
-
             try:
-                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email], fail_silently=False)
             except Exception as e:
-                return Response(
-                    {"error": f"Failed to send email: {str(e)}"},
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
+                return Response({"error": f"Failed to send email: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({"message": "If that email is registered, an OTP has been sent."})
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+# ----------------------------------------
+# 🔐 Password Reset: Confirm New Password
+# ----------------------------------------
 
 class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -233,6 +237,6 @@ class PasswordResetConfirmView(APIView):
     def post(self, request):
         serializer = PasswordResetConfirmSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()  # Handles password change
+            serializer.save()
             return Response({"message": "Password has been reset successfully."})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

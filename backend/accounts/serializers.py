@@ -1,24 +1,40 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from .models import User, UserOTP, EmergencyContact
+
+from .models import UserOTP, EmergencyContact
 
 User = get_user_model()
+
+
+# --------------------------
+# User Serializers
+# --------------------------
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'profile_image', 'preferences', 'travel_history', 'nationality', 'is_superuser']
+        fields = [
+            'id',
+            'username',
+            'email',
+            'profile_image',
+            'preferences',
+            'travel_history',
+            'nationality',
+            'is_superuser'
+        ]
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
-        write_only=True, 
-        required=True, 
+        write_only=True,
+        required=True,
         validators=[validate_password],
         style={'input_type': 'password'}
     )
     password2 = serializers.CharField(
-        write_only=True, 
+        write_only=True,
         required=True,
         style={'input_type': 'password'}
     )
@@ -45,16 +61,23 @@ class RegisterSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=email,
             password=validated_data['password'],
-            is_active=False,  # User inactive until email verification
+            is_active=False  # Require email verification
         )
         return user
+
+
+# --------------------------
+# Password Management
+# --------------------------
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, validators=[validate_password])
 
+
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
+
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -66,7 +89,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             raise serializers.ValidationError({"email": "No user found with this email."})
-        
         attrs["user"] = user
         return attrs
 
@@ -77,8 +99,13 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         user.set_password(new_password)
         user.save()
 
-        # Clean up OTPs if any (optional)
+        # Optional: Delete used OTPs
         UserOTP.objects.filter(user=user, otp_type='password_reset').delete()
+
+
+# --------------------------
+# Emergency Contact
+# --------------------------
 
 class EmergencyContactSerializer(serializers.ModelSerializer):
     class Meta:
