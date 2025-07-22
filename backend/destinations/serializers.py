@@ -131,11 +131,12 @@ class ItineraryDaySerializer(serializers.ModelSerializer):
 class WishlistItemSerializer(serializers.ModelSerializer):
     deal_title = serializers.CharField(source='deal.title', read_only=True)
     deal_image = serializers.ImageField(source='deal.image', read_only=True)
-    deal_country_slug = serializers.SlugField(source="deal.country.slug", read_only=True)
+    deal_country_slug = serializers.SlugField(source='deal.country.slug', read_only=True)
+    deal_price = serializers.DecimalField(source='deal.price_from', max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = WishlistItem
-        fields = ['id', 'deal', 'deal_title', 'deal_image', 'deal_country_slug']
+        fields = ['id', 'deal', 'deal_title', 'deal_image', 'deal_country_slug', 'deal_price']
 
 
 # -------------------------

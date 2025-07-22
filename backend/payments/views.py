@@ -6,6 +6,7 @@ from rest_framework import status, permissions, generics
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from datetime import date
 from rest_framework.permissions import IsAuthenticated
 from django.http import HttpResponse, Http404
 from reportlab.pdfgen import canvas
@@ -269,3 +270,21 @@ def cancel_booking(request, booking_id):
             return Response({"error": "Booking cannot be canceled."}, status=status.HTTP_400_BAD_REQUEST)
     except Booking.DoesNotExist:
         return Response({"error": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+# --------------------------
+# User Reminders View
+# --------------------------
+class UserRemindersAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        today = date.today()
+        upcoming_bookings = Booking.objects.filter(
+            user=request.user,
+            date_option__start_date__gte=today,
+            status__in=['confirmed', 'pending']
+        ).order_by('date_option__start_date')
+
+        serializer = BookingSerializer(upcoming_bookings, many=True, context={'request': request})
+        return Response(serializer.data)

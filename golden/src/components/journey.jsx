@@ -183,7 +183,16 @@ export default function ExclusiveTrips() {
                 <p className="exclusive-trip-desc">{truncate(trip.description, 100)}</p>
                 <div className="exclusive-trip-days">{trip.days} days</div>
                 <div className="exclusive-action-row">
-                  <button className="exclusive-details-btn">See Details</button>
+                <button
+                  className="exclusive-details-btn"
+                  onClick={() =>
+                    navigate(
+                      `/destinations/${trip.country?.slug || "country"}/deal/${trip.slug || trip.id}`
+                    )
+                  }
+                >
+                  See Details
+                </button>
                   <div className="exclusive-price">
                     <span className="exclusive-original">
                       {trip.originalPrice ? `$${trip.originalPrice}` : ""}

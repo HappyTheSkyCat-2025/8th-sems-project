@@ -9,6 +9,7 @@ from .views import (
     VerifyPayPalPaymentView,
     download_invoice,
     cancel_booking,
+    UserRemindersAPIView,
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     path("bookings/<int:pk>/update-payment/", BookingPaymentUpdateAPIView.as_view(), name="booking-payment-update"),
     path("stripe/create-intent/", CreatePaymentIntentView.as_view(), name="create-stripe-intent"),
     path("paypal/verify/", VerifyPayPalPaymentView.as_view(), name="verify-paypal"),
+    path('reminders/', UserRemindersAPIView.as_view(), name='user-reminders'),
 ]
