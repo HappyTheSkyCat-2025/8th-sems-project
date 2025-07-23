@@ -16,7 +16,6 @@ from .serializers import BookingSerializer
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
-
 # --------------------------
 # Booking CRUD Views
 # --------------------------
@@ -39,8 +38,21 @@ class BookingCreateAPIView(generics.CreateAPIView):
         data['user'] = request.user.id
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        booking = serializer.save()
+        travel_date = booking.date_option
+
+        if travel_date.capacity >= booking.travellers:
+            travel_date.capacity -= booking.travellers
+            travel_date.save()
+        else:
+            booking.delete()
+            return Response(
+                {"error": "Not enough slots available for this date."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(self.get_serializer(booking).data, status=status.HTTP_201_CREATED)
 
 
 class BookingRetrieveAPIView(generics.RetrieveAPIView):
@@ -264,6 +276,8 @@ def cancel_booking(request, booking_id):
     try:
         booking = Booking.objects.get(id=booking_id, user=request.user)
         if booking.can_be_canceled():
+            booking.date_option.capacity += booking.travellers
+            booking.date_option.save()
             booking.cancel()
             return Response({"message": "Booking canceled successfully."}, status=status.HTTP_200_OK)
         else:

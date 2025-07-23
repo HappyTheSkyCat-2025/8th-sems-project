@@ -348,7 +348,7 @@ export default function Navbar() {
             <div className="language-switch">
               <IoLanguageOutline size={20} />
             </div>
-            <Link to="/my-wishlist" className="wishlist-icon">
+            <Link to="/profile" state={{ tab: "favourites" }} className="wishlist-icon">
               <Heart size={18} />
             </Link>
             <div className="profile-dropdown">

@@ -71,3 +71,30 @@ class BookingSerializer(serializers.ModelSerializer):
             'transaction_id',
             'payment_status',
         ]
+
+    def validate(self, data):
+        # Get date_option from data if updating, else from existing instance
+        date_option = data.get('date_option', None)
+        if date_option is None and self.instance:
+            date_option = self.instance.date_option
+
+        travellers = data.get('travellers', None)
+        if travellers is None and self.instance:
+            travellers = self.instance.travellers
+
+        if date_option is not None and travellers is not None:
+            if date_option.capacity < travellers:
+                raise serializers.ValidationError("Not enough capacity for the selected date option.")
+
+        return data
+
+    def create(self, validated_data):
+        date_option = validated_data['date_option']
+        travellers = validated_data['travellers']
+
+        # Reduce the capacity
+        date_option.capacity -= travellers
+        date_option.save()
+
+        # Create the booking
+        return super().create(validated_data)

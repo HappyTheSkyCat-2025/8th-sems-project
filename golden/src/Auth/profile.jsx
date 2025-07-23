@@ -5,6 +5,7 @@ import "../styles/profile.css";
 import bali from "../assets/bali.jpg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useLocation } from "react-router-dom";
 
 // Tab Components
 import MyBookings from "../Auth/booking";
@@ -16,12 +17,17 @@ import ProfileEditModal from "../Auth/ProfileEditModal";
 import ChangePasswordModal from "../Auth/ChangePasswordModal";
 
 export default function Profile() {
+  const location = useLocation();
+
+  // Use the tab from location.state if provided, otherwise default to "bookings"
+  const initialTab = location.state?.tab || "bookings";
+
   const [profile, setProfile] = useState(null);
   const [editData, setEditData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newImage, setNewImage] = useState(null);
-  const [activeTab, setActiveTab] = useState("bookings");
+  const [activeTab, setActiveTab] = useState(initialTab);
 
   // Modal visibility state
   const [showProfileModal, setShowProfileModal] = React.useState(false);
@@ -81,7 +87,12 @@ export default function Profile() {
             <input type="text" value={profile.phone || ""} readOnly placeholder="Phone" />
           </div>
           <div className="profile-field">
-            <input type="text" value={profile.nationality || ""} readOnly placeholder="Nationality" />
+            <input
+              type="text"
+              value={profile.nationality || ""}
+              readOnly
+              placeholder="Nationality"
+            />
           </div>
         </div>
       </div>
@@ -125,11 +136,7 @@ export default function Profile() {
         />
       )}
 
-      {showPasswordModal && (
-        <ChangePasswordModal
-          onClose={() => setShowPasswordModal(false)}
-        />
-      )}
+      {showPasswordModal && <ChangePasswordModal onClose={() => setShowPasswordModal(false)} />}
     </>
   );
 }

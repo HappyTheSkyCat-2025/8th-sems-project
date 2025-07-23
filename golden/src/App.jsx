@@ -23,7 +23,6 @@ import ResetPassword from "./Auth/ResetPassword";
 import Profile from "./Auth/profile";
 import ChangePassword from "./Auth/ChangePassword";
 import BookingDetail from "./Auth/BookingDetail";
-import MyWishlist from "./pages/MyWishlist";
 
 // Home page sections
 import Home from "./components/Home";
@@ -167,7 +166,6 @@ function Layout() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/change-password" element={<ChangePassword />} />
-        <Route path="/my-wishlist" element={<MyWishlist />} />
         <Route path="/bookings/:id" element={<BookingDetail />} />
 
         {/* Payment Routes */}

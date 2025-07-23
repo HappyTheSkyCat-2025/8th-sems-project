@@ -21,9 +21,7 @@ export default function Payment1() {
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [dobDay, setDobDay] = useState("");
-  const [dobMonth, setDobMonth] = useState("");
-  const [dobYear, setDobYear] = useState("");
+  const [dob, setDob] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address1, setAddress1] = useState("");
@@ -42,15 +40,6 @@ export default function Payment1() {
   const [dateOptionData, setDateOptionData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const generateOptions = (start, end) =>
-    Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  const days = generateOptions(1, 31);
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-  const years = generateOptions(1950, new Date().getFullYear());
 
   useEffect(() => {
     async function fetchData() {
@@ -86,12 +75,10 @@ export default function Payment1() {
       return;
     }
 
-    if (!title || !firstName || !lastName || !dobDay || !dobMonth || !dobYear || !email || !phone || !address1 || !town || !state || !postcode || !country) {
+    if (!title || !firstName || !lastName || !dob || !email || !phone || !address1 || !town || !state || !postcode || !country) {
       setError("Please fill in all required fields.");
       return;
     }
-
-    const dob = `${dobYear}-${String(months.indexOf(dobMonth) + 1).padStart(2, "0")}-${String(dobDay).padStart(2, "0")}`;
 
     try {
       setLoading(true);
@@ -101,6 +88,7 @@ export default function Payment1() {
         travel_deal_id: dealData.id,
         date_option_id: dateOptionData.id,
         full_name: `${title} ${firstName} ${middleName ? middleName + " " : ""}${lastName}`,
+        dob,
         email,
         phone,
         address_line1: address1,
@@ -114,7 +102,6 @@ export default function Payment1() {
       };
 
       const response = await axiosInstance.post("/payments/bookings/create/", payload);
-
       const booking = response.data;
       navigate(`/payment/payment2/${booking.id}`, { state: { booking } });
     } catch (err) {
@@ -186,16 +173,13 @@ export default function Payment1() {
             <input type="text" placeholder="Last name*" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
 
             <label>Date of birth *</label>
-            <div className="dob-group">
-              <input list="days" placeholder="Day" required value={dobDay} onChange={(e) => setDobDay(e.target.value)} />
-              <datalist id="days">{days.map((d) => <option key={d} value={d} />)}</datalist>
-
-              <input list="months" placeholder="Month" required value={dobMonth} onChange={(e) => setDobMonth(e.target.value)} />
-              <datalist id="months">{months.map((m) => <option key={m} value={m} />)}</datalist>
-
-              <input list="years" placeholder="Year" required value={dobYear} onChange={(e) => setDobYear(e.target.value)} />
-              <datalist id="years">{years.slice().reverse().map((y) => <option key={y} value={y} />)}</datalist>
-            </div>
+            <input
+              type="date"
+              required
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              max={new Date().toISOString().split("T")[0]}
+            />
 
             <h4>Contact details</h4>
             <input type="email" placeholder="Email *" required value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -276,7 +260,6 @@ export default function Payment1() {
         </div>
       </div>
 
-      {/* Modals */}
       {showWhyModal && (
         <div className="modal">
           <div className="modal-content">

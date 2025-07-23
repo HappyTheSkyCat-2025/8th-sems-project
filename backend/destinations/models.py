@@ -265,6 +265,8 @@ class TravelDealDate(models.Model):
     original_price = models.CharField(max_length=50, blank=True, null=True)  # in €
     discounted_price = models.CharField(max_length=50)  # in €
     discount_percent = models.CharField(max_length=10, blank=True, null=True)
+    capacity = models.PositiveIntegerField(default=0, help_text="Maximum number of people allowed for this date")
+
 
     def save(self, *args, **kwargs):
         if self.original_price and self.discounted_price:
