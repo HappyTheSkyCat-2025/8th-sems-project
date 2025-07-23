@@ -161,6 +161,8 @@ OPENWEATHER_API_KEY = config('OPENWEATHER_API_KEY')
 EXCHANGE_RATE_API_KEY = config('EXCHANGE_RATE_API_KEY')
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OLLAMA_HOST = "http://127.0.0.1:11435"
 
 # ---------------------------
 # 🆔 Default Primary Key

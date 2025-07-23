@@ -41,7 +41,7 @@ class JSONListField(serializers.Field):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country
-        fields = ['id', 'name', 'slug', 'region', 'image']
+        fields = ['id', 'name', 'slug', 'region', 'image', 'code', 'currency_code']
 
 
 class TravelImageSerializer(serializers.ModelSerializer):

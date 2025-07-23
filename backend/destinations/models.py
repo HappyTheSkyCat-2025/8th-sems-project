@@ -17,6 +17,8 @@ class Region(models.Model):
 class Country(models.Model):
     region = models.ForeignKey(Region, related_name="countries", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    code = models.CharField(max_length=2, blank=True, null=True)  # ISO country code (e.g. "US")
+    currency_code = models.CharField(max_length=3, blank=True, null=True)  # e.g. "USD"
     slug = models.SlugField(unique=True, blank=True)
     subtitle = models.CharField(max_length=200, blank=True)
     section_title = models.CharField(max_length=200, blank=True)
