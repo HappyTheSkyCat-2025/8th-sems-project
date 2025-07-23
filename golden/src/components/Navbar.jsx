@@ -41,6 +41,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileView, setMobileView] = useState("main");
   const [mobileActiveRegion, setMobileActiveRegion] = useState(null);
+  const [activeCountry, setActiveCountry] = useState(null);
 
   useEffect(() => {
     axiosInstance.get("destinations/").then((res) => {
@@ -167,45 +168,110 @@ export default function Navbar() {
               {showDestinations && activeRegion && (
                 <div className="mega-menu-dest">
                   <div className="mega-columns">
+                    {/* Regions column */}
                     <div className="column">
                       <ul>
                         {regions.map((r) => (
                           <li
                             key={r}
-                            onClick={() => setActiveRegion(r)}
-                            className={activeRegion === r ? "active" : ""}
+                            onClick={() => {
+                              setActiveRegion(r);
+                              setActiveCountry(null);
+                            }}
+                            className={activeRegion === r ? "region-active" : ""}
+                            onMouseEnter={() => setActiveRegion(r)}
                           >
                             {r}
                           </li>
                         ))}
                       </ul>
                     </div>
-                    <div className="column">
-                      <ul>
-                        {(countriesByRegion[activeRegion] || []).map((c) => (
-                          <li key={c.slug}>
-                            <Link
-                              to={`/destinations/${c.slug}`}
-                              className="plain-link"
-                            >
-                              {c.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className="column image-column">
-                      <img src={baliImage} alt={activeRegion} />
-                      <p className="image-description">
-                        Discover unforgettable journeys in{" "}
-                        <strong>{activeRegion}</strong>.
-                      </p>
-                      <Link
-                        to={`/destinations/${activeRegion.toLowerCase()}`}
-                        className="read-more-btn"
+                    {/* Countries column */}
+                    <div className="column countries-column">
+                      <div className="countries-subcolumns">
+                        {(() => {
+                          const countries = countriesByRegion[activeRegion] || [];
+                          const firstCol = countries.slice(0, 6);
+                          const secondCol = countries.slice(6, 12);
+                          return (
+                            <>
+                              <ul>
+                                {firstCol.map((c) => (
+                                  <li key={c.slug}>
+                                    <Link
+                                      to={`/destinations/${c.slug}`}
+                                      className="plain-link"
+                                      onClick={(e) => {
+                                        setActiveCountry(c);
+                                        setShowDestinations(false);
+                                      }}
+                                    >
+                                      {c.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                              <ul>
+                                {secondCol.map((c) => (
+                                  <li key={c.slug}>
+                                    <Link
+                                      to={`/destinations/${c.slug}`}
+                                      className="plain-link"
+                                      onClick={(e) => {
+                                        setActiveCountry(c);
+                                        setShowDestinations(false);
+                                      }}
+                                    >
+                                      {c.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </>
+                          );
+                        })()}
+                      </div>
+                      <button
+                        className="view-all-region-btn"
+                        onClick={() => {
+                          setShowDestinations(false);
+                          navigate(`/destinations/${activeRegion.toLowerCase()}`);
+                        }}
                       >
-                        Learn More
-                      </Link>
+                        View all {activeRegion}
+                      </button>
+                    </div>
+                    {/* Featured card column */}
+                    <div className="column image-column">
+                      <div className="featured-card">
+                        <div className="featured-image-wrapper">
+                          <img
+                            src={baliImage}
+                            alt={activeCountry ? activeCountry.name : activeRegion}
+                            className="featured-image"
+                          />
+                          <div className="featured-overlay">
+                            <div className="featured-title">
+                              {activeRegion}
+                            </div>
+                            <div className="featured-desc">
+                              {activeCountry
+                                ? `Explore ${activeCountry.name} with all our heart and money.`
+                                : `Discover unforgettable journeys in ${activeRegion}.`}
+                            </div>
+                            <Link
+                              to={
+                                activeCountry
+                                  ? `/destinations/${activeCountry.slug}`
+                                  : `/destinations/${activeRegion.toLowerCase()}`
+                              }
+                              className="featured-btn"
+                            >
+                              View Trip
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
