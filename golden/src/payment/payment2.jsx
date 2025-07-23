@@ -72,8 +72,13 @@ export default function Payment2() {
         state: { extras: extrasForState },
       });
     } catch (err) {
-      alert("Failed to save your extras. Please try again.");
-    }
+  console.error(err.response?.data || err.message);
+  alert(
+    `Failed to save your extras: ${
+      err.response?.data?.error || JSON.stringify(err.response?.data) || "Please try again."
+    }`
+  );
+}
   };
 
   if (loading) return <div>Loading booking details...</div>;
@@ -126,13 +131,7 @@ export default function Payment2() {
             </div>
           </div>
 
-          <div className="notice-box selling-fast">
-            <div className="icon">i</div>
-            <div className="notice-content">
-              This departure is selling fast, only <strong>3 places</strong>{" "}
-              remaining.
-            </div>
-          </div>
+          {/* REMOVED selling-fast notice here */}
 
           <div className="room-options">
             <h3>Room options</h3>

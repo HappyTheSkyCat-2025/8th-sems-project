@@ -126,7 +126,7 @@ const Register = () => {
                 required
                 className="fullname-input"
               />
-              <label className="label-fullname">Full Name</label>
+              <label className="label-fullname">Username</label>
             </div>
 
             {/* Email */}

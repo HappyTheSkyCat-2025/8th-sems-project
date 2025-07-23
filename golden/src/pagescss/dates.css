@@ -194,3 +194,24 @@
     transform: translateY(0);
   }
 }
+
+.notice-box.selling-fast {
+  background: #fff4e5;
+  border: 1px solid #ffa500;
+  padding: 0.5rem;
+  border-radius: 5px;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.notice-box .icon {
+  font-weight: bold;
+  margin-right: 0.5rem;
+  color: #ff8c00;
+}
+.sold-out-text {
+  color: red;
+  font-weight: bold;
+  margin-top: 1rem;
+}

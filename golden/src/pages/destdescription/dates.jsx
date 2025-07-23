@@ -107,14 +107,29 @@ export default function Dates({ data }) {
               <option>Full Payment</option>
             </select>
 
-            <button
-              className="confirm-btn"
-              onClick={() =>
-                navigate(`/payment/payment1?country=${countrySlug}&deal=${dealSlug}&date=${item.id}`)
-              }
-            >
-              Confirm Dates
-            </button>
+            {item.capacity === 0 ? (
+              <div className="sold-out-text">Sold Out</div>
+            ) : (
+              <>
+                {item.capacity < 10 && (
+                  <div className="notice-box selling-fast">
+                    <div className="icon">i</div>
+                    <div className="notice-content">
+                      Only <strong>{item.capacity} places</strong> remaining
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  className="confirm-btn"
+                  onClick={() =>
+                    navigate(`/payment/payment1?country=${countrySlug}&deal=${dealSlug}&date=${item.id}`)
+                  }
+                >
+                  Confirm Dates
+                </button>
+              </>
+            )}
           </div>
         </div>
       ))}

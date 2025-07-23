@@ -67,6 +67,10 @@ export default function Payment1() {
     fetchData();
   }, [countrySlug, dealSlug, dateId]);
 
+  // Check if booking is allowed:
+  const capacity = dateOptionData?.capacity ?? 0;
+  const canBook = capacity > 0 && travellers <= capacity;
+
   const handleContinue = async (e) => {
     e.preventDefault();
 
@@ -77,6 +81,11 @@ export default function Payment1() {
 
     if (!title || !firstName || !lastName || !dob || !email || !phone || !address1 || !town || !state || !postcode || !country) {
       setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (!canBook) {
+      setError(`Cannot book ${travellers} traveller${travellers > 1 ? "s" : ""}. Only ${capacity} place${capacity !== 1 ? "s" : ""} remaining.`);
       return;
     }
 
@@ -112,7 +121,7 @@ export default function Payment1() {
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div style={{ color: "red" }}>{error}</div>;
+  if (error) return <div style={{ color: "red", marginBottom: 10 }}>{error}</div>;
 
   return (
     <div className="traveller-container">
@@ -129,6 +138,24 @@ export default function Payment1() {
               <p><br />Please wait for confirmation before booking flights or non-refundable travel arrangements.</p>
             </div>
           </div>
+
+          {capacity !== undefined ? (
+            capacity > 0 && capacity < 10 ? (
+              <div className="notice-box selling-fast">
+                <div className="icon">i</div>
+                <div className="notice-content">
+                  This departure is selling fast, only <strong>{capacity}</strong> place{capacity > 1 ? "s" : ""} remaining.
+                </div>
+              </div>
+            ) : capacity === 0 ? (
+              <div className="notice-box sold-out">
+                <div className="icon">!</div>
+                <div className="notice-content">
+                  Sorry, this departure is fully booked.
+                </div>
+              </div>
+            ) : null
+          ) : null}
 
           <div className="availability-box">
             {dateOptionData?.guaranteed
@@ -206,9 +233,18 @@ export default function Payment1() {
               <h4><span className="deposit-icon">💳</span> Deposit</h4>
               <p>Lock in your trip with a deposit if it departs 30+ days from now. Read <a href="#">booking conditions</a>.</p>
               <p className="privacy-text">Please see our <a href="#">Privacy and Collection notice</a>.</p>
-              <button className="continue-button" type="submit" disabled={loading}>
+              <button
+                className="continue-button"
+                type="submit"
+                disabled={loading || !canBook}
+              >
                 {loading ? "Submitting..." : "Continue →"}
               </button>
+              {travellers > capacity && (
+                <p style={{ color: "red", marginTop: "8px" }}>
+                  Only {capacity} place{capacity !== 1 ? "s" : ""} remaining, please adjust the number of travellers.
+                </p>
+              )}
             </div>
           </form>
 
