@@ -10,6 +10,8 @@ from .views import (
     download_invoice,
     cancel_booking,
     UserRemindersAPIView,
+    send_location,
+    get_location_history,
 )
 
 urlpatterns = [
@@ -23,4 +25,6 @@ urlpatterns = [
     path("stripe/create-intent/", CreatePaymentIntentView.as_view(), name="create-stripe-intent"),
     path("paypal/verify/", VerifyPayPalPaymentView.as_view(), name="verify-paypal"),
     path('reminders/', UserRemindersAPIView.as_view(), name='user-reminders'),
+    path('bookings/<int:pk>/send-location/', send_location, name='send_location'),
+    path('bookings/<int:pk>/location-history/', get_location_history, name='location_history'),
 ]

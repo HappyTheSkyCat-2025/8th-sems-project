@@ -11,8 +11,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import HttpResponse, Http404
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from .models import Booking
-from .serializers import BookingSerializer
+from destinations.models import TravelDealDate
+from .models import Booking, BookingLocation
+from .serializers import BookingSerializer, BookingLocationSerializer
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -36,21 +37,27 @@ class BookingCreateAPIView(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
         data['user'] = request.user.id
+
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
-        booking = serializer.save()
-        travel_date = booking.date_option
+        # Check capacity before saving booking
+        date_option = data.get('date_option_id')
+        travellers = int(data.get('travellers', 1))
 
-        if travel_date.capacity >= booking.travellers:
-            travel_date.capacity -= booking.travellers
-            travel_date.save()
-        else:
-            booking.delete()
-            return Response(
-                {"error": "Not enough slots available for this date."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        try:
+            travel_date = TravelDealDate.objects.get(id=date_option)
+        except TravelDealDate.DoesNotExist:
+            return Response({"error": "Invalid date option."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if travel_date.capacity < travellers:
+            return Response({"error": "Not enough slots available for this date."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Reduce capacity safely
+        travel_date.capacity -= travellers
+        travel_date.save()
+
+        booking = serializer.save()
 
         return Response(self.get_serializer(booking).data, status=status.HTTP_201_CREATED)
 
@@ -69,6 +76,14 @@ class BookingUpdateAPIView(generics.UpdateAPIView):
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        partial = True  # allow partial update on PATCH
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class BookingPaymentUpdateAPIView(generics.UpdateAPIView):
@@ -302,3 +317,34 @@ class UserRemindersAPIView(APIView):
 
         serializer = BookingSerializer(upcoming_bookings, many=True, context={'request': request})
         return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_location(request, pk):
+    try:
+        booking = Booking.objects.get(pk=pk, user=request.user)
+    except Booking.DoesNotExist:
+        return Response({"detail": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    lat = request.data.get('latitude')
+    lon = request.data.get('longitude')
+
+    if lat is None or lon is None:
+        return Response({"detail": "Latitude and longitude required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    location = BookingLocation.objects.create(booking=booking, latitude=lat, longitude=lon)
+    serializer = BookingLocationSerializer(location)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_location_history(request, pk):
+    try:
+        booking = Booking.objects.get(pk=pk, user=request.user)
+    except Booking.DoesNotExist:
+        return Response({"detail": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    locations = booking.locations.all()  # related_name='locations'
+    serializer = BookingLocationSerializer(locations, many=True)
+    return Response(serializer.data)

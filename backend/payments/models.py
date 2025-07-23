@@ -77,3 +77,15 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking by {self.user} - {self.travel_deal.title} - {self.date_option.start_date}"
+
+class BookingLocation(models.Model):
+    booking = models.ForeignKey(Booking, related_name='locations', on_delete=models.CASCADE)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['timestamp']
+
+    def __str__(self):
+        return f"{self.booking.id} @ ({self.latitude}, {self.longitude}) at {self.timestamp}"
