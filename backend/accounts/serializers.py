@@ -18,11 +18,10 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'username',
             'email',
+            'phone',
             'profile_image',
-            'preferences',
-            'travel_history',
             'nationality',
-            'is_superuser'
+            'is_superuser',
         ]
 
 

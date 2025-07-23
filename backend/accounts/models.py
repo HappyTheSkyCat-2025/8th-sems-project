@@ -11,9 +11,8 @@ from datetime import timedelta
 
 class User(AbstractUser):
     email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     profile_image = models.ImageField(upload_to='profiles/', null=True, blank=True)
-    preferences = models.JSONField(default=dict, blank=True)
-    travel_history = models.JSONField(default=list, blank=True)
     nationality = models.CharField(max_length=2, blank=True, null=True)
 
     USERNAME_FIELD = 'email'

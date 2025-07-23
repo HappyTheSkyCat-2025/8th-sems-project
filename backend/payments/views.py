@@ -4,15 +4,30 @@ from django.conf import settings
 from django.utils import timezone
 from rest_framework import status, permissions, generics
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from datetime import date
+from rest_framework.permissions import IsAuthenticated
+from django.http import HttpResponse, Http404
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 from .models import Booking
 from .serializers import BookingSerializer
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
 # --------------------------
 # Booking CRUD Views
 # --------------------------
+
+class BookingListAPIView(generics.ListAPIView):
+    serializer_class = BookingSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Booking.objects.filter(user=self.request.user).order_by('-created_at')
+
 
 class BookingCreateAPIView(generics.CreateAPIView):
     queryset = Booking.objects.all()
@@ -130,3 +145,146 @@ class VerifyPayPalPaymentView(APIView):
             return Response({"status": "success", "payer_id": data["payer"]["payer_id"]})
 
         return Response({"error": "Payment not completed"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# --------------------------
+# Invoice PDF Download
+# --------------------------
+
+def download_invoice(request, id):
+    try:
+        booking = Booking.objects.select_related('travel_deal', 'date_option').get(id=id)
+    except Booking.DoesNotExist:
+        raise Http404("Booking not found")
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{id}.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    left_margin = 50
+    y = height - 50
+    line_height = 18
+
+    p.setFont("Helvetica-Bold", 20)
+    p.drawString(left_margin, y, "Booking Invoice")
+    y -= line_height * 2
+
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(left_margin, y, "Order Details")
+    y -= line_height
+
+    p.setFont("Helvetica", 12)
+    p.drawString(left_margin, y, f"Booking ID: {booking.id}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Status: {booking.status}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Purchased On: {booking.created_at.strftime('%Y-%m-%d %H:%M')}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Payment Status: {booking.payment_status}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Payment Method: {booking.payment_method or 'N/A'}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Transaction ID: {booking.transaction_id or 'N/A'}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Payment Date: {booking.payment_date.strftime('%Y-%m-%d %H:%M') if booking.payment_date else 'N/A'}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Amount Paid: ${booking.payment_amount or 'N/A'}")
+    y -= line_height * 2
+
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(left_margin, y, "Traveller Information")
+    y -= line_height
+
+    p.setFont("Helvetica", 12)
+    p.drawString(left_margin, y, f"Name: {booking.full_name}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Email: {booking.email}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Phone: {booking.phone}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Address Line 1: {booking.address_line1}")
+    y -= line_height
+    if booking.address_line2:
+        p.drawString(left_margin, y, f"Address Line 2: {booking.address_line2}")
+        y -= line_height
+    p.drawString(left_margin, y, f"Town: {booking.town}")
+    y -= line_height
+    p.drawString(left_margin, y, f"State: {booking.state}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Postcode: {booking.postcode}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Country: {booking.country}")
+    y -= line_height * 2
+
+    p.setFont("Helvetica-Bold", 14)
+    p.drawString(left_margin, y, "Booking Details")
+    y -= line_height
+
+    p.setFont("Helvetica", 12)
+    p.drawString(left_margin, y, f"Travel Deal: {booking.travel_deal.title if booking.travel_deal else 'N/A'}")
+    y -= line_height
+    if booking.date_option:
+        start_date = booking.date_option.start_date.strftime('%Y-%m-%d')
+        end_date = booking.date_option.end_date.strftime('%Y-%m-%d')
+    else:
+        start_date = "N/A"
+        end_date = "N/A"
+    p.drawString(left_margin, y, f"Travel Dates: {start_date} to {end_date}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Number of Travellers: {booking.travellers}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Room Option: {booking.room_option.capitalize() if booking.room_option else 'N/A'}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Add Transfer: {'Yes' if booking.add_transfer else 'No'}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Add Nights: {'Yes' if booking.add_nights else 'No'}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Flight Help: {'Yes' if booking.flight_help else 'No'}")
+    y -= line_height
+    p.drawString(left_margin, y, f"Donation: {'Yes' if booking.donation else 'No'}")
+    y -= line_height * 2
+
+    p.setFont("Helvetica-Oblique", 10)
+    p.drawString(left_margin, y, "Thank you for booking with us! Please contact support if you have any questions.")
+    p.showPage()
+    p.save()
+
+    return response
+
+
+# --------------------------
+# Cancel Booking View
+# --------------------------
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def cancel_booking(request, booking_id):
+    try:
+        booking = Booking.objects.get(id=booking_id, user=request.user)
+        if booking.can_be_canceled():
+            booking.cancel()
+            return Response({"message": "Booking canceled successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Booking cannot be canceled."}, status=status.HTTP_400_BAD_REQUEST)
+    except Booking.DoesNotExist:
+        return Response({"error": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+# --------------------------
+# User Reminders View
+# --------------------------
+class UserRemindersAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        today = date.today()
+        upcoming_bookings = Booking.objects.filter(
+            user=request.user,
+            date_option__start_date__gte=today,
+            status__in=['confirmed', 'pending']
+        ).order_by('date_option__start_date')
+
+        serializer = BookingSerializer(upcoming_bookings, many=True, context={'request': request})
+        return Response(serializer.data)
