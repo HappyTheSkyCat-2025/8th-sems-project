@@ -195,6 +195,8 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 160px; /* NEW: lock width to prevent layout shift */
+  justify-content: flex-end;
   user-select: none;
 }
 
@@ -311,9 +313,7 @@
   align-items: center;
   font-size: 18px;
 }
-.search-icon:hover {
-  color: var(--primary-color);
-}
+
 .search-bar-wrapper {
   position: absolute;
   top: 70px;
@@ -335,7 +335,7 @@
   flex: 1;
   border: none;
   outline: none;
-  background: transparent;
+  background: transparent; 
   font-size: 14px;
   color: var(--text-color);
 }
@@ -349,14 +349,16 @@
   color: #555;
   cursor: pointer;
 }
-.search-close-btn:hover {
-  color: var(--primary-color);
+
+.search-icon.hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
-.wishlist-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+
+.search-icon.visible {
+  visibility: visible;
+  opacity: 1;
 }
 
 /* Animations */
@@ -391,7 +393,7 @@
     display: block;
     position: absolute;
     right: 16px;
-    top: 14px;
+    top: 4px;
     z-index: 1100;
   }
 

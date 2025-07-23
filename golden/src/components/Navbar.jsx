@@ -337,20 +337,21 @@ export default function Navbar() {
 
           {/* Desktop Icons */}
           <div className="navbar-icons">
-            {showSearchIcon && (
-              <button
-                className="search-icon"
-                onClick={() => setShowSearchBar((p) => !p)}
-              >
-                <Search size={20} />
-              </button>
-            )}
+            <button
+              className={`search-icon ${showSearchIcon ? "visible" : "hidden"}`}
+              onClick={() => setShowSearchBar((p) => !p)}
+            >
+              <Search size={20} />
+            </button>
+
             <div className="language-switch">
               <IoLanguageOutline size={20} />
             </div>
-            <Link to="/my-wishlist" className="wishlist-icon">
-              <Heart size={18} />
-            </Link>
+            {/* 
+<Link to="/my-wishlist" className="wishlist-icon">
+  <Heart size={18} />
+</Link> 
+*/}
             <div className="profile-dropdown">
               <User
                 size={18}

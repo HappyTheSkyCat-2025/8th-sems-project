@@ -64,7 +64,7 @@ export default function Home() {
           <p className="hero-description">
             Explore handpicked destinations and customize your travel experiences. Where will you go next?
           </p>
-
+ 
           <div className="search-field-wrapper">
             <div className="search-field-container">
               <div className="search-boxes">
