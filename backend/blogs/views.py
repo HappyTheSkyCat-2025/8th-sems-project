@@ -2,8 +2,8 @@ from rest_framework import generics, permissions
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .models import Blog, Comment, Category
-from .serializers import BlogSerializer, CommentSerializer, CategorySerializer
+from .models import Blog, Comment, Category, Story
+from .serializers import BlogSerializer, CommentSerializer, CategorySerializer, StorySerializer
 
 # -------------------------
 # Category Views
@@ -114,3 +114,14 @@ def toggle_comment_like(request, comment_id):
         comment.likes.add(user)
         liked = True
     return Response({'liked': liked, 'likes_count': comment.likes.count()})
+
+# -------------------------
+# Story Views
+# -------------------------
+class StoryListView(generics.ListAPIView):
+    queryset = Story.objects.all().order_by('-created_at')
+    serializer_class = StorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_serializer_context(self):
+        return {'request': self.request}

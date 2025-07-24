@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
-from .models import Category, Blog, Comment
+from .models import Category, Blog, Comment, Story
 
 # -------------------------
 # Category Serializer
@@ -84,3 +84,11 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_likes_count(self, obj):
         return obj.likes.count()
+
+# -------------------------
+# Story Serializer
+# -------------------------
+class StorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Story
+        fields = "__all__"

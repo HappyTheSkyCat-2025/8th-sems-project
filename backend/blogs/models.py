@@ -104,3 +104,16 @@ class Comment(models.Model):
 
     def is_reply(self):
         return self.parent is not None
+
+# -------------------------
+# Story Model
+# -------------------------
+class Story(models.Model):
+    name = models.CharField(max_length=100)
+    location = models.CharField(max_length=100)
+    message = models.TextField()
+    photo = models.ImageField(upload_to='stories/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} from {self.location}"

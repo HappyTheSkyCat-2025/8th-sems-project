@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance";
 
 const VisaCheckerInline = ({ nationality, destination }) => {
   const [result, setResult] = useState(null);
@@ -23,7 +23,7 @@ const VisaCheckerInline = ({ nationality, destination }) => {
       setError("");
       setResult(null);
       try {
-        const res = await axios.post("http://localhost:8000/api/visa-checker/", {
+        const res = await axiosInstance.post("utils/visa-checker/", {
           nationality: nationality.toUpperCase().trim(),
           destination: destination.toUpperCase().trim(),
         });
@@ -41,17 +41,17 @@ const VisaCheckerInline = ({ nationality, destination }) => {
   if (!nationality || !destination) return null;
 
   return (
-    <div className="my-5">
-      <h4>🛂 Visa Checker</h4>
+    <div className="visa-checker-widget my-5" style={{ flex: 1 }}>
+      <h4 style={{ marginBottom: "1rem" }}>🛂 Visa Checker</h4>
       {loading ? (
         <p>Checking visa info...</p>
       ) : error ? (
         <div className="alert alert-danger">{error}</div>
       ) : result ? (
-        <div className="card p-3">
-          <h6>
-            {result.passport.name} ({result.passport.code}) → {result.destination.name} (
-            {result.destination.code})
+        <div className="card p-3" style={{ background: "#fff", borderRadius: "8px" }}>
+          <h6 style={{ marginBottom: "0.5rem" }}>
+            {result.passport.name} ({result.passport.code}) →{" "}
+            {result.destination.name} ({result.destination.code})
           </h6>
           <p>
             <strong>Visa Type:</strong> {result.category.name} ({result.category.code})

@@ -137,3 +137,42 @@
 .back-home:hover {
   text-decoration: underline;
 }
+
+.tools-wrapper h3, .tools-wrapper h4 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+}
+
+.tools-wrapper .card, .tools-wrapper > div {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+  padding: 1rem;
+  flex: 1 1 320px;
+}
+
+.tools-wrapper input, .tools-wrapper button {
+  font-size: 0.95rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.tools-wrapper button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.tools-wrapper button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .tools-wrapper {
+    flex-direction: column;
+    padding: 1rem;
+  }
+}

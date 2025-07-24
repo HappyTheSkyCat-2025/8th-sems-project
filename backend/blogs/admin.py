@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Blog, Comment
+from .models import Category, Blog, Comment, Story
 
 # -------------------------
 # Category Admin
@@ -36,3 +36,6 @@ class CommentAdmin(admin.ModelAdmin):
         return obj.is_reply()
     is_reply.boolean = True
     is_reply.short_description = 'Is a Reply?'
+
+
+admin.site.register(Story)

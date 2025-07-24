@@ -23,17 +23,34 @@ class VisaCheckerAPI(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Clean country codes (ensure uppercase)
+        nationality = nationality.upper()
+        destination = destination.upper()
+
         api_url = f"https://rough-sun-2523.fly.dev/visa/{nationality}/{destination}"
 
         try:
-            external_response = requests.get(api_url, timeout=5)
+            external_response = requests.get(api_url, timeout=10)
+
+            # Log for debugging
+            print(f"[VisaChecker] URL: {api_url}")
+            print(f"[VisaChecker] Status: {external_response.status_code}")
+            print(f"[VisaChecker] Response: {external_response.text}")
+
             if external_response.status_code == 200:
                 return Response(external_response.json())
+
             return Response(
-                {"error": "Could not fetch visa info from external API."},
+                {
+                    "error": "Could not fetch visa info from external API.",
+                    "status_code": external_response.status_code,
+                    "message": external_response.text,
+                },
                 status=external_response.status_code
             )
-        except requests.RequestException:
+
+        except requests.RequestException as e:
+            print(f"[VisaChecker] Exception: {str(e)}")
             return Response(
                 {"error": "Failed to connect to Visa API."},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE

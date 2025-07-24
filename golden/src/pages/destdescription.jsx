@@ -5,6 +5,7 @@ import Feat from "./destdescription/feat";
 import Places from "./destdescription/places";
 import Included from "./destdescription/included";
 import Reviewplaces from "./destdescription/reviewplaces";
+import WeatherForecastInline from "./destdescription/WeatherForecastInline";
 import Dates from "./destdescription/dates";
 import Foot from "../pages/foot";
 import "../pagescss/destdescription.css";
@@ -87,8 +88,11 @@ export default function DestDescription() {
       </nav>
 
       <Desc data={descData} onViewDatesClick={scrollToDates} />
+      {/* Show weather for main city of the deal */}
+      {dealData.city && <WeatherForecastInline city={dealData.city} />}
       <Places data={dealData} />
       {/* Pass country and dealId explicitly */}
+
       <Feat country={country} dealId={dealId} />
       <Included country={country} dealId={dealId} />
       <div ref={datesRef}>

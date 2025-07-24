@@ -52,25 +52,6 @@ import Payment2 from "./payment/payment2";
 import Payment3 from "./payment/payment3";
 import ThankYou from "./payment/ThankYou";
 
-// Admin Pages and utilities
-import RequireAdmin from "./utils/RequireAdmin";
-import AdminLayout from "./components/admin/AdminLayout";
-import AdminDashboard from "./components/admin/AdminDashboard";
-import RegionList from "./components/admin/regions/RegionList";
-import RegionForm from "./components/admin/regions/RegionForm";
-import CountryList from "./components/admin/countries/CountryList";
-import CountryForm from "./components/admin/countries/CountryForm";
-import TravelDealList from "./components/admin/travel-deals/TravelDealList";
-import TravelDealForm from "./components/admin/travel-deals/TravelDealForm";
-import FAQList from "./components/admin/faqs/FAQList";
-import FAQForm from "./components/admin/faqs/FAQForm";
-import ReviewList from "./components/admin/reviews/ReviewList";
-import ReviewForm from "./components/admin/reviews/ReviewForm";
-import CountryOverviewList from "./components/admin/country-overview/CountryOverviewList";
-import CountryOverviewForm from "./components/admin/country-overview/CountryOverviewForm";
-import LearnMoreTopicList from "./components/admin/learn-more-topics/LearnMoreTopicList";
-import LearnMoreTopicForm from "./components/admin/learn-more-topics/LearnMoreTopicForm";
-
 // Toastify
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
@@ -91,23 +72,9 @@ function Layout() {
     "/thank-you",
   ];
 
-  const adminRoutes = [
-    "/admin",
-    "/admin/regions",
-    "/admin/regions/create",
-    "/admin/regions/:id/edit",
-    "/admin/countries",
-    "/admin/countries/create",
-    "/admin/countries/:slug/edit",
-  ];
-
-  const hideLayout =
-    noLayoutRoutes.some((path) =>
-      matchPath({ path, end: false }, location.pathname)
-    ) ||
-    adminRoutes.some((path) =>
-      location.pathname.startsWith(path.replace(":id", "").replace(":slug", ""))
-    );
+  const hideLayout = noLayoutRoutes.some((path) =>
+    matchPath({ path, end: false }, location.pathname)
+  );
 
   const authRoutes = [
     "/login",
@@ -180,91 +147,10 @@ function Layout() {
 
         {/* Search */}
         <Route path="/search" element={<Search />} />
-
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <RequireAdmin>
-              <AdminLayout />
-            </RequireAdmin>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="regions" element={<RegionList />} />
-          <Route path="regions/create" element={<RegionForm />} />
-          <Route path="regions/:id/edit" element={<RegionForm />} />
-          <Route path="countries" element={<CountryList />} />
-          <Route path="countries/create" element={<CountryForm />} />
-          <Route path="countries/:slug/edit" element={<CountryForm />} />
-
-          <Route
-            path="countries/:country_slug/travel-deals"
-            element={<TravelDealList />}
-          />
-          <Route
-            path="countries/:country_slug/travel-deals/create"
-            element={<TravelDealForm />}
-          />
-          <Route
-            path="countries/:country_slug/travel-deals/:slug/edit"
-            element={<TravelDealForm />}
-          />
-
-          <Route
-            path="countries/:country_slug/reviews"
-            element={<ReviewList />}
-          />
-          <Route
-            path="countries/:country_slug/reviews/create"
-            element={<ReviewForm />}
-          />
-          <Route
-            path="countries/:country_slug/reviews/:id/edit"
-            element={<ReviewForm />}
-          />
-
-          <Route path="countries/:country_slug/faqs" element={<FAQList />} />
-          <Route
-            path="countries/:country_slug/faqs/create"
-            element={<FAQForm />}
-          />
-          <Route
-            path="countries/:country_slug/faqs/:id/edit"
-            element={<FAQForm />}
-          />
-
-          <Route
-            path="countries/:country_slug/overview"
-            element={<CountryOverviewList />}
-          />
-          <Route
-            path="countries/:country_slug/overview/create"
-            element={<CountryOverviewForm />}
-          />
-          <Route
-            path="countries/:country_slug/overview/:id/edit"
-            element={<CountryOverviewForm />}
-          />
-
-          <Route
-            path="countries/:country_slug/learn-more-topics"
-            element={<LearnMoreTopicList />}
-          />
-          <Route
-            path="countries/:country_slug/learn-more-topics/create"
-            element={<LearnMoreTopicForm />}
-          />
-          <Route
-            path="countries/:country_slug/learn-more-topics/:id/edit"
-            element={<LearnMoreTopicForm />}
-          />
-        </Route>
       </Routes>
 
       {!hideLayout && <Footer />}
 
-      {/* ✅ Show chatbot only outside auth & payment pages */}
       {showChatBot && <ChatBot />}
     </>
   );

@@ -22,7 +22,7 @@ class TravelChatbotAPIView(APIView):
             prompt = f"System: {system_prompt}\nUser: {user_message}\nAssistant:"
 
             payload = {
-                "model": "mistral",  # your Ollama model name
+                "model": "llama3:8b",
                 "prompt": prompt,
                 "temperature": 0.7,
                 "max_tokens": 500,

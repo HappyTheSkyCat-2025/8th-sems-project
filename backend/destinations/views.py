@@ -443,3 +443,11 @@ class TravelDealSearchAPIView(ListAPIView):
             queryset = queryset.filter(themes__overlap=theme)
 
         return queryset
+
+
+class GroupTourListView(generics.ListAPIView):
+    serializer_class = TravelDealSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return TravelDeal.objects.filter(style__iexact="group")
