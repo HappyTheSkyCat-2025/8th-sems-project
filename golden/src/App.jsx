@@ -1,11 +1,10 @@
-// src/App.jsx
 import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
-  matchPath,
+  matchPath, 
 } from "react-router-dom";
 
 // Layout components
@@ -13,6 +12,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
 import ScrollToTop from "./components/ScrollToTop";
 import ChatBot from "./components/chatbot";
+import Contact from "./components/Contact";
 
 // Auth pages
 import Login from "./Auth/login";
@@ -54,11 +54,14 @@ import Payment2 from "./payment/payment2";
 import Payment3 from "./payment/payment3";
 import ThankYou from "./payment/ThankYou";
 
+// Admin
+import AdminRoutes from "./admin/routes/AdminRoutes";
+
 // Toastify
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 
-function Layout() {
+function UserLayout() {
   const location = useLocation();
 
   const noLayoutRoutes = [
@@ -128,6 +131,7 @@ function Layout() {
         <Route path="/about" element={<AboutUs />} />
         
 
+
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -156,7 +160,6 @@ function Layout() {
       </Routes>
 
       {!hideLayout && <Footer />}
-
       {showChatBot && <ChatBot />}
     </>
   );
@@ -166,7 +169,10 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Layout />
+      <Routes>
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/*" element={<UserLayout />} />
+      </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );
