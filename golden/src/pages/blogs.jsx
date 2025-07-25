@@ -161,7 +161,7 @@ const BlogPage = () => {
                       )}
                       <div className="author-info">
                         <span className="author-name">{blog.author?.username || "Unknown Author"}</span>
-                        <small className="author-job">{blog.category?.name || "Uncategorized"}</small>
+                        <small className="author-job">{blog.category_details?.name || "Uncategorized"}</small>
                       </div>
                     </div>
                     <h3>{blog.title}</h3>

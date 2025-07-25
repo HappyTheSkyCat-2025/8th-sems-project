@@ -25,21 +25,6 @@ from .serializers import (
 from .permissions import IsSuperUserOrReadOnly
 
 # ================================
-# Admin Dashboard
-# ================================
-class AdminStatsView(APIView):
-    permission_classes = [IsAdminUser]
-
-    def get(self, request):
-        data = {
-            "regions": Region.objects.count(),
-            "countries": Country.objects.count(),
-            "travel_deals": TravelDeal.objects.count(),
-            "reviews": Review.objects.count(),
-        }
-        return Response(data)
-
-# ================================
 # Region Views
 # ================================
 class RegionListCreateAPIView(generics.ListCreateAPIView):

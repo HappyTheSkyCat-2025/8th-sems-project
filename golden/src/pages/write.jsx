@@ -25,22 +25,28 @@ export default function BecomeContributor() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState([]);
-  const [content, setContent] = useState(""); // plain content now
+  const [country, setCountry] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [content, setContent] = useState("");
   const [tags, setTags] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await axiosInstance.get("/blogs/categories/");
-        setCategories(response.data.results || []);
+        const [catRes, countryRes] = await Promise.all([
+          axiosInstance.get("/blogs/categories/"),
+          axiosInstance.get("/destinations/countries/"),
+        ]);
+        setCategories(catRes.data.results || []);
+        setCountries(countryRes.data.results || []);
       } catch {
-        toast.error("Failed to load categories");
+        toast.error("Failed to load categories or countries");
       }
     };
-    fetchCategories();
+    fetchInitialData();
   }, []);
 
   const handleThumbnailChange = (e) => {
@@ -75,8 +81,11 @@ export default function BecomeContributor() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("category", category);
-    formData.append("content", content); // plain content
+    formData.append("content", content);
     formData.append("tags", tags);
+    if (country) {
+      formData.append("country", country);
+    }
     if (thumbnail) {
       formData.append("thumbnail", thumbnail);
     }
@@ -118,21 +127,10 @@ export default function BecomeContributor() {
 
         <FaqDropdown title="🧭 What we’re looking for">
           <ul>
-            <li>
-              <strong>Good Stories</strong> – Unique experiences & travel
-              narratives
-            </li>
-            <li>
-              <strong>Good Trips</strong> – Adventures, challenges, and
-              highlights
-            </li>
-            <li>
-              <strong>Good Life</strong> – Food, culture, people, personal
-              growth
-            </li>
-            <li>
-              <strong>Good Ideas</strong> – Travel tips, reflections, insights
-            </li>
+            <li><strong>Good Stories</strong> – Unique experiences & travel narratives</li>
+            <li><strong>Good Trips</strong> – Adventures, challenges, and highlights</li>
+            <li><strong>Good Life</strong> – Food, culture, people, personal growth</li>
+            <li><strong>Good Ideas</strong> – Travel tips, reflections, insights</li>
           </ul>
         </FaqDropdown>
 
@@ -157,6 +155,21 @@ export default function BecomeContributor() {
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Country
+            <select
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+            >
+              <option value="">Optional: Select a country</option>
+              {countries.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </select>

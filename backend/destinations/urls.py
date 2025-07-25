@@ -3,11 +3,6 @@ from . import views
 
 urlpatterns = [
     # -----------------------------
-    # Admin Dashboard Stats
-    # -----------------------------
-    path('admin/stats/', views.AdminStatsView.as_view(), name='admin-stats'),
-
-    # -----------------------------
     # Regions CRUD
     # -----------------------------
     path('regions/', views.RegionListCreateAPIView.as_view(), name='region-list'),

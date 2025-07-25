@@ -436,9 +436,9 @@ export default function BlogDetail() {
           )}
           <div>
             <h5 className="text-primary mb-1">{blog.author?.username}</h5>
-            {blog.category && (
-              <Link to={`/blogs?category=${blog.category.id}`} className="badge bg-secondary text-decoration-none">
-                {blog.category.name}
+            {blog.category_details && (
+              <Link to={`/blogs?category=${blog.category_details.id}`} className="badge bg-secondary text-decoration-none">
+                {blog.category_details.name}
               </Link>
             )}
           </div>

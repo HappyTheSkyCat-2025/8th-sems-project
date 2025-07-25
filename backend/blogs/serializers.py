@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.conf import settings
 from .models import Category, Blog, Comment, Story
+from destinations.models import Country
 
 # -------------------------
 # Category Serializer
@@ -18,10 +19,10 @@ class BlogSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     likes_count = serializers.SerializerMethodField()
-    
-    # For writing (input): accept category ID
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(),
+
+    # For writing (input): accept country ID
+    country = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(),
         required=False,
         allow_null=True,
         write_only=True,
@@ -35,7 +36,7 @@ class BlogSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'slug', 'content', 'thumbnail', 'category', 'category_details',
             'created_at', 'updated_at', 'status', 'tags', 'views',
-            'likes_count', 'is_liked', 'author'
+            'likes_count', 'is_liked', 'author', 'country'
         ]
 
     def get_author(self, obj):
