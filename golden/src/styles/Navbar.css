@@ -44,6 +44,10 @@
   user-select: none;
 }
 
+.navbar-links a {
+  text-decoration: none;
+}
+
 .link-item {
   cursor: pointer;
   display: flex;
@@ -278,6 +282,10 @@
   user-select: none;
 }
 
+.navbar-icons a {
+  text-decoration: none;
+}
+
 .language-switch {
   display: flex;
   align-items: center;
@@ -329,6 +337,7 @@
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  text-decoration: none;
 }
 .contact-btn:hover {
   background-color: var(--primary-dark);
@@ -666,6 +675,10 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.with-icon a {
+  text-decoration: none;
 }
 
 .mobile-menu-list.sub li {

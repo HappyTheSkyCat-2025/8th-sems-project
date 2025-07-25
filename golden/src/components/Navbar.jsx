@@ -225,7 +225,7 @@ export default function Navbar() {
                                         setShowDestinations(false);
                                       }}
                                     >
-                                      {c.name}
+                                      {c.name} 
                                     </Link>
                                   </li>
                                 ))}
@@ -448,9 +448,9 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <button className="contact-btn" onClick={() => navigate("/contact")}>
+            <Link to="/contact" className="contact-btn" tabIndex={0}>
               Contact Us
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -529,7 +529,7 @@ export default function Navbar() {
             </li>
             <li>
               <Phone size={18} />{" "}
-              <Link to="/contact" className="with-icon">
+              <Link to="/contact" className="with-icon" onClick={() => setIsMobileMenuOpen(false)}>
                 Contact Us
               </Link>
             </li>

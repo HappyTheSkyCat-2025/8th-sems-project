@@ -5,7 +5,7 @@ import {
   Routes,
   Route,
   useLocation,
-  matchPath,
+  matchPath, 
 } from "react-router-dom";
 
 // Layout components
@@ -13,6 +13,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
 import ScrollToTop from "./components/ScrollToTop";
 import ChatBot from "./components/chatbot";
+import Contact from "./components/Contact";
 
 // Auth pages
 import Login from "./Auth/login";
@@ -126,6 +127,7 @@ function Layout() {
           element={<DestDescription />}
         />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<Contact />} />
 
 
         {/* Auth Routes */}
