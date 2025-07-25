@@ -276,14 +276,23 @@
 .navbar-icons {
   display: flex;
   align-items: center;
-  gap: 14px;
-  min-width: 160px; /* NEW: lock width to prevent layout shift */
+  gap: 16px;
+  min-width: 160px;
   justify-content: flex-end;
   user-select: none;
+}
+.wishlist-icon {
+  display: flex; 
+  align-items: center;
 }
 
 .navbar-icons a {
   text-decoration: none;
+}
+
+.navbar-icons svg,
+.wishlist-icon svg {
+  color: var(--text-color);
 }
 
 .language-switch {
@@ -407,6 +416,7 @@
   right: 20px;
   width: 260px;
   max-width: 90vw;
+  max-height: 900vh;
   background: #fff;
   border-radius: 30px;
   padding: 6px 14px;

@@ -19,7 +19,7 @@ export default function Payment3() {
   const extras = location.state?.extras || {};
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(null); 
   const [paying, setPaying] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [showTrip, setShowTrip] = useState(false);
@@ -131,7 +131,7 @@ export default function Payment3() {
 
   return (
     <div className="payment3-container">
-      <StepIndicator current={2} />
+      <StepIndicator current={2} steps={["Your details", "Trip extras", "Payment"]} />
       <h2 className="payment-title">Payment</h2>
 
       {/* Late request alert */}
@@ -157,8 +157,8 @@ export default function Payment3() {
 
           {/* --- TERMS AND AGREEMENTS --- */}
           <h3 className="section-heading">Terms and Agreements</h3>
-          <div className="checkboxes">
-            <label>
+          <div className="terms-checkboxes">
+            <label className="terms-checkbox-label">
               <input
                 type="checkbox"
                 checked={agreedTerms}
@@ -167,7 +167,7 @@ export default function Payment3() {
               I agree to the <a href="#">terms and conditions</a> and
               <a href="#"> privacy policy</a> <span className="required">*</span>
             </label>
-            <label>
+            <label className="terms-checkbox-label">
               <input
                 type="checkbox"
                 checked={agreedInfo}
@@ -176,7 +176,7 @@ export default function Payment3() {
               I have read the <a href="#">Essential Trip Information</a> and will follow
               <a href="#"> community guidelines</a> <span className="required">*</span>
             </label>
-            <label>
+            <label className="terms-checkbox-label">
               <input
                 type="checkbox"
                 checked={optInEmails}
@@ -192,6 +192,7 @@ export default function Payment3() {
           </h3>
           {/* Disable payment option buttons if required checkboxes unchecked */}
           <div
+            className="payment-options-row"
             style={{
               pointerEvents: canPay ? "auto" : "none",
               opacity: canPay ? 1 : 0.6,
@@ -222,12 +223,12 @@ export default function Payment3() {
             <>
               <p>Please pay cash on arrival.</p>
               <button
-                className="btn btn-success w-100 mt-2"
+                className="btn-cash"
                 onClick={handleManualPayment}
                 disabled={paying || !canPay}
                 aria-disabled={paying || !canPay}
               >
-                {paying ? "Processing..." : "Confirm Cash Payment"}
+                <span role="img" aria-label="cash">💵</span> {paying ? "Processing..." : "Confirm Cash Payment"}
               </button>
             </>
           )}
