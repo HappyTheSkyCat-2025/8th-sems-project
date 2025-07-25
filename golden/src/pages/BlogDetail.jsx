@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../utils/axiosInstance";
-<<<<<<< HEAD
-import"../styles/blogd.css";
-=======
 import "../styles/blogd.css";
->>>>>>> c9ad0dd23486eacbf1939ebfadfcb75a2a51dbc0
 
 export default function BlogDetail() {
   const { slug } = useParams();
