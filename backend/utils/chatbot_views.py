@@ -34,7 +34,7 @@ class TravelChatbotAPIView(APIView):
             headers = {"Content-Type": "application/json"}
 
             # Increased timeout from 30 to 120 seconds
-            response = requests.post(url, json=payload, headers=headers, timeout=120)
+            response = requests.post(url, json=payload, headers=headers, timeout=300)
             response.raise_for_status()
             data = response.json()
 
