@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
@@ -451,3 +452,29 @@ class GroupTourListView(generics.ListAPIView):
 
     def get_queryset(self):
         return TravelDeal.objects.filter(style__iexact="group")
+    
+    
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def related_countries(request):
+    slug = request.GET.get('slug')
+    print(f"related_countries called with slug: {slug}")
+    
+    if not slug:
+        return Response({"error": "Slug is required."}, status=400)
+
+    try:
+        country = Country.objects.get(slug=slug)
+        print("Found country:", country.name, "Region:", country.region)
+
+        related = Country.objects.filter(region=country.region).exclude(id=country.id)
+        print("Related countries count:", related.count())
+
+        for r in related:
+            print("Related:", r.name)
+
+        serializer = CountrySerializer(related, many=True, context={'request': request})
+        return Response(serializer.data)
+    except Country.DoesNotExist:
+        print("Country not found")
+        return Response([], status=200)

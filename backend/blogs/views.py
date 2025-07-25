@@ -22,6 +22,9 @@ class BlogListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         queryset = Blog.objects.filter(status='published').order_by('-created_at')
+        country_name = self.request.query_params.get('country')
+        if country_name:
+            queryset = queryset.filter(country__name=country_name)
         category_slug = self.request.query_params.get('category')
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)

@@ -16,6 +16,10 @@ urlpatterns = [
     # -----------------------------
     # Countries CRUD
     # -----------------------------
+
+    # ✅ Move this BEFORE <slug:slug> route
+    path('countries/related/', views.related_countries, name='related-countries'),
+
     path('countries/', views.CountryListCreateAPIView.as_view(), name='country-list'),
     path('countries/<slug:slug>/', views.CountryRetrieveUpdateDestroyAPIView.as_view(), name='country-detail'),
 
@@ -34,7 +38,7 @@ urlpatterns = [
     # -----------------------------
     # Travel Deals CRUD (Nested under Country)
     # -----------------------------
-    path('travel-deals/', views.TravelDealListAPIView.as_view(), name='travel-deal-list-all'),  # List all travel deals
+    path('travel-deals/', views.TravelDealListAPIView.as_view(), name='travel-deal-list-all'),
     path('countries/<slug:slug>/travel-deals/', views.TravelDealListCreateAPIView.as_view(), name='travel-deal-list'),
     path('countries/<slug:country_slug>/travel-deals/<slug:slug>/', views.TravelDealRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-detail'),
 
@@ -53,11 +57,7 @@ urlpatterns = [
     # -----------------------------
     # Included / Not Included Details for Travel Deal
     # -----------------------------
-    path(
-        'countries/<country_slug>/travel-deals/<deal_slug>/included/',
-        views.TravelDealIncludedRetrieveUpdateAPIView.as_view(),
-        name='traveldeal-included-detail'
-    ),
+    path('countries/<country_slug>/travel-deals/<deal_slug>/included/', views.TravelDealIncludedRetrieveUpdateAPIView.as_view(), name='traveldeal-included-detail'),
 
     # -----------------------------
     # Reviews CRUD (Nested under Travel Deal)
@@ -97,16 +97,8 @@ urlpatterns = [
     # -----------------------------
     # TravelDealDate CRUD (Nested under Travel Deal)
     # -----------------------------
-    path(
-        'countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/',
-        views.TravelDealDateListCreateAPIView.as_view(),
-        name='travel-deal-date-list-create'
-    ),
-    path(
-        'countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/<int:pk>/',
-        views.TravelDealDateRetrieveUpdateDestroyAPIView.as_view(),
-        name='travel-deal-date-detail'
-    ),
+    path('countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/', views.TravelDealDateListCreateAPIView.as_view(), name='travel-deal-date-list-create'),
+    path('countries/<str:country_slug>/travel-deals/<str:deal_slug>/dates/<int:pk>/', views.TravelDealDateRetrieveUpdateDestroyAPIView.as_view(), name='travel-deal-date-detail'),
 
     # -----------------------------
     # Wishlist CRUD

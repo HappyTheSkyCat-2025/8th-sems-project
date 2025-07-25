@@ -38,10 +38,27 @@ class JSONListField(serializers.Field):
 # -------------------------
 # Basic Serializers
 # -------------------------
+class RegionSerializer(serializers.ModelSerializer):
+    countries = serializers.StringRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Region
+        fields = ['id', 'name', 'countries']
+
+
 class CountrySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    region = RegionSerializer(read_only=True)
+
     class Meta:
         model = Country
         fields = ['id', 'name', 'slug', 'region', 'image']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and request:
+            return request.build_absolute_uri(obj.image.url)
+        return None
 
 
 class TravelImageSerializer(serializers.ModelSerializer):
@@ -62,15 +79,13 @@ class PlaceSerializer(serializers.ModelSerializer):
 class TravelDealSerializer(serializers.ModelSerializer):
     themes = JSONListField()  # Handle JSON list of themes
     country = CountrySerializer(read_only=True)  # Nested read-only country
-    country_id = serializers.PrimaryKeyRelatedField(  # Write country by id
+    country_id = serializers.PrimaryKeyRelatedField(
         queryset=Country.objects.all(), write_only=True, source='country'
     )
     gallery = TravelImageSerializer(many=True, read_only=True)  # Related images
 
-    # Average rating computed from related reviews
     average_rating = serializers.SerializerMethodField()
 
-    # Places nested read-only and writeable by ids
     places = PlaceSerializer(many=True, read_only=True)
     place_ids = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -197,17 +212,6 @@ class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
 
 
 # -------------------------
-# Region Serializer
-# -------------------------
-class RegionSerializer(serializers.ModelSerializer):
-    countries = serializers.StringRelatedField(many=True, read_only=True)
-
-    class Meta:
-        model = Region
-        fields = ['id', 'name', 'countries']
-
-
-# -------------------------
 # Detailed Country Serializer with nested relations
 # -------------------------
 class CountryDetailSerializer(serializers.ModelSerializer):
@@ -219,7 +223,6 @@ class CountryDetailSerializer(serializers.ModelSerializer):
     learn_more_topics = CountryLearnMoreTopicSerializer(many=True, read_only=True)
     region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
 
-    # Additional filtered article lists
     inspirations = serializers.SerializerMethodField()
     suggested_articles = serializers.SerializerMethodField()
 

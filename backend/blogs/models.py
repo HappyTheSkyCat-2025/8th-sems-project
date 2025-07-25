@@ -54,6 +54,13 @@ class Blog(models.Model):
         related_name='liked_blogs',
         blank=True
     )
+    country = models.ForeignKey(
+        'destinations.Country',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='blogs'
+    )
 
     def __str__(self):
         return self.title
