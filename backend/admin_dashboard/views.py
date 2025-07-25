@@ -1,7 +1,8 @@
 from rest_framework import viewsets, permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 from accounts.models import User
 from blogs.models import Category, Blog, Comment, Story
-from backend.contacts.models import ContactMessage
+from contacts.models import ContactMessage
 from destinations.models import (
     Region, Country, TravelType, TravelOption, DealCategory, DealOffer,
     Place, TravelDeal, TravelImage, ItineraryDay,
@@ -51,6 +52,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all().order_by('-created_at')
     serializer_class = BlogSerializer
+    parser_classes = [MultiPartParser, FormParser]
     permission_classes = [permissions.IsAdminUser]
 
 class CommentViewSet(viewsets.ModelViewSet):

@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/blogs/', include('blogs.urls')),
     path('api/utils/', include('utils.urls')),
     path('api/payments/', include('payments.urls')),
+    path('api/admin-dashboard/', include('admin_dashboard.urls')),
 ]
 
 

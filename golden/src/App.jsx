@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from "react";
 import {
   BrowserRouter as Router,
@@ -54,11 +53,14 @@ import Payment2 from "./payment/payment2";
 import Payment3 from "./payment/payment3";
 import ThankYou from "./payment/ThankYou";
 
+// Admin
+import AdminRoutes from "./admin/routes/AdminRoutes";
+
 // Toastify
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 
-function Layout() {
+function UserLayout() {
   const location = useLocation();
 
   const noLayoutRoutes = [
@@ -156,7 +158,6 @@ function Layout() {
       </Routes>
 
       {!hideLayout && <Footer />}
-
       {showChatBot && <ChatBot />}
     </>
   );
@@ -166,7 +167,10 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <Layout />
+      <Routes>
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/*" element={<UserLayout />} />
+      </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>
   );

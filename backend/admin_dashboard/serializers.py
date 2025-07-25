@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from accounts.models import User
-from backend.contacts.models import ContactMessage
+from contacts.models import ContactMessage
 from blogs.models import Category, Blog, Comment, Story
 from destinations.models import (
     Region, Country, TravelType, TravelOption, DealCategory, DealOffer,

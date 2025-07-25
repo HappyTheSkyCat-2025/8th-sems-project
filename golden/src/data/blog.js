@@ -39,7 +39,7 @@ export const blogs = [
 // Testimonial Author Data
 export const testimonialsData = [
   { name: "saroj don", job: "k ma timro haina ra company", img: tst1 },
-  { name: "gwal bhadur", job: "timi kina yesto", img: tst2 },
+  { name: "Sahil Shrestha", job: "Apple Inc.", img: tst2 },
   { name: "kalu don", job: "pagal premi", img: tst3 },
   { name: "khali from ratnapark", job: "gym expert", img: tst4 },
 ];
