@@ -112,4 +112,7 @@ urlpatterns = [
     path('search-deals/', views.TravelDealSearchAPIView.as_view(), name='search-deals'),
 
     path('group-tours/', views.GroupTourListView.as_view(), name='group-tour-list'),
+
+    path("regions/with-countries/", views.RegionWithCountriesView.as_view(), name="region-with-countries"),
+
 ]

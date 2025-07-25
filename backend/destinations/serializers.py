@@ -38,27 +38,26 @@ class JSONListField(serializers.Field):
 # -------------------------
 # Basic Serializers
 # -------------------------
-class RegionSerializer(serializers.ModelSerializer):
-    countries = serializers.StringRelatedField(many=True, read_only=True)
-
-    class Meta:
-        model = Region
-        fields = ['id', 'name', 'countries']
-
-
 class CountrySerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    region = RegionSerializer(read_only=True)
+    region = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Country
-        fields = ['id', 'name', 'slug', 'region', 'image']
+        fields = ['id', 'name', 'slug', 'image', 'region']
 
     def get_image(self, obj):
         request = self.context.get('request')
         if obj.image and request:
             return request.build_absolute_uri(obj.image.url)
         return None
+
+class RegionSerializer(serializers.ModelSerializer):
+    countries = CountrySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Region
+        fields = ['id', 'name', 'countries']
 
 
 class TravelImageSerializer(serializers.ModelSerializer):
@@ -73,19 +72,55 @@ class PlaceSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'image']
 
 
+
+
+# -------------------------
+# TravelDealDate Serializer with validation on price fields
+# -------------------------
+class TravelDealDateSerializer(serializers.ModelSerializer):
+    effective_discount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TravelDealDate
+        fields = [
+            'id', 'start_date', 'end_date', 'language', 'guaranteed',
+            'rooms', 'original_price', 'discounted_price',
+            'discount_percent', 'capacity', 'effective_discount'
+        ]
+
+    def get_effective_discount(self, obj):
+        """
+        Priority-based discount logic: 
+        Prefer TravelDealDate's discount → else TravelDeal's discount → else DealCategory default
+        """
+        try:
+            if obj.original_price and obj.discounted_price:
+                original = float(str(obj.original_price).replace(",", "").replace("€", "").strip())
+                discounted = float(str(obj.discounted_price).replace(",", "").replace("€", "").strip())
+                if original > 0 and discounted < original:
+                    percent = round((original - discounted) / original * 100)
+                    return {
+                        "percent": f"{percent}%",
+                        "discounted_price": f"{discounted}€"
+                    }
+        except Exception:
+            pass
+        return {
+            "percent": None,
+            "discounted_price": None
+        }
+
+
 # -------------------------
 # TravelDeal Serializer
 # -------------------------
 class TravelDealSerializer(serializers.ModelSerializer):
-    themes = JSONListField()  # Handle JSON list of themes
-    country = CountrySerializer(read_only=True)  # Nested read-only country
+    themes = JSONListField()
+    country = CountrySerializer(read_only=True)
     country_id = serializers.PrimaryKeyRelatedField(
         queryset=Country.objects.all(), write_only=True, source='country'
     )
-    gallery = TravelImageSerializer(many=True, read_only=True)  # Related images
-
-    average_rating = serializers.SerializerMethodField()
-
+    gallery = TravelImageSerializer(many=True, read_only=True)
     places = PlaceSerializer(many=True, read_only=True)
     place_ids = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -93,6 +128,10 @@ class TravelDealSerializer(serializers.ModelSerializer):
         write_only=True,
         source='places'
     )
+
+    average_rating = serializers.SerializerMethodField()
+    effective_discount = serializers.SerializerMethodField()
+    dates = TravelDealDateSerializer(many=True, read_only=True)  # Include deal dates
 
     class Meta:
         model = TravelDeal
@@ -104,6 +143,27 @@ class TravelDealSerializer(serializers.ModelSerializer):
             avg_rating = reviews.aggregate(avg=Avg('rating'))['avg']
             return round(avg_rating, 1) if avg_rating else 0
         return 0
+
+    def get_effective_discount(self, obj):
+        """
+        Compute the best discount (highest %) from associated TravelDealDate objects.
+        """
+        best_discount = None
+        for date in obj.dates.all():
+            try:
+                original = float(str(date.original_price).replace(",", "").replace("€", "").strip())
+                discounted = float(str(date.discounted_price).replace(",", "").replace("€", "").strip())
+                if original > 0 and discounted < original:
+                    percent = round((original - discounted) / original * 100)
+                    if not best_discount or percent > best_discount['percent']:
+                        best_discount = {
+                            'percent': percent,
+                            'discounted_price': f"{discounted}€"
+                        }
+            except Exception:
+                continue
+
+        return best_discount or {"percent": None, "discounted_price": None}
 
 
 # Serializer to expose included/not included JSON fields conveniently
@@ -215,6 +275,7 @@ class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
 # Detailed Country Serializer with nested relations
 # -------------------------
 class CountryDetailSerializer(serializers.ModelSerializer):
+    video = serializers.SerializerMethodField()
     deals = serializers.SerializerMethodField()
     reviews = serializers.SerializerMethodField()
     articles = serializers.SerializerMethodField()
@@ -222,7 +283,6 @@ class CountryDetailSerializer(serializers.ModelSerializer):
     overview = CountryOverviewSerializer(read_only=True)
     learn_more_topics = CountryLearnMoreTopicSerializer(many=True, read_only=True)
     region = serializers.PrimaryKeyRelatedField(queryset=Region.objects.all())
-
     inspirations = serializers.SerializerMethodField()
     suggested_articles = serializers.SerializerMethodField()
 
@@ -230,11 +290,17 @@ class CountryDetailSerializer(serializers.ModelSerializer):
         model = Country
         fields = [
             "id", "name", "slug", "subtitle", "section_title",
-            "description", "image", "code", "currency_code", "video_url", "region",
+            "description", "image", "code", "currency_code", "video", "region",
             "deals", "reviews", "articles", "faqs",
             "overview", "learn_more_topics",
             "inspirations", "suggested_articles",
         ]
+
+    def get_video(self, obj):
+        request = self.context.get('request')
+        if obj.video and request:
+            return request.build_absolute_uri(obj.video.url)
+        return None
 
     def get_deals(self, obj):
         return TravelDealSerializer(obj.deals.all(), many=True, context=self.context).data
@@ -327,34 +393,3 @@ class DealCategorySerializer(serializers.ModelSerializer):
                 DealOffer.objects.create(category=instance, **offer_data)
 
         return instance
-
-
-# -------------------------
-# TravelDealDate Serializer with validation on price fields
-# -------------------------
-class TravelDealDateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TravelDealDate
-        fields = '__all__'
-
-    def validate(self, data):
-        """
-        Validate price fields and calculate discount percentage if applicable.
-        """
-        original = data.get("original_price")
-        discounted = data.get("discounted_price")
-
-        if original and discounted:
-            try:
-                original_float = float(str(original).replace(",", "").replace("€", "").strip())
-                discounted_float = float(str(discounted).replace(",", "").replace("€", "").strip())
-                if original_float > 0 and discounted_float < original_float:
-                    data["discount_percent"] = f"{round((original_float - discounted_float) / original_float * 100)}%"
-                else:
-                    data["discount_percent"] = None
-            except ValueError:
-                raise serializers.ValidationError("Prices must be numeric.")
-        else:
-            data["discount_percent"] = None
-
-        return data

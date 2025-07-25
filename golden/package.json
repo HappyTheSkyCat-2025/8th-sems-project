@@ -26,6 +26,7 @@
     "aos": "^2.3.4",
     "axios": "^1.10.0",
     "bootstrap": "^5.3.7",
+    "country-telephone-data": "^0.6.3",
     "draft-js": "^0.11.7",
     "hamburger-react": "^2.5.2",
     "leaflet": "^1.9.4",
@@ -37,6 +38,8 @@
     "react-icons": "^5.5.0",
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^7.6.3",
+    "react-select": "^5.10.2",
+    "react-select-country-list": "^2.2.3",
     "react-toastify": "^11.0.5",
     "swiper": "^11.2.10"
   },

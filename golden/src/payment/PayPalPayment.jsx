@@ -2,12 +2,9 @@ import React from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import axiosInstance from "../utils/axiosInstance";
 
-const PayPalPayment = ({ amount, onSuccess, onError }) => {
-
-  // Handler for payment approval
+const PayPalPayment = ({ amount, onSuccess, onError, disabled }) => {
   const handleApprove = async (data, actions) => {
     try {
-      // Capture the order from PayPal
       const order = await actions.order.capture();
       const orderID = order.id;
 
@@ -22,10 +19,17 @@ const PayPalPayment = ({ amount, onSuccess, onError }) => {
         onError("Payment verification failed");
       }
     } catch (err) {
-      console.error(err);
       onError("Something went wrong during PayPal payment");
     }
   };
+
+  if (disabled) {
+    return (
+      <div style={{ opacity: 0.6, pointerEvents: "none", marginTop: "1rem" }}>
+        <p>Please agree to the required terms before payment.</p>
+      </div>
+    );
+  }
 
   return (
     <PayPalScriptProvider
@@ -36,11 +40,11 @@ const PayPalPayment = ({ amount, onSuccess, onError }) => {
     >
       <PayPalButtons
         style={{ layout: "vertical" }}
-        createOrder={(data, actions) => {
-          return actions.order.create({
-            purchase_units: [{ amount: { value: amount.toString() } }], // Amount as a string
-          });
-        }}
+        createOrder={(data, actions) =>
+          actions.order.create({
+            purchase_units: [{ amount: { value: amount.toString() } }],
+          })
+        }
         onApprove={handleApprove}
         onError={(err) => onError("PayPal payment error: " + err)}
       />

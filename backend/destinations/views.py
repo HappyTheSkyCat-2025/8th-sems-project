@@ -405,6 +405,11 @@ class TravelDealSearchAPIView(ListAPIView):
         style = request.query_params.getlist("style")
         theme = request.query_params.getlist("theme")
         query = request.query_params.get("query")
+        region = request.query_params.get("region")  # ✅ NEW
+
+        # Filter by region
+        if region:
+            queryset = queryset.filter(country__region__id=region)
 
         # Filter by search query
         if query:
@@ -414,14 +419,14 @@ class TravelDealSearchAPIView(ListAPIView):
                 Q(country__name__icontains=query)
             )
 
-        # Filter by date range (TravelDealDate)
+        # Filter by date range
         if start_date and end_date:
             queryset = queryset.filter(
                 dates__start_date__gte=start_date,
                 dates__end_date__lte=end_date
             ).distinct()
 
-        # Filter by duration (days)
+        # Filter by duration
         if min_duration:
             queryset = queryset.filter(days__gte=min_duration)
         if max_duration:
@@ -433,11 +438,11 @@ class TravelDealSearchAPIView(ListAPIView):
         if max_price:
             queryset = queryset.filter(price__lte=max_price)
 
-        # Filter by sale status
+        # Filter by sale
         if sale == "true":
             queryset = queryset.filter(on_sale=True)
 
-        # Filter by style and theme (array fields)
+        # Filter by style and theme
         if style:
             queryset = queryset.filter(style__in=style)
         if theme:
@@ -478,3 +483,11 @@ def related_countries(request):
     except Country.DoesNotExist:
         print("Country not found")
         return Response([], status=200)
+
+class RegionWithCountriesView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        regions = Region.objects.prefetch_related("countries").all()
+        data = RegionSerializer(regions, many=True, context={"request": request}).data
+        return Response(data)

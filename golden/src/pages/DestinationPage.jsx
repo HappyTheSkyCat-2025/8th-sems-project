@@ -38,7 +38,7 @@ export default function DestinationPage() {
   // Fetch user profile (for nationality)
   useEffect(() => {
     axiosInstance
-      .get("/api/accounts/profile/")
+      .get("/accounts/profile/")
       .then((res) => setUser(res.data))
       .catch(() => setUser(null));
   }, []);
@@ -155,7 +155,12 @@ export default function DestinationPage() {
           regularArticles={regularArticles}
           country={data.name}
           learnMoreTopics={data.learn_more_topics || []}
-          glanceData={{ countryName: data.name, ...data.overview }}
+          // Pass slug here for related countries fetch
+          glanceData={{ 
+            countryName: data.name, 
+            slug: data.slug,        // <<--- ADD THIS
+            ...data.overview 
+          }}
         />
       </div>
 
@@ -164,7 +169,7 @@ export default function DestinationPage() {
       </div>
 
       <div id="video">
-        <VideoSection videoUrl={data.video_url} country={data.name} />
+        <VideoSection videoUrl={data.video} country={data.name} />
       </div>
 
       <div id="foot">

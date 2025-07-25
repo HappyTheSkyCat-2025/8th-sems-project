@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 import json
 
+
 # -------------------------
 # Region and Country Models
 # -------------------------
@@ -24,7 +25,7 @@ class Country(models.Model):
     section_title = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
     image = models.ImageField(upload_to='countries/', blank=True, null=True)
-    video_url = models.URLField(blank=True)
+    video = models.FileField(upload_to='videos/', blank=True, null=True)
 
     class Meta:
         unique_together = ('region', 'name')
@@ -61,6 +62,7 @@ class TravelOption(models.Model):
 # -------------------------
 class DealCategory(models.Model):
     name = models.CharField(max_length=100)
+    discount_percent = models.CharField(max_length=10, blank=True, null=True, help_text="e.g. '15%' for category discount")
 
     def __str__(self):
         return self.name
@@ -90,6 +92,7 @@ class Place(models.Model):
 # -------------------------
 class TravelDeal(models.Model):
     country = models.ForeignKey(Country, related_name="deals", on_delete=models.CASCADE)
+    category = models.ForeignKey(DealCategory, related_name='deals', on_delete=models.SET_NULL, null=True, blank=True)
     places = models.ManyToManyField(Place, related_name="deals", blank=True)
     city = models.CharField(max_length=100, blank=True, null=True)
     map_zoom = models.PositiveIntegerField(default=5)
@@ -105,6 +108,8 @@ class TravelDeal(models.Model):
     description = models.TextField(blank=True, null=True)
     on_sale = models.BooleanField(default=False)
     last_minute = models.BooleanField(default=False)
+
+    discount_percent = models.CharField(max_length=10, blank=True, null=True, help_text="e.g. '10%' for deal-wide discount")
 
     # Stored as JSON string, accessed via properties below
     included_json = models.TextField(blank=True, default='[]')
@@ -269,8 +274,10 @@ class TravelDealDate(models.Model):
     discount_percent = models.CharField(max_length=10, blank=True, null=True)
     capacity = models.PositiveIntegerField(default=0, help_text="Maximum number of people allowed for this date")
 
-
     def save(self, *args, **kwargs):
+        """
+        Calculate and set discount_percent based on prices if not set manually.
+        """
         if self.original_price and self.discounted_price:
             try:
                 original = float(self.original_price.replace(",", "").replace("€", "").strip())
@@ -286,6 +293,56 @@ class TravelDealDate(models.Model):
             self.discount_percent = None
 
         super().save(*args, **kwargs)
+
+    def get_effective_discount(self):
+        """
+        Calculate the effective discount and discounted price based on priority:
+          1. Date discount_percent (self.discount_percent)
+          2. Deal discount_percent (self.travel_deal.discount_percent)
+          3. Category discount_percent (self.travel_deal.category.discount_percent)
+          4. No discount
+        Returns tuple: (discount_percent_str or None, discounted_price_float or None)
+        """
+        def parse_price(price_str):
+            try:
+                return float(price_str.replace("€", "").replace(",", "").strip())
+            except Exception:
+                return None
+
+        def parse_percent(percent_str):
+            try:
+                return float(percent_str.replace("%", "").strip())
+            except Exception:
+                return 0
+
+        original_price = parse_price(self.original_price)
+        if original_price is None:
+            return None, None
+
+        # Priority 1: Date discount
+        if self.discount_percent:
+            discount_value = parse_percent(self.discount_percent)
+            discounted_price = original_price * (1 - discount_value / 100)
+            return self.discount_percent, round(discounted_price, 2)
+
+        # Priority 2: Deal discount
+        deal_discount_str = getattr(self.travel_deal, 'discount_percent', None)
+        if deal_discount_str:
+            discount_value = parse_percent(deal_discount_str)
+            if discount_value > 0:
+                discounted_price = original_price * (1 - discount_value / 100)
+                return deal_discount_str, round(discounted_price, 2)
+
+        # Priority 3: Category discount
+        category = getattr(self.travel_deal, 'category', None)
+        if category and getattr(category, 'discount_percent', None):
+            discount_value = parse_percent(category.discount_percent)
+            if discount_value > 0:
+                discounted_price = original_price * (1 - discount_value / 100)
+                return category.discount_percent, round(discounted_price, 2)
+
+        # No discount
+        return None, original_price
 
     def __str__(self):
         return f"{self.travel_deal.title} ({self.start_date} → {self.end_date})"

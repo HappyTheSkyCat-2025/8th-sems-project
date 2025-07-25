@@ -14,7 +14,6 @@ export default function Payment3() {
   const navigate = useNavigate();
   const { id } = useParams();
   const location = useLocation();
-  const token = localStorage.getItem("access_token");
 
   // Extras from navigation state (camelCase keys)
   const extras = location.state?.extras || {};
@@ -25,6 +24,11 @@ export default function Payment3() {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [showTrip, setShowTrip] = useState(false);
   const [showRooms, setShowRooms] = useState(false);
+
+  // Terms checkbox states
+  const [agreedTerms, setAgreedTerms] = useState(false);
+  const [agreedInfo, setAgreedInfo] = useState(false);
+  const [optInEmails, setOptInEmails] = useState(false);
 
   useEffect(() => {
     async function fetchBooking() {
@@ -48,12 +52,24 @@ export default function Payment3() {
 
   // Calculate costs based on extras (camelCase)
   const tripCost = parseFloat(date_option.discounted_price) || 0;
-  const roomCost = extras.roomOption === "private" ? 345 : 0;
+
+  // Use travellers count passed via extras; default to 1 if missing or invalid
+  const travellersCount = Number(extras.numTravellers) > 0 ? Number(extras.numTravellers) : 1;
+
+  const roomCost = extras.roomOption === "private" ? 345 * travellersCount : 0;
   const donationCost = extras.donation ? 23 : 0;
+
   const amount = (tripCost + roomCost + donationCost).toFixed(2);
+
+  // Enable payment only if required checkboxes are checked
+  const canPay = agreedTerms && agreedInfo;
 
   // === CALLBACKS ===
   const handleManualPayment = async () => {
+    if (!canPay) {
+      toast.error("Please agree to all required terms before payment.");
+      return;
+    }
     setPaying(true);
     try {
       await axiosInstance.put(
@@ -84,7 +100,7 @@ export default function Payment3() {
         }
       );
       toast.success("Stripe payment confirmed!");
-      setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500); // Redirect with success param
+      setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500);
     } catch (err) {
       toast.error("Stripe update failed: " + (err.response?.data?.detail || "Unknown error"));
     }
@@ -101,7 +117,7 @@ export default function Payment3() {
         }
       );
       toast.success("PayPal payment confirmed!");
-      setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500); // Redirect with success param
+      setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500);
     } catch (err) {
       toast.error("PayPal update failed: " + (err.response?.data?.detail || "Unknown error"));
     }
@@ -139,32 +155,84 @@ export default function Payment3() {
             details in the previous steps.
           </div>
 
-          <h3 className="section-heading">Payment options</h3>
-          {paymentOptions.map((opt) => (
-            <button
-              key={opt.id}
-              className={`payment-option-btn ${paymentMethod === opt.id ? "selected" : ""}`}
-              onClick={() => setPaymentMethod(opt.id)}
-            >
-              {opt.icon} {opt.label}
-            </button>
-          ))}
+          {/* --- TERMS AND AGREEMENTS --- */}
+          <h3 className="section-heading">Terms and Agreements</h3>
+          <div className="checkboxes">
+            <label>
+              <input
+                type="checkbox"
+                checked={agreedTerms}
+                onChange={(e) => setAgreedTerms(e.target.checked)}
+              />{" "}
+              I agree to the <a href="#">terms and conditions</a> and
+              <a href="#"> privacy policy</a> <span className="required">*</span>
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={agreedInfo}
+                onChange={(e) => setAgreedInfo(e.target.checked)}
+              />{" "}
+              I have read the <a href="#">Essential Trip Information</a> and will follow
+              <a href="#"> community guidelines</a> <span className="required">*</span>
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={optInEmails}
+                onChange={(e) => setOptInEmails(e.target.checked)}
+              />{" "}
+              I would like to receive offers and regular updates from Intrepid Travel via email
+            </label>
+          </div>
+
+          {/* --- PAYMENT OPTIONS --- */}
+          <h3 className="section-heading" style={{ marginTop: "1.5rem" }}>
+            Payment options
+          </h3>
+          {/* Disable payment option buttons if required checkboxes unchecked */}
+          <div
+            style={{
+              pointerEvents: canPay ? "auto" : "none",
+              opacity: canPay ? 1 : 0.6,
+              userSelect: canPay ? "auto" : "none",
+            }}
+          >
+            {paymentOptions.map((opt) => (
+              <button
+                key={opt.id}
+                className={`payment-option-btn ${paymentMethod === opt.id ? "selected" : ""}`}
+                onClick={() => setPaymentMethod(opt.id)}
+                type="button"
+              >
+                {opt.icon} {opt.label}
+              </button>
+            ))}
+          </div>
 
           <h3 className="section-heading">Payment details</h3>
+
+          {!canPay && (
+            <div style={{ color: "red", marginBottom: "1rem" }}>
+              Please agree to all required terms to proceed with payment.
+            </div>
+          )}
+
           {paymentMethod === "cash" && (
             <>
               <p>Please pay cash on arrival.</p>
               <button
                 className="btn btn-success w-100 mt-2"
                 onClick={handleManualPayment}
-                disabled={paying}
+                disabled={paying || !canPay}
+                aria-disabled={paying || !canPay}
               >
                 {paying ? "Processing..." : "Confirm Cash Payment"}
               </button>
             </>
           )}
 
-          {paymentMethod === "stripe" && (
+          {paymentMethod === "stripe" && canPay && (
             <StripePayment
               amount={amount}
               onSuccess={onStripeSuccess}
@@ -172,28 +240,13 @@ export default function Payment3() {
             />
           )}
 
-          {paymentMethod === "paypal" && (
+          {paymentMethod === "paypal" && canPay && (
             <PayPalPayment
               amount={amount}
               onSuccess={onPayPalSuccess}
               onError={(msg) => toast.error(msg)}
             />
           )}
-
-          {/* Agreements */}
-          <div className="checkboxes">
-            <label>
-              <input type="checkbox" /> I agree to the <a href="#">terms and conditions</a> and
-              <a href="#"> privacy policy</a> <span className="required">*</span>
-            </label>
-            <label>
-              <input type="checkbox" /> I have read the <a href="#">Essential Trip Information</a> and will follow
-              <a href="#"> community guidelines</a> <span className="required">*</span>
-            </label>
-            <label>
-              <input type="checkbox" /> I would like to receive offers and regular updates from Intrepid Travel via email
-            </label>
-          </div>
         </div>
 
         {/* RIGHT */}
@@ -223,13 +276,13 @@ export default function Payment3() {
             </p>
           </div>
 
-          <div className="summary-dropdown" onClick={() => setShowTrip(!showTrip)}>
+          <div className="summary-dropdown" onClick={() => setShowTrip(!showTrip)} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && setShowTrip(!showTrip)}>
             <span>Trip</span>
             <span>{showTrip ? "▲" : "▼"}</span>
           </div>
-          {showTrip && <div className="dropdown-content">Trip amount: EUR €{tripCost.toFixed(2)}</div>}
+          {showTrip && <div className="dropdown-content">Trip amount: USD ${tripCost.toFixed(2)}</div>}
 
-          <div className="summary-dropdown" onClick={() => setShowRooms(!showRooms)}>
+          <div className="summary-dropdown" onClick={() => setShowRooms(!showRooms)} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && setShowRooms(!showRooms)}>
             <span>Room options</span>
             <span>{showRooms ? "▲" : "▼"}</span>
           </div>
@@ -239,15 +292,15 @@ export default function Payment3() {
 
           <div className="total breakdown">
             <div>Total</div>
-            <div>EUR €{amount}</div>
+            <div>USD ${amount}</div>
           </div>
 
           <div className="final-total pay-now">
             <span>Pay now</span>
-            <strong>EUR €{amount}</strong>
+            <strong>USD ${amount}</strong>
           </div>
 
-          <div className="how-to-credit" title="How to redeem credit">
+          <div className="how-to-credit" title="How to redeem credit" tabIndex={0} role="button" onKeyDown={e => e.key === "Enter" && alert("Select “Use Credit” on payment page before finalizing payment.")}>
             <span>ⓘ</span> How to redeem credit
           </div>
         </div>

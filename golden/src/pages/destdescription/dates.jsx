@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../../pagescss/dates.css";
 import { FaCheckCircle, FaGlobe, FaBed } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function Dates({ data }) {
   const { country: countrySlug, dealId: dealSlug } = useParams();
@@ -10,6 +11,9 @@ export default function Dates({ data }) {
   const [filterMonth, setFilterMonth] = useState("All Months");
   const [sortBy, setSortBy] = useState("Start date (earliest)");
   const navigate = useNavigate();
+
+  // Check login status by looking for access_token in localStorage
+  const isAuthenticated = !!localStorage.getItem("access_token");
 
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
@@ -43,6 +47,15 @@ export default function Dates({ data }) {
 
   const handleToggle = () => {
     setVisibleCount(prev => prev === initialVisibleCount ? sortedDates.length : initialVisibleCount);
+  };
+
+  const handleConfirmClick = (itemId) => {
+    if (!isAuthenticated) {
+      toast.info("Please login to proceed with booking.");
+      navigate("/login");
+      return;
+    }
+    navigate(`/payment/payment1?country=${countrySlug}&deal=${dealSlug}&date=${itemId}`);
   };
 
   return (
@@ -97,9 +110,9 @@ export default function Dates({ data }) {
             <div className="price-line">
               <span>From:</span>
               {item.original_price && item.original_price !== item.discounted_price && (
-                <span className="original-price">€{item.original_price}</span>
+                <span className="original-price">${item.original_price}</span>
               )}
-              <span className="discounted-price">€{item.discounted_price}</span>
+              <span className="discounted-price">${item.discounted_price}</span>
             </div>
 
             <select className="payment-select">
@@ -122,9 +135,7 @@ export default function Dates({ data }) {
 
                 <button
                   className="confirm-btn"
-                  onClick={() =>
-                    navigate(`/payment/payment1?country=${countrySlug}&deal=${dealSlug}&date=${item.id}`)
-                  }
+                  onClick={() => handleConfirmClick(item.id)}
                 >
                   Confirm Dates
                 </button>

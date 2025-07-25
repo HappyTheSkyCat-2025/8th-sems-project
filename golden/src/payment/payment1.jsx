@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { FaChevronDown, FaInfo } from "react-icons/fa";
 import { BsFillPersonFill } from "react-icons/bs";
 import StepIndicator from "../components/StepIndicator";
+import Select from "react-select";
+import countryList from "react-select-country-list";
 import "../payment/payment1.css";
 
 export default function Payment1() {
@@ -29,7 +31,7 @@ export default function Payment1() {
   const [town, setTown] = useState("");
   const [state, setState] = useState("");
   const [postcode, setPostcode] = useState("");
-  const [country, setCountry] = useState("");
+  const [country, setCountry] = useState(null); // react-select object
 
   const [showWhyModal, setShowWhyModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
@@ -40,6 +42,9 @@ export default function Payment1() {
   const [dateOptionData, setDateOptionData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Get country options once
+  const options = useMemo(() => countryList().getData(), []);
 
   useEffect(() => {
     async function fetchData() {
@@ -67,9 +72,12 @@ export default function Payment1() {
     fetchData();
   }, [countrySlug, dealSlug, dateId]);
 
-  // Check if booking is allowed:
   const capacity = dateOptionData?.capacity ?? 0;
   const canBook = capacity > 0 && travellers <= capacity;
+
+  const handleCountryChange = (selectedOption) => {
+    setCountry(selectedOption);
+  };
 
   const handleContinue = async (e) => {
     e.preventDefault();
@@ -79,13 +87,29 @@ export default function Payment1() {
       return;
     }
 
-    if (!title || !firstName || !lastName || !dob || !email || !phone || !address1 || !town || !state || !postcode || !country) {
+    if (
+      !title ||
+      !firstName ||
+      !lastName ||
+      !dob ||
+      !email ||
+      !phone ||
+      !address1 ||
+      !town ||
+      !state ||
+      !postcode ||
+      !country?.label
+    ) {
       setError("Please fill in all required fields.");
       return;
     }
 
     if (!canBook) {
-      setError(`Cannot book ${travellers} traveller${travellers > 1 ? "s" : ""}. Only ${capacity} place${capacity !== 1 ? "s" : ""} remaining.`);
+      setError(
+        `Cannot book ${travellers} traveller${travellers > 1 ? "s" : ""}. Only ${capacity} place${
+          capacity !== 1 ? "s" : ""
+        } remaining.`
+      );
       return;
     }
 
@@ -105,7 +129,7 @@ export default function Payment1() {
         town,
         state,
         postcode,
-        country,
+        country: country.label, // send country full name
         travellers,
         room_option: roomOption,
       };
@@ -131,11 +155,20 @@ export default function Payment1() {
           <h2>Traveller details</h2>
 
           <div className="late-request-box">
-            <div className="late-request-icon"><FaInfo size={14} /></div>
+            <div className="late-request-icon">
+              <FaInfo size={14} />
+            </div>
             <div className="late-request-content">
               <strong>Late request</strong>
-              <p>For bookings close to departure date, full payment is required. This usually takes 2 to 4 business days.</p>
-              <p><br />Please wait for confirmation before booking flights or non-refundable travel arrangements.</p>
+              <p>
+                For bookings close to departure date, full payment is required. This usually takes 2
+                to 4 business days.
+              </p>
+              <p>
+                <br />
+                Please wait for confirmation before booking flights or non-refundable travel
+                arrangements.
+              </p>
             </div>
           </div>
 
@@ -144,24 +177,17 @@ export default function Payment1() {
               <div className="notice-box selling-fast">
                 <div className="icon">i</div>
                 <div className="notice-content">
-                  This departure is selling fast, only <strong>{capacity}</strong> place{capacity > 1 ? "s" : ""} remaining.
+                  This departure is selling fast, only <strong>{capacity}</strong> place
+                  {capacity > 1 ? "s" : ""} remaining.
                 </div>
               </div>
             ) : capacity === 0 ? (
               <div className="notice-box sold-out">
                 <div className="icon">!</div>
-                <div className="notice-content">
-                  Sorry, this departure is fully booked.
-                </div>
+                <div className="notice-content">Sorry, this departure is fully booked.</div>
               </div>
             ) : null
           ) : null}
-
-          <div className="availability-box">
-            {dateOptionData?.guaranteed
-              ? <p>This departure is guaranteed to run.</p>
-              : <p>This departure is selling fast, only 3 places remaining.</p>}
-          </div>
 
           <div className="traveller-counter">
             <label>How many travellers?</label>
@@ -174,7 +200,9 @@ export default function Payment1() {
 
           <h3 className="traveller-heading">
             <BsFillPersonFill /> 1. Primary traveller details
-            <span className="info-icon" onClick={() => setShowPrimaryModal(true)}>ⓘ</span>
+            <span className="info-icon" onClick={() => setShowPrimaryModal(true)}>
+              ⓘ
+            </span>
           </h3>
 
           <form className="form-box traveller-form" onSubmit={handleContinue}>
@@ -191,13 +219,31 @@ export default function Payment1() {
                 </select>
               </div>
               <div className="title-info" onClick={() => setShowWhyModal(true)}>
-                <FaInfo size={14} /><span>Why do we need this?</span>
+                <FaInfo size={14} />
+                <span>Why do we need this?</span>
               </div>
             </div>
 
-            <input type="text" placeholder="First name*" required value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-            <input type="text" placeholder="Middle name" value={middleName} onChange={(e) => setMiddleName(e.target.value)} />
-            <input type="text" placeholder="Last name*" required value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <input
+              type="text"
+              placeholder="First name*"
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Middle name"
+              value={middleName}
+              onChange={(e) => setMiddleName(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Last name*"
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
 
             <label>Date of birth *</label>
             <input
@@ -209,19 +255,65 @@ export default function Payment1() {
             />
 
             <h4>Contact details</h4>
-            <input type="email" placeholder="Email *" required value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input type="tel" placeholder="Contact number *" required value={phone} onChange={(e) => setPhone(e.target.value)} />
-            <input type="text" placeholder="Address line 1 *" required value={address1} onChange={(e) => setAddress1(e.target.value)} />
-            <input type="text" placeholder="Address line 2" value={address2} onChange={(e) => setAddress2(e.target.value)} />
-            <input type="text" placeholder="Suburb / Town *" required value={town} onChange={(e) => setTown(e.target.value)} />
-            <input type="text" placeholder="State / Province *" required value={state} onChange={(e) => setState(e.target.value)} />
-            <input type="text" placeholder="Postcode / Zip *" required value={postcode} onChange={(e) => setPostcode(e.target.value)} />
-            <select required value={country} onChange={(e) => setCountry(e.target.value)}>
-              <option value="">Country *</option>
-              <option>Nepal</option>
-              <option>India</option>
-              <option>Vietnam</option>
-            </select>
+            <input
+              type="email"
+              placeholder="Email *"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="tel"
+              placeholder="Contact number *"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Address line 1 *"
+              required
+              value={address1}
+              onChange={(e) => setAddress1(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Address line 2"
+              value={address2}
+              onChange={(e) => setAddress2(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Suburb / Town *"
+              required
+              value={town}
+              onChange={(e) => setTown(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="State / Province *"
+              required
+              value={state}
+              onChange={(e) => setState(e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Postcode / Zip *"
+              required
+              value={postcode}
+              onChange={(e) => setPostcode(e.target.value)}
+            />
+
+            {/* Country dropdown */}
+            <label>Country *</label>
+            <Select
+              options={options}
+              value={country}
+              onChange={handleCountryChange}
+              placeholder="Select a country"
+              isClearable
+              classNamePrefix="react-select"
+            />
 
             <h4>Room Option</h4>
             <select value={roomOption} onChange={(e) => setRoomOption(e.target.value)}>
@@ -230,19 +322,23 @@ export default function Payment1() {
             </select>
 
             <div className="deposit-section">
-              <h4><span className="deposit-icon">💳</span> Deposit</h4>
-              <p>Lock in your trip with a deposit if it departs 30+ days from now. Read <a href="#">booking conditions</a>.</p>
-              <p className="privacy-text">Please see our <a href="#">Privacy and Collection notice</a>.</p>
-              <button
-                className="continue-button"
-                type="submit"
-                disabled={loading || !canBook}
-              >
+              <h4>
+                <span className="deposit-icon">💳</span> Deposit
+              </h4>
+              <p>
+                Lock in your trip with a deposit if it departs 30+ days from now. Read{" "}
+                <a href="#">booking conditions</a>.
+              </p>
+              <p className="privacy-text">
+                Please see our <a href="#">Privacy and Collection notice</a>.
+              </p>
+              <button className="continue-button" type="submit" disabled={loading || !canBook}>
                 {loading ? "Submitting..." : "Continue →"}
               </button>
               {travellers > capacity && (
                 <p style={{ color: "red", marginTop: "8px" }}>
-                  Only {capacity} place{capacity !== 1 ? "s" : ""} remaining, please adjust the number of travellers.
+                  Only {capacity} place{capacity !== 1 ? "s" : ""} remaining, please adjust the
+                  number of travellers.
                 </p>
               )}
             </div>
@@ -264,35 +360,49 @@ export default function Payment1() {
 
               <div className="trip-dates">
                 <p>
-                  <strong>Start</strong><br />
-                  {new Date(dateOptionData.start_date).toLocaleDateString()}<br />
+                  <strong>Start</strong>
+                  <br />
+                  {new Date(dateOptionData.start_date).toLocaleDateString()}
+                  <br />
                   {dealData.country.name.toUpperCase()}
                 </p>
                 <p>
-                  <strong>Finish</strong><br />
-                  {new Date(dateOptionData.end_date).toLocaleDateString()}<br />
+                  <strong>Finish</strong>
+                  <br />
+                  {new Date(dateOptionData.end_date).toLocaleDateString()}
+                  <br />
                   {dealData.country.name.toUpperCase()}
                 </p>
               </div>
 
               <div className="price-header" onClick={() => setShowTravellerDropdown(!showTravellerDropdown)}>
                 <p>Trip</p>
-                <p><FaChevronDown /></p>
+                <p>
+                  <FaChevronDown />
+                </p>
               </div>
 
               {showTravellerDropdown && (
                 <div className="dropdown-content">
-                  <p>Total for {travellers} traveller{travellers > 1 ? "s" : ""}: EUR €
+                  <p>
+                    Total for {travellers} traveller{travellers > 1 ? "s" : ""}: USD $
                     {(parseFloat(dateOptionData.discounted_price.replace("€", "").trim()) * travellers).toFixed(2)}
                   </p>
                 </div>
               )}
 
               <hr />
-              <h4>Total EUR €{(parseFloat(dateOptionData.discounted_price.replace("€", "").trim()) * travellers).toFixed(2)}</h4>
-              <p className="credit-info" onClick={() => setShowCreditModal(true)}>ⓘ How to redeem credit</p>
+              <h4>
+                Total USD $
+                {(parseFloat(dateOptionData.discounted_price.replace("€", "").trim()) * travellers).toFixed(2)}
+              </h4>
+              <p className="credit-info" onClick={() => setShowCreditModal(true)}>
+                ⓘ How to redeem credit
+              </p>
             </div>
-          ) : <div>Loading booking summary...</div>}
+          ) : (
+            <div>Loading booking summary...</div>
+          )}
         </div>
       </div>
 

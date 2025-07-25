@@ -26,7 +26,6 @@ const MyBookings = () => {
     fetchBookings();
   }, []);
 
-  // Download invoice handler
   const handleDownloadInvoice = async (id) => {
     try {
       const response = await axiosInstance.get(`/payments/bookings/${id}/download-invoice/`, {
@@ -46,14 +45,12 @@ const MyBookings = () => {
     }
   };
 
-  // Cancel booking handler
   const handleCancelBooking = async (id) => {
     if (!window.confirm("Are you sure you want to cancel this booking?")) return;
 
     try {
       await axiosInstance.post(`/payments/bookings/${id}/cancel/`);
       toast.success("Booking canceled successfully.");
-      // Refresh bookings after cancellation
       setBookings((prev) =>
         prev.map((b) => (b.id === id ? { ...b, status: "canceled" } : b))
       );
@@ -122,6 +119,25 @@ const MyBookings = () => {
                   >
                     <XCircle size={16} /> Cancel Booking
                   </button>
+                )}
+                {booking.status === "pending" && (
+                  <Link
+                    to={`/payment/payment2/${booking.id}`}
+                    className="complete-booking-btn"
+                    style={{
+                      marginLeft: "10px",
+                      backgroundColor: "#4caf50",
+                      color: "white",
+                      padding: "6px 12px",
+                      borderRadius: "4px",
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    Complete Booking →
+                  </Link>
                 )}
                 {booking.status === "canceled" && (
                   <span

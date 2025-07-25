@@ -7,10 +7,11 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import axiosInstance from "../utils/axiosInstance";
+import { toast } from "react-toastify";
 
 const stripePromise = loadStripe("pk_test_51RhozD04WnqvgZDXXbFeCGU9sY4wPefwFc5jR4IFfOosH4BPJzxjiDhQWsfbUtpNTPN37VJLfLBJnh49XnbIh7OF00mpk0vAwJ");
 
-const CheckoutForm = ({ amount, onSuccess, onError }) => {
+const CheckoutForm = ({ amount, onSuccess, onError, disabled }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -19,6 +20,10 @@ const CheckoutForm = ({ amount, onSuccess, onError }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (disabled) {
+      toast.warn("Please agree to the required terms before payment.");
+      return;
+    }
     setLoading(true);
     setError(null);
     setSuccess(null);
@@ -26,15 +31,13 @@ const CheckoutForm = ({ amount, onSuccess, onError }) => {
     if (!stripe || !elements) return;
 
     try {
-      // Fetching client secret from backend
       const { data } = await axiosInstance.post(
-        "/payments/stripe/create-intent/", 
+        "/payments/stripe/create-intent/",
         { amount }
       );
 
       const clientSecret = data.clientSecret;
 
-      // Confirm the card payment
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
@@ -48,7 +51,6 @@ const CheckoutForm = ({ amount, onSuccess, onError }) => {
         const charges = result.paymentIntent.charges?.data || [];
         const chargeId = charges.length > 0 ? charges[0].id : result.paymentIntent.id;
 
-        console.log("Using transaction_id:", chargeId);
         setSuccess("Payment successful!");
         onSuccess?.(chargeId);
       }
@@ -62,9 +64,9 @@ const CheckoutForm = ({ amount, onSuccess, onError }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: "400px" }}>
-      <CardElement options={{ hidePostalCode: true }} />
-      <button type="submit" disabled={!stripe || loading} style={{ marginTop: "20px" }}>
+    <form onSubmit={handleSubmit} style={{ maxWidth: "400px", opacity: disabled ? 0.6 : 1 }}>
+      <CardElement options={{ hidePostalCode: true, disabled }} />
+      <button type="submit" disabled={!stripe || loading || disabled} style={{ marginTop: "20px" }}>
         {loading ? "Processing..." : `Pay $${amount}`}
       </button>
       {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
@@ -73,9 +75,9 @@ const CheckoutForm = ({ amount, onSuccess, onError }) => {
   );
 };
 
-const StripePayment = ({ amount, onSuccess, onError }) => (
+const StripePayment = ({ amount, onSuccess, onError, disabled }) => (
   <Elements stripe={stripePromise}>
-    <CheckoutForm amount={amount} onSuccess={onSuccess} onError={onError} />
+    <CheckoutForm amount={amount} onSuccess={onSuccess} onError={onError} disabled={disabled} />
   </Elements>
 );
 

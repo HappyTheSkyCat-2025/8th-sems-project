@@ -66,19 +66,20 @@ export default function Payment2() {
         addNights,
         flightHelp,
         donation,
+        numTravellers,
       };
 
       navigate(`/payment/payment3/${id}`, {
         state: { extras: extrasForState },
       });
     } catch (err) {
-  console.error(err.response?.data || err.message);
-  alert(
-    `Failed to save your extras: ${
-      err.response?.data?.error || JSON.stringify(err.response?.data) || "Please try again."
-    }`
-  );
-}
+      console.error(err.response?.data || err.message);
+      alert(
+        `Failed to save your extras: ${
+          err.response?.data?.error || JSON.stringify(err.response?.data) || "Please try again."
+        }`
+      );
+    }
   };
 
   if (loading) return <div>Loading booking details...</div>;
@@ -92,10 +93,12 @@ export default function Payment2() {
 
   const travelDeal = booking?.travel_deal || {};
   const dateOption = booking?.date_option || {};
+  const numTravellers = booking?.travellers || 1; // Make sure backend returns this
 
   // Calculate total price
   const tripCost = parseFloat(dateOption.discounted_price) || 0;
-  const roomCost = roomOption === "private" ? 345 : 0;
+  const roomPricePerTraveller = 345;
+  const roomCost = roomOption === "private" ? roomPricePerTraveller * numTravellers : 0;
   const donationCost = donation ? 23 : 0;
   const totalCost = (tripCost + roomCost + donationCost).toFixed(2);
 
@@ -145,7 +148,10 @@ export default function Payment2() {
                   onChange={(e) => setRoomOption(e.target.value)}
                   aria-checked={roomOption === "private"}
                 />
-                <span className="room-option">Private room (+€345.00)</span>
+                <span className="room-option">
+                  Private room ({numTravellers} traveller{numTravellers > 1 ? "s" : ""}) (+$
+                  {(roomPricePerTraveller * numTravellers).toFixed(2)})
+                </span>
               </label>
               <label>
                 <input
@@ -201,7 +207,7 @@ export default function Payment2() {
                 onChange={(e) => setDonation(e.target.checked)}
                 aria-checked={donation}
               />{" "}
-              Yes, add €23 donation
+              Yes, add $23 donation
             </label>
           </div>
         </div>
@@ -231,19 +237,21 @@ export default function Payment2() {
             <div className="total">
               <span>Trip cost</span>
               <span>
-                <strong>€{tripCost.toFixed(2)}</strong>
+                <strong>${tripCost.toFixed(2)}</strong>
               </span>
             </div>
             {roomOption === "private" && (
               <div className="total">
-                <span>Private room</span>
-                <span>+ €345</span>
+                <span>
+                  Private room ({numTravellers} traveller{numTravellers > 1 ? "s" : ""})
+                </span>
+                <span>+ ${(roomPricePerTraveller * numTravellers).toFixed(2)}</span>
               </div>
             )}
             {donation && (
               <div className="total">
                 <span>Donation</span>
-                <span>+ €23</span>
+                <span>+ $23</span>
               </div>
             )}
             <hr />
@@ -252,7 +260,7 @@ export default function Payment2() {
                 <strong>Total Payment</strong>
               </span>
               <span>
-                <strong>€{totalCost}</strong>
+                <strong>${totalCost}</strong>
               </span>
             </div>
             <div

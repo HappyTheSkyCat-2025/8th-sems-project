@@ -26,6 +26,9 @@ export default function Search() {
     themes: [],
   });
 
+  const [regionId, setRegionId] = useState(null);
+  const [regionName, setRegionName] = useState(null);
+
   const perPage = 15;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -35,10 +38,26 @@ export default function Search() {
     const sd = searchParams.get("start_date");
     const ed = searchParams.get("end_date");
     const q = searchParams.get("query");
+    const r = searchParams.get("region");
+
     if (sd) setStartDate(new Date(sd));
     if (ed) setEndDate(new Date(ed));
     if (q) setSearchQuery(q);
+    if (r) {
+      setRegionId(r);
+      fetchRegionName(r);
+    }
   }, [searchParams]);
+
+  const fetchRegionName = async (id) => {
+    try {
+      const res = await axiosInstance.get(`/api/regions/${id}/`);
+      setRegionName(res.data.name);
+    } catch (err) {
+      console.warn("Failed to fetch region name", err);
+      setRegionName(null);
+    }
+  };
 
   const shouldSearch =
     searchQuery.trim() ||
@@ -50,7 +69,8 @@ export default function Search() {
     filters.priceMax ||
     filters.sale ||
     filters.styles.length > 0 ||
-    filters.themes.length > 0;
+    filters.themes.length > 0 ||
+    regionId; // include region in shouldSearch
 
   // Fetch deals data
   const fetchDeals = async () => {
@@ -65,6 +85,7 @@ export default function Search() {
       style: filters.styles,
       theme: filters.themes,
       query: searchQuery.trim() || undefined,
+      region: regionId || undefined,
     };
 
     try {
@@ -73,6 +94,7 @@ export default function Search() {
       setPage(1);
     } catch (err) {
       console.error("Failed to fetch deals:", err);
+      setResults([]);
     }
   };
 
@@ -82,7 +104,7 @@ export default function Search() {
     } else {
       setResults([]);
     }
-  }, [startDate, endDate, filters, searchQuery]);
+  }, [startDate, endDate, filters, searchQuery, regionId]);
 
   const norm = (v = "") => v.toLowerCase().trim();
 
@@ -185,7 +207,8 @@ export default function Search() {
       </div>
 
       <h2 className="search-results-header">
-        <span>{filteredResults.length}</span> trips found
+        Showing <span>{filteredResults.length}</span> trip{filteredResults.length !== 1 ? "s" : ""}{" "}
+        {regionName ? `in ${regionName}` : "matching your search"}
       </h2>
 
       <div className="search-bar-wrapper1">
