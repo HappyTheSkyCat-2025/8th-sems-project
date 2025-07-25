@@ -436,7 +436,9 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-            <button className="contact-btn">Contact Us</button>
+            <button className="contact-btn" onClick={() => navigate("/contact")}>
+              Contact Us
+            </button>
           </div>
         </div>
 

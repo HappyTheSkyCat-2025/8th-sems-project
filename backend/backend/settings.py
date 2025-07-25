@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'blogs',          # Blog + Comment
     'payments',       # Stripe / PayPal integration
     'utils',          # Any shared logic
+    'admin_dashboard', # Admin dashboard for managing the site
 ]
 
 # ---------------------------
