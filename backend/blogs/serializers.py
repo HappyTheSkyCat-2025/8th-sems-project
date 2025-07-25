@@ -16,34 +16,47 @@ class CategorySerializer(serializers.ModelSerializer):
 # -------------------------
 class BlogSerializer(serializers.ModelSerializer):
     author = serializers.SerializerMethodField()
-    likes_count = serializers.IntegerField(source='likes.count', read_only=True)
     is_liked = serializers.SerializerMethodField()
-    category = CategorySerializer(read_only=True)
+    likes_count = serializers.SerializerMethodField()
+    
+    # For writing (input): accept category ID
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        required=False,
+        allow_null=True,
+        write_only=True,
+    )
+    
+    # For reading (output): nested category data
+    category_details = CategorySerializer(source='category', read_only=True)
 
     class Meta:
         model = Blog
         fields = [
-            'id', 'title', 'slug', 'content', 'thumbnail', 'category',
-            'created_at', 'updated_at', 'status', 'tags',
-            'views', 'likes_count', 'is_liked', 'author',
-        ]
-        read_only_fields = [
-            'slug', 'created_at', 'updated_at', 'views',
-            'likes_count', 'is_liked', 'author',
+            'id', 'title', 'slug', 'content', 'thumbnail', 'category', 'category_details',
+            'created_at', 'updated_at', 'status', 'tags', 'views',
+            'likes_count', 'is_liked', 'author'
         ]
 
     def get_author(self, obj):
-        # Return minimal author info
+        request = self.context.get('request')
+        profile_image_url = (
+            request.build_absolute_uri(obj.author.profile_image.url)
+            if obj.author.profile_image
+            else None
+        )
         return {
-            'id': obj.author.id,
-            'username': obj.author.username,
+            "id": obj.author.id,
+            "username": obj.author.username,
+            "profile_image": profile_image_url
         }
 
     def get_is_liked(self, obj):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return obj.likes.filter(id=request.user.id).exists()
-        return False
+        user = self.context.get('request').user
+        return user.is_authenticated and obj.likes.filter(id=user.id).exists()
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
 
 
 # -------------------------

@@ -1,4 +1,10 @@
 // src/main.jsx
+
+// Polyfill global for Draft.js (and fbjs) in browser environment
+if (typeof global === 'undefined') {
+  window.global = window;
+}
+
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';

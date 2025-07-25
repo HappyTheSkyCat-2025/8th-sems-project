@@ -1,12 +1,15 @@
 import React from "react";
 import "../styles/Whygolden.css";
-import img2 from "../assets/img2.jpg";
+import img2 from "../assets/217870.jpg";
+import { useNavigate } from "react-router-dom";
 
 import { GoPeople } from "react-icons/go";
 import { CiMap, CiStar } from "react-icons/ci";
 import { LuLeaf } from "react-icons/lu";
 
 export default function WhyGolden() {
+  const navigate = useNavigate();
+
   return (
     <section className="why-golden-section">
       {/* ─── Heading ─── */}
@@ -33,7 +36,12 @@ export default function WhyGolden() {
             environments.
           </p>
 
-          <button className="read-more-btn">Read More About Our Story</button>
+          <button
+            className="read-more-btn"
+            onClick={() => navigate("/about")}
+          >
+            Read More About Our Story
+          </button>
         </div>
 
         <div className="why-golden-image">

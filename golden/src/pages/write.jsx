@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { RiArrowDropDownLine } from "react-icons/ri";
+import { toast } from "react-toastify";
+import axiosInstance from "../utils/axiosInstance";
 import "../styles/write.css";
 
 const FaqDropdown = ({ title, children }) => {
@@ -20,39 +22,74 @@ const FaqDropdown = ({ title, children }) => {
 };
 
 export default function BecomeContributor() {
-  const [firstName, setFirstName] = useState("");
-  const [email, setEmail] = useState("");
-  const [country, setCountry] = useState("");
-  const [cities, setCities] = useState("");
-  const [description, setDescription] = useState("");
-  const [images, setImages] = useState([]);
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [content, setContent] = useState(""); // plain content now
+  const [tags, setTags] = useState("");
+  const [thumbnail, setThumbnail] = useState(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState(null);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get("/blogs/categories/");
+        setCategories(response.data.results || []);
+      } catch {
+        toast.error("Failed to load categories");
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setThumbnail(file);
+      setThumbnailPreview(URL.createObjectURL(file));
+    } else {
+      setThumbnail(null);
+      setThumbnailPreview(null);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (description.length < 300) {
-      alert("Description must be at least 300 characters.");
+
+    if (content.trim().length < 300) {
+      toast.error("Content must be at least 300 characters.");
+      return;
+    }
+
+    if (!title.trim()) {
+      toast.error("Title is required.");
+      return;
+    }
+
+    if (!category) {
+      toast.error("Please select a category.");
       return;
     }
 
     const formData = new FormData();
-    formData.append("firstName", firstName);
-    formData.append("email", email);
-    formData.append("country", country);
-    formData.append("cities", cities);
-    formData.append("description", description);
-    images.forEach((img) => formData.append("images", img));
+    formData.append("title", title);
+    formData.append("category", category);
+    formData.append("content", content); // plain content
+    formData.append("tags", tags);
+    if (thumbnail) {
+      formData.append("thumbnail", thumbnail);
+    }
 
-    // 👇 Replace this with your API call
-    console.log("Form Submitted", {
-      firstName,
-      email,
-      country,
-      cities,
-      description,
-      images,
-    });
-
-    alert("Form submitted successfully!");
+    try {
+      await axiosInstance.post("/blogs/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Blog post submitted successfully!");
+      navigate("/blogs");
+    } catch {
+      toast.error("Submission failed");
+    }
   };
 
   return (
@@ -64,14 +101,10 @@ export default function BecomeContributor() {
 
       <div className="contributor-content">
         <h1>Become a Contributor</h1>
-        <p className="intro">
-          So, you want to write for The Good Times? Great!
-        </p>
+        <p className="intro">So, you want to write for The Good Times? Great!</p>
         <p className="short-desc">
           We’re always eager to hear from travellers who are interested in
-          sharing their travel tales and passion for the good life. We regularly
-          work with journalists, freelance writers and Intrepid travellers to
-          capture the joy of travel and how it shapes us and our world.
+          sharing their travel tales and passion for the good life.
         </p>
 
         <FaqDropdown title="📌 Rules & What You Can Post">
@@ -105,83 +138,74 @@ export default function BecomeContributor() {
 
         <form className="contributor-form" onSubmit={handleSubmit}>
           <label>
-            First Name<span className="required">*</span>
+            Title<span className="required">*</span>
             <input
               type="text"
-              required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter blog post title"
             />
           </label>
 
           <label>
-            Email<span className="required">*</span>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-
-          <label>
-            Country Visited<span className="required">*</span>
-            <input
-              type="text"
-              required
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            />
-          </label>
-
-          <label>
-            Cities Name<span className="required">*</span>
-            <input
-              type="text"
-              required
-              value={cities}
-              onChange={(e) => setCities(e.target.value)}
-            />
-          </label>
-
-          <label>
-            Description (Min. 300 characters)
-            <span className="required">*</span>
-            <textarea
-              required
-              minLength={300}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </label>
-
-          <label>
-            Upload Images (multiple allowed)
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) =>
-                setImages(Array.from(e.target.files))
-              }
-            />
-          </label>
-
-          {images.length > 0 && (
-            <div className="image-preview">
-              {images.map((img, idx) => (
-                <img
-                  key={idx}
-                  src={URL.createObjectURL(img)}
-                  alt={`Preview ${idx}`}
-                  className="preview-img"
-                />
+            Category<span className="required">*</span>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="">Select a category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
               ))}
+            </select>
+          </label>
+
+          <label>
+            Content (Min. 300 characters)<span className="required">*</span>
+            <textarea
+              rows={10}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="Write your blog content here..."
+              style={{
+                width: "100%",
+                padding: "10px",
+                fontSize: "16px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+              }}
+            />
+          </label>
+
+          <label>
+            Tags
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="travel, adventure, food"
+            />
+          </label>
+
+          <label>
+            Upload Thumbnail
+            <input type="file" accept="image/*" onChange={handleThumbnailChange} />
+          </label>
+
+          {thumbnailPreview && (
+            <div className="image-preview">
+              <img
+                src={thumbnailPreview}
+                alt="Preview"
+                className="preview-img"
+              />
             </div>
           )}
 
           <button type="submit" className="submit-btn">
-            Submit
+            Submit Blog Post
           </button>
         </form>
       </div>

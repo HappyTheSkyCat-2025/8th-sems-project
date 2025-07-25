@@ -1,7 +1,7 @@
-import img1 from "../assets/img2.jpg";
-import img2 from "../assets/bali.jpg";
-import img3 from "../assets/bali.jpg";
-import img4 from "../assets/img2.jpg";
+import img1 from "../assets/people.jpg";
+import img2 from "../assets/1300x820.webp";
+import img3 from "../assets/cheers-culinary+journeys.jpg";
+import img4 from "../assets/hero-wildebeest.jpg";
 
 const trips = [
   {

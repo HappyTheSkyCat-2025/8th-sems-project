@@ -37,7 +37,7 @@ class Blog(models.Model):
         blank=True,
         related_name='blogs'
     )
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, max_length=150)
     content = models.TextField()
     thumbnail = models.ImageField(upload_to='blog_thumbnails/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

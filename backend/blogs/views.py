@@ -11,6 +11,7 @@ from .serializers import BlogSerializer, CommentSerializer, CategorySerializer, 
 class CategoryListView(generics.ListAPIView):
     queryset = Category.objects.all().order_by('id')
     serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 # -------------------------
 # Blog Views
@@ -20,7 +21,7 @@ class BlogListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        queryset = Blog.objects.all().order_by('-created_at')
+        queryset = Blog.objects.filter(status='published').order_by('-created_at')
         category_slug = self.request.query_params.get('category')
         if category_slug:
             queryset = queryset.filter(category__slug=category_slug)

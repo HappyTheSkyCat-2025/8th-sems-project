@@ -94,7 +94,8 @@
 
 .contributor-form input[type="text"],
 .contributor-form input[type="email"],
-.contributor-form textarea {
+.contributor-form textarea,
+.contributor-form select {
   width: 100%;
   padding: 10px;
   border-radius: 5px;
@@ -143,3 +144,66 @@ textarea {
   border-radius: 6px;
   border: 1px solid #ccc;
 }
+
+/* Lexical editor specific styles */
+.lexical-editor {
+  /* Optional container styling */
+}
+
+.editor-input {
+  outline: none;
+  white-space: pre-wrap;
+  min-height: 150px;
+  font-size: 1rem;
+  font-family: Arial, sans-serif;
+  padding: 4px;
+  cursor: text;
+}
+.contributor-container { padding: 2rem; max-width: 800px; margin: auto; }
+.breadcrumb { ... }
+.contributor-content h1 { ... }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.toolbar button {
+  padding: 6px 10px;
+  background: #f2f2f2;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+.toolbar button:hover {
+  background: #e2e2e2;
+}
+.lexical-editor {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-height: 200px;
+  padding: 8px;
+  background: #fafafa;
+  margin-bottom: 1rem;
+}
+.editor-input {
+  min-height: 150px;
+  outline: none;
+}
+.editor-placeholder {
+  color: #aaa;
+  padding: 8px;
+}
+.contributor-form label { margin-bottom: 16px; display: block; }
+input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.submit-btn {
+  background: #0077cc;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.submit-btn:hover { background: #005fa3; }
+.image-preview { margin-top: 8px; }
+.preview-img { width: 100px; height: 100px; object-fit: cover; border-radius: 4px; }
+.required { color: red; margin-left: 4px; }

@@ -1,15 +1,27 @@
-import React from "react";
-import journal from "../data/journal";
+import React, { useEffect, useState } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
 import "../styles/journal.css";
 
 export default function Journal() {
+  const [blogs, setBlogs] = useState([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    axiosInstance
+      .get("/blogs/?limit=3")
+      .then((res) => {
+        setBlogs(res.data.results || res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch blogs", err);
+      });
+  }, []);
+
   const handleViewAll = () => {
-    navigate("/blogs"); 
+    navigate("/blogs");
   };
 
   return (
@@ -21,16 +33,23 @@ export default function Journal() {
       </p>
 
       <div className="journal-grid">
-        {journal.map(({ id, title, description, date, category, image }) => (
-          <article key={id} className="journal-card">
-            <div className="journal-badge">{category}</div>
-            <img src={image} alt={title} className="journal-img" />
+        {blogs.map((blog) => (
+          <article key={blog.id} className="journal-card">
+            {blog.category && <div className="journal-badge">{blog.category.name}</div>}
+            <img src={blog.thumbnail} alt={blog.title} className="journal-img" />
             <div className="journal-date">
-              <FaCalendarAlt className="calendar-icon" /> {date}
+              <FaCalendarAlt className="calendar-icon" />{" "}
+              {new Date(blog.created_at).toLocaleDateString()}
             </div>
-            <h3 className="journal-card-title">{title}</h3>
-            <p className="journal-card-description">{description}</p>
-            <div className="read-more">
+            <h3 className="journal-card-title">{blog.title}</h3>
+            <p className="journal-card-description">
+              {blog.content.slice(0, 100)}...
+            </p>
+            <div
+              className="read-more"
+              onClick={() => navigate(`/blogs/${blog.slug}`)}
+              style={{ cursor: "pointer" }}
+            >
               Read more <IoIosArrowForward />
             </div>
           </article>

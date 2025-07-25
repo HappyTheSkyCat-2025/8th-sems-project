@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams, Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
+import axiosInstance from "../utils/axiosInstance";
 
 export default function BlogDetail() {
   const { slug } = useParams();
@@ -14,469 +13,528 @@ export default function BlogDetail() {
   const [prevPageUrl, setPrevPageUrl] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
   const [newComment, setNewComment] = useState("");
-  const [replyText, setReplyText] = useState({});
-  const [showReplyBox, setShowReplyBox] = useState({});
-  const [editingCommentId, setEditingCommentId] = useState(null);
-  const [editedCommentText, setEditedCommentText] = useState("");
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
 
-  const token = localStorage.getItem("access_token");
+  const [showReplyBox, setShowReplyBox] = useState({});
+  const [replyText, setReplyText] = useState({});
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editedCommentText, setEditedCommentText] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch current user ID
   useEffect(() => {
-    if (!token) {
-      setCurrentUserId(null);
-      return;
-    }
-    axios
-      .get("http://localhost:8000/api/auth/profile/", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    setLoading(true);
+    axiosInstance
+      .get("/accounts/profile/")
       .then((res) => setCurrentUserId(res.data.id))
-      .catch(() => setCurrentUserId(null));
-  }, [token]);
+      .catch(() => setCurrentUserId(null))
+      .finally(() => setLoading(false));
+  }, []);
 
-  // Fetch blog data
   useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const response = await axios.get(`http://localhost:8000/api/blogs/${slug}/`, { headers });
-        setBlog(response.data);
-        setLikesCount(response.data.likes_count);
-        setLiked(response.data.is_liked);
+    setLoading(true);
+    axiosInstance
+      .get(`/blogs/${slug}/`)
+      .then((res) => {
+        setBlog(res.data);
+        setLikesCount(res.data.likes_count);
+        setLiked(res.data.is_liked);
         setError(null);
-      } catch {
+        setCurrentPage(1);
+      })
+      .catch(() => {
         setError("Failed to load blog");
         setBlog(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+      })
+      .finally(() => setLoading(false));
+  }, [slug]);
 
-    if ((token && currentUserId !== null) || !token) {
-      fetchBlog();
-    }
-  }, [slug, token, currentUserId]);
-
-  // Fetch comments with pagination
-  // We'll extract top-level comments only (parent = null)
-  const fetchComments = async (page = 1) => {
+  const fetchComments = (page = 1) => {
     if (!blog) return;
-
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/blogs/${blog.id}/comments/?page=${page}`
-      );
-
-      // Filter top-level comments (parent === null)
-      const topLevelComments = (res.data.results || []).filter(
-        (comment) => comment.parent === null || comment.parent === undefined
-      );
-
-      setComments(topLevelComments);
-      setNextPageUrl(res.data.next);
-      setPrevPageUrl(res.data.previous);
-      setTotalCount(res.data.count);
-      setTotalPages(Math.ceil(res.data.count / 5));
-    } catch {
-      setComments([]);
-    }
+    axiosInstance
+      .get(`/blogs/${blog.id}/comments/?page=${page}`)
+      .then((res) => {
+        const topLevelComments = (res.data.results || []).filter((c) => !c.parent);
+        setComments(topLevelComments);
+        setNextPageUrl(res.data.next);
+        setPrevPageUrl(res.data.previous);
+        setTotalCount(res.data.count);
+        setTotalPages(Math.ceil(res.data.count / 5));
+      })
+      .catch(() => {
+        setComments([]);
+        setTotalCount(0);
+        setTotalPages(1);
+      });
   };
 
   useEffect(() => {
     fetchComments(currentPage);
   }, [blog, currentPage]);
 
-  // Blog like toggle
   const handleLike = async () => {
-    if (!token) {
-      toast.warning("Login to like this blog.");
-      return;
+    if (!localStorage.getItem("access_token")) {
+      return toast.warning("Login to like this blog.");
     }
+    setLiked((prevLiked) => !prevLiked);
+    setLikesCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
+
+    setActionLoading(true);
     try {
-      const response = await axios.post(
-        `http://localhost:8000/api/blogs/${blog.id}/like/`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setLiked(response.data.liked);
-      setLikesCount(response.data.likes_count);
+      const res = await axiosInstance.post(`/blogs/${blog.id}/toggle-like/`);
+      setLiked(res.data.liked);
+      setLikesCount(res.data.likes_count);
     } catch {
+      setLiked((prevLiked) => !prevLiked);
+      setLikesCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
       toast.error("Failed to toggle like.");
     }
+    setActionLoading(false);
   };
 
-  // Submit new top-level comment
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!token) {
-      toast.warning("Login to comment.");
-      return;
+    if (!localStorage.getItem("access_token")) {
+      return toast.warning("Login to comment.");
     }
     if (!newComment.trim()) return;
-
+    setActionLoading(true);
     try {
-      await axios.post(
-        `http://localhost:8000/api/blogs/${blog.id}/comments/`,
-        { text: newComment },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axiosInstance.post(`/blogs/${blog.id}/comments/`, {
+        text: newComment.trim(),
+      });
       setNewComment("");
       setCurrentPage(1);
-      await fetchComments(1); // immediately fetch new comments after posting
-      toast.success("Comment posted!");
-    } catch {
-      toast.error("Failed to submit comment");
+      fetchComments(1);
+      toast.success("Comment posted successfully!");
+    } catch (error) {
+      if (error.response?.data) {
+        const errMsg =
+          typeof error.response.data === "string"
+            ? error.response.data
+            : JSON.stringify(error.response.data);
+        toast.error(`Failed to post comment: ${errMsg}`);
+      } else {
+        toast.error("Failed to post comment.");
+      }
     }
+    setActionLoading(false);
   };
 
-  // Edit comment or reply
-  const handleEditComment = async (commentId) => {
-    if (!editedCommentText.trim()) return;
-    if (!token) {
-      toast.warning("Login to edit comment.");
-      return;
-    }
-    try {
-      const response = await axios.put(
-        `http://localhost:8000/api/blogs/comments/${commentId}/`,
-        { text: editedCommentText },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      // Update comment or nested reply locally
-      setComments((prev) =>
-        prev.map((comment) => {
-          if (comment.id === commentId) return response.data;
-          if (comment.replies && comment.replies.length) {
-            return {
-              ...comment,
-              replies: comment.replies.map((r) => (r.id === commentId ? response.data : r)),
-            };
-          }
-          return comment;
-        })
-      );
-      setEditingCommentId(null);
-      toast.success("Comment updated.");
-    } catch {
-      toast.error("Failed to update comment.");
-    }
+  const toggleReplyBox = (commentId) => {
+    setShowReplyBox((prev) => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
   };
 
-  // Delete comment or reply
-  const handleDeleteComment = async (commentId) => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    if (!token) {
-      toast.warning("Login required.");
-      return;
-    }
-    try {
-      await axios.delete(`http://localhost:8000/api/blogs/comments/${commentId}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCurrentPage(1);
-      await fetchComments(1); // refresh comments immediately after delete
-      toast.success("Comment deleted.");
-    } catch {
-      toast.error("Failed to delete comment.");
-    }
+  const handleReplyTextChange = (commentId, text) => {
+    setReplyText((prev) => ({ ...prev, [commentId]: text }));
   };
 
-  // Toggle like on comment or reply
-  const handleCommentLike = async (commentId) => {
-    if (!token) {
-      toast.warning("Login to like comments.");
-      return;
-    }
-    try {
-      const res = await axios.post(
-        `http://localhost:8000/api/blogs/comments/${commentId}/like/`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setComments((prev) =>
-        prev.map((comment) => {
-          if (comment.id === commentId) {
-            return { ...comment, is_liked: res.data.liked, likes_count: res.data.likes_count };
-          }
-          if (comment.replies && comment.replies.length) {
-            return {
-              ...comment,
-              replies: comment.replies.map((reply) =>
-                reply.id === commentId
-                  ? { ...reply, is_liked: res.data.liked, likes_count: res.data.likes_count }
-                  : reply
-              ),
-            };
-          }
-          return comment;
-        })
-      );
-    } catch {
-      toast.error("Failed to like comment.");
-    }
-  };
-
-  // Submit reply to a comment
   const handleReplySubmit = async (parentId) => {
-    const text = replyText[parentId];
-    if (!text || !text.trim()) return;
-    if (!token) {
-      toast.warning("Login to reply.");
-      return;
+    if (!localStorage.getItem("access_token")) {
+      return toast.warning("Login to reply.");
     }
+    if (!replyText[parentId] || !replyText[parentId].trim()) return;
+    setActionLoading(true);
     try {
-      await axios.post(
-        `http://localhost:8000/api/blogs/${blog.id}/comments/`,
-        { text, parent: parentId },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axiosInstance.post(`/blogs/${blog.id}/comments/`, {
+        text: replyText[parentId].trim(),
+        parent: parentId,
+      });
       setReplyText((prev) => ({ ...prev, [parentId]: "" }));
       setShowReplyBox((prev) => ({ ...prev, [parentId]: false }));
       setCurrentPage(1);
-      await fetchComments(1); // refresh comments after reply
+      fetchComments(1);
       toast.success("Reply posted!");
     } catch {
       toast.error("Failed to post reply.");
     }
+    setActionLoading(false);
   };
 
-  // Recursive render function for comments and nested replies
+  const startEditing = (comment) => {
+    setEditingCommentId(comment.id);
+    setEditedCommentText(comment.text);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditedCommentText("");
+  };
+
+  const saveEditedComment = async () => {
+    if (!editedCommentText.trim()) return;
+    if (!localStorage.getItem("access_token")) {
+      return toast.warning("Login to edit comment.");
+    }
+    setActionLoading(true);
+    try {
+      const res = await axiosInstance.put(`/blogs/comments/${editingCommentId}/`, {
+        text: editedCommentText.trim(),
+      });
+      const updatedComment = res.data;
+      const updateComments = (commentsList) =>
+        commentsList.map((c) => {
+          if (c.id === updatedComment.id) return updatedComment;
+          if (c.replies && c.replies.length) {
+            return { ...c, replies: updateComments(c.replies) };
+          }
+          return c;
+        });
+      setComments((prev) => updateComments(prev));
+      toast.success("Comment updated.");
+      cancelEditing();
+    } catch {
+      toast.error("Failed to update comment.");
+    }
+    setActionLoading(false);
+  };
+
+  const deleteComment = async (commentId) => {
+    if (!window.confirm("Are you sure you want to delete this comment?")) return;
+    if (!localStorage.getItem("access_token")) {
+      return toast.warning("Login required.");
+    }
+    setActionLoading(true);
+    try {
+      await axiosInstance.delete(`/blogs/comments/${commentId}/`);
+      setCurrentPage(1);
+      fetchComments(1);
+      toast.success("Comment deleted.");
+    } catch {
+      toast.error("Failed to delete comment.");
+    }
+    setActionLoading(false);
+  };
+
+  const toggleCommentLike = async (commentId) => {
+    if (!localStorage.getItem("access_token")) {
+      return toast.warning("Login to like comments.");
+    }
+    setComments((prevComments) => {
+      const toggleLikeRecursive = (list) =>
+        list.map((comment) => {
+          if (comment.id === commentId) {
+            const likedNow = !comment.is_liked;
+            const likesCountNow = likedNow
+              ? comment.likes_count + 1
+              : comment.likes_count - 1;
+            return {
+              ...comment,
+              is_liked: likedNow,
+              likes_count: likesCountNow,
+            };
+          }
+          if (comment.replies && comment.replies.length) {
+            return {
+              ...comment,
+              replies: toggleLikeRecursive(comment.replies),
+            };
+          }
+          return comment;
+        });
+      return toggleLikeRecursive(prevComments);
+    });
+
+    setActionLoading(true);
+    try {
+      const res = await axiosInstance.post(`/blogs/comments/${commentId}/toggle-like/`);
+      const updated = res.data;
+      setComments((prevComments) => {
+        const updateComments = (list) =>
+          list.map((comment) => {
+            if (comment.id === updated.id) {
+              return {
+                ...comment,
+                is_liked: updated.is_liked,
+                likes_count: updated.likes_count,
+              };
+            }
+            if (comment.replies && comment.replies.length) {
+              return { ...comment, replies: updateComments(comment.replies) };
+            }
+            return comment;
+          });
+        return updateComments(prevComments);
+      });
+    } catch {
+      toast.error("Failed to like comment.");
+      setComments((prevComments) => {
+        const toggleLikeRecursive = (list) =>
+          list.map((comment) => {
+            if (comment.id === commentId) {
+              const likedNow = !comment.is_liked;
+              const likesCountNow = likedNow
+                ? comment.likes_count + 1
+                : comment.likes_count - 1;
+              return {
+                ...comment,
+                is_liked: likedNow,
+                likes_count: likesCountNow,
+              };
+            }
+            if (comment.replies && comment.replies.length) {
+              return {
+                ...comment,
+                replies: toggleLikeRecursive(comment.replies),
+              };
+            }
+            return comment;
+          });
+        return toggleLikeRecursive(prevComments);
+      });
+    }
+    setActionLoading(false);
+  };
+
+  // Recursive render of comments with Bootstrap classes
   const renderComment = (comment, isReply = false) => (
     <div
       key={comment.id}
-      className={`p-3 border rounded ${isReply ? "ms-5 bg-light" : "mb-4"} comment-card`}
-      style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.1)" }}
+      className={`card mb-3 ${isReply ? "ms-4" : ""}`}
+      style={isReply ? { borderLeft: "4px solid #0d6efd" } : {}}
     >
-      <div className="d-flex justify-content-between align-items-start mb-2">
-        <div className="d-flex align-items-center gap-2">
-          {comment.author?.profile_image && (
-            <img
-              src={comment.author.profile_image}
-              alt={comment.author.username}
-              className="rounded-circle"
-              style={{ width: "40px", height: "40px", objectFit: "cover" }}
-            />
-          )}
-          <strong>{comment.author?.username}</strong>
+      <div className="card-body p-3">
+        <div className="d-flex justify-content-between align-items-center mb-1">
+          <strong>{comment.author?.username || "Unknown"}</strong>
+          <small className="text-muted" style={{ fontSize: "0.8rem" }}>
+            {new Date(comment.created_at).toLocaleString()}
+          </small>
         </div>
-        {currentUserId === comment.author?.id && (
-          <div className="btn-group">
-            <button
-              className="btn btn-sm btn-outline-primary"
-              onClick={() => {
-                setEditingCommentId(comment.id);
-                setEditedCommentText(comment.text);
-              }}
-            >
-              Edit
-            </button>
-            <button
-              className="btn btn-sm btn-outline-danger"
-              onClick={() => handleDeleteComment(comment.id)}
-            >
-              Delete
-            </button>
-          </div>
-        )}
-      </div>
 
-      {editingCommentId === comment.id ? (
-        <>
-          <textarea
-            className="form-control mb-2"
-            value={editedCommentText}
-            onChange={(e) => setEditedCommentText(e.target.value)}
-          />
-          <div>
-            <button
-              className="btn btn-sm btn-success me-2"
-              onClick={() => handleEditComment(comment.id)}
-              disabled={!editedCommentText.trim()}
-            >
-              Save
-            </button>
-            <button className="btn btn-sm btn-secondary" onClick={() => setEditingCommentId(null)}>
-              Cancel
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
+        {editingCommentId === comment.id ? (
+          <>
+            <textarea
+              className="form-control mb-2"
+              value={editedCommentText}
+              onChange={(e) => setEditedCommentText(e.target.value)}
+              disabled={actionLoading}
+              rows={3}
+            />
+            <div>
+              <button
+                className="btn btn-primary me-2"
+                onClick={saveEditedComment}
+                disabled={!editedCommentText.trim() || actionLoading}
+              >
+                Save
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={cancelEditing}
+                disabled={actionLoading}
+              >
+                Cancel
+              </button>
+            </div>
+          </>
+        ) : (
           <p>{comment.text}</p>
-          <small className="text-muted">{new Date(comment.created_at).toLocaleString()}</small>
-          <div className="d-flex gap-3 mt-2">
+        )}
+
+        {editingCommentId !== comment.id && (
+          <div className="d-flex flex-wrap gap-2">
             <button
-              className={`btn btn-sm ${comment.is_liked ? "btn-danger" : "btn-outline-danger"}`}
-              onClick={() => handleCommentLike(comment.id)}
+              type="button"
+              className={`btn btn-sm btn-outline-primary d-flex align-items-center gap-1 ${
+                comment.is_liked ? "active" : ""
+              }`}
+              onClick={() => toggleCommentLike(comment.id)}
+              disabled={actionLoading}
             >
-              ❤️ {comment.likes_count}
+              <span role="img" aria-label="like">
+                ❤️
+              </span>{" "}
+              {comment.likes_count}
             </button>
+
             <button
+              type="button"
               className="btn btn-sm btn-outline-secondary"
-              onClick={() =>
-                setShowReplyBox((prev) => ({ ...prev, [comment.id]: !prev[comment.id] }))
-              }
+              onClick={() => toggleReplyBox(comment.id)}
+              disabled={actionLoading}
             >
               Reply
             </button>
+
+            {currentUserId === comment.author?.id && (
+              <>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-warning"
+                  onClick={() => startEditing(comment)}
+                  disabled={actionLoading}
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => deleteComment(comment.id)}
+                  disabled={actionLoading}
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
+        )}
 
-          {showReplyBox[comment.id] && (
-            <div className="mt-2">
-              <textarea
-                className="form-control mb-2"
-                rows="2"
-                placeholder="Write a reply..."
-                value={replyText[comment.id] || ""}
-                onChange={(e) => setReplyText((prev) => ({ ...prev, [comment.id]: e.target.value }))}
-              />
-              <button
-                className="btn btn-sm btn-primary"
-                onClick={() => handleReplySubmit(comment.id)}
-                disabled={!replyText[comment.id] || !replyText[comment.id].trim()}
-              >
-                Post Reply
-              </button>
-            </div>
-          )}
+        {showReplyBox[comment.id] && (
+          <div className="mt-3">
+            <textarea
+              className="form-control mb-2"
+              rows={2}
+              placeholder="Write a reply..."
+              value={replyText[comment.id] || ""}
+              onChange={(e) => handleReplyTextChange(comment.id, e.target.value)}
+              disabled={actionLoading}
+            />
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => handleReplySubmit(comment.id)}
+              disabled={!replyText[comment.id]?.trim() || actionLoading}
+            >
+              Post Reply
+            </button>
+          </div>
+        )}
 
-          {comment.replies &&
-            comment.replies.length > 0 &&
-            comment.replies.map((reply) => renderComment(reply, true))}
-        </>
-      )}
+        {comment.replies &&
+          comment.replies.length > 0 &&
+          comment.replies.map((reply) => renderComment(reply, true))}
+      </div>
     </div>
   );
 
-  if (loading) {
-    return <div className="text-center py-5 display-6 text-secondary">Loading blog...</div>;
-  }
-
-  if (error) {
-    return <div className="alert alert-danger text-center">{error}</div>;
-  }
-
-  if (!blog) {
-    return <div className="alert alert-warning text-center">Blog not found.</div>;
-  }
+  if (loading) return <div className="text-center py-5">Loading blog...</div>;
+  if (error) return <div className="alert alert-danger text-center">{error}</div>;
+  if (!blog) return <div className="alert alert-warning text-center">Blog not found.</div>;
 
   return (
-    <>
-      <ToastContainer position="top-right" autoClose={3000} pauseOnHover />
-      <div className="container py-5">
-        {/* Blog Content */}
-        <div className="card shadow-lg border-0 p-4 mb-5">
-          <h1 className="display-4 fw-bold">{blog.title}</h1>
-          <div className="d-flex align-items-center mb-4 gap-3">
-            {blog.author?.profile_image && (
-              <img
-                src={blog.author.profile_image}
-                alt={blog.author.username}
-                className="rounded-circle border"
-                style={{ width: "60px", height: "60px", objectFit: "cover" }}
-              />
+    <div className="container my-4">
+      <div className="card p-4 mb-5 shadow-sm">
+        <h1 className="display-4 mb-3">{blog.title}</h1>
+
+        <div className="d-flex align-items-center gap-3 mb-3">
+          {blog.author?.profile_image && (
+            <img
+              className="rounded-circle"
+              style={{ width: 60, height: 60, objectFit: "cover" }}
+              src={
+                blog.author.profile_image.startsWith("http")
+                  ? blog.author.profile_image
+                  : `${import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"}${blog.author.profile_image}`
+              }
+              alt={blog.author.username}
+            />
+          )}
+          <div>
+            <h5 className="text-primary mb-1">{blog.author?.username}</h5>
+            {blog.category && (
+              <Link to={`/blogs?category=${blog.category.id}`} className="badge bg-secondary text-decoration-none">
+                {blog.category.name}
+              </Link>
             )}
-            <div>
-              <h5 className="mb-0 text-primary">{blog.author?.username}</h5>
-              {blog.category && (
-                <Link
-                  to={`/blog?category=${blog.category.id}`}
-                  className="badge bg-secondary text-decoration-none"
-                >
-                  {blog.category.name}
-                </Link>
-              )}
-            </div>
-          </div>
-
-          {blog.thumbnail && (
-            <img src={blog.thumbnail} alt={blog.title} className="img-fluid rounded shadow-sm mb-4" />
-          )}
-
-          <div className="mb-4 fs-5 lh-lg" dangerouslySetInnerHTML={{ __html: blog.content }} />
-
-          {blog.tags && (
-            <div className="mb-3">
-              <strong>Tags: </strong>
-              {blog.tags.split(",").map((tag, index) => (
-                <span key={index} className="badge bg-light text-dark me-2">
-                  #{tag.trim()}
-                </span>
-              ))}
-            </div>
-          )}
-
-          <div className="d-flex gap-4 fs-5 mt-4 align-items-center">
-            <button
-              className="btn btn-outline-danger d-flex align-items-center gap-2"
-              onClick={handleLike}
-            >
-              {liked ? "Liked" : "Like"}{" "}
-              <span className={`transition-opacity ${liked ? "text-danger" : ""}`}>
-                ({likesCount})
-              </span>
-            </button>
-            <span className="text-muted">Views: {blog.views}</span>
           </div>
         </div>
 
-        {/* Comments Section */}
-        <div className="card shadow-sm border-0 mb-5">
-          <div className="card-body">
-            <h4 className="card-title mb-4">Comments ({totalCount})</h4>
+        {blog.thumbnail && (
+          <img src={blog.thumbnail} alt={blog.title} className="img-fluid rounded mb-4 shadow-sm" />
+        )}
 
-            <form onSubmit={handleCommentSubmit} className="mb-4">
-              <textarea
-                className="form-control mb-2"
-                rows="3"
-                placeholder="Write a comment..."
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                required
-              />
-              <button className="btn btn-primary" disabled={!newComment.trim()}>
-                Post Comment
-              </button>
-            </form>
+        <div
+          className="mb-4"
+          style={{ fontSize: "1.125rem", lineHeight: 1.6, color: "#444" }}
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+        />
 
-            {comments.length > 0 ? (
-              comments.map((comment) => renderComment(comment))
-            ) : (
-              <p className="text-muted">No comments yet.</p>
-            )}
+        {blog.tags && (
+          <div className="mb-3">
+            <strong>Tags: </strong>
+            {blog.tags.split(",").map((tag, i) => (
+              <span key={i} className="badge bg-light text-secondary me-1">
+                #{tag.trim()}
+              </span>
+            ))}
+          </div>
+        )}
 
-            {totalPages > 1 && (
-              <div className="d-flex justify-content-center gap-2 mt-3">
+        <div className="d-flex align-items-center gap-3 mb-5">
+          <button
+            className={`btn btn-${liked ? "danger" : "primary"}`}
+            onClick={handleLike}
+            disabled={actionLoading}
+          >
+            {liked ? "Liked" : "Like"} <span className="badge bg-light text-dark ms-2">{likesCount}</span>
+          </button>
+          <span className="text-muted">Views: {blog.views}</span>
+        </div>
+      </div>
+
+      <div>
+        <h4 className="mb-3">Comments ({totalCount})</h4>
+
+        <form onSubmit={handleCommentSubmit} className="mb-4">
+          <textarea
+            className="form-control mb-2"
+            rows={3}
+            placeholder="Write a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            required
+            disabled={actionLoading}
+          />
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!newComment.trim() || actionLoading}
+          >
+            Post Comment
+          </button>
+        </form>
+
+        {comments.length > 0 ? (
+          comments.map((comment) => renderComment(comment))
+        ) : (
+          <p className="text-muted fst-italic">No comments yet.</p>
+        )}
+
+        {totalPages > 1 && (
+          <nav aria-label="Comments pagination">
+            <ul className="pagination justify-content-center gap-2 mt-4">
+              <li className={`page-item ${!prevPageUrl ? "disabled" : ""}`}>
                 <button
-                  className="btn btn-outline-secondary"
-                  disabled={!prevPageUrl}
+                  className="page-link"
                   onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  disabled={!prevPageUrl}
                 >
                   Previous
                 </button>
-                <span className="align-self-center">
+              </li>
+              <li className="page-item disabled">
+                <span className="page-link">
                   Page {currentPage} of {totalPages}
                 </span>
+              </li>
+              <li className={`page-item ${!nextPageUrl ? "disabled" : ""}`}>
                 <button
-                  className="btn btn-outline-secondary"
+                  className="page-link"
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                   disabled={!nextPageUrl}
-                  onClick={() => setCurrentPage((p) => p + 1)}
                 >
                   Next
                 </button>
-              </div>
-            )}
-          </div>
-        </div>
+              </li>
+            </ul>
+          </nav>
+        )}
       </div>
-    </>
+    </div>
   );
 }

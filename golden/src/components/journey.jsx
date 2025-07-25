@@ -140,7 +140,13 @@ export default function ExclusiveTrips() {
               </span>
             ))}
           </div>
-          <span className="exclusive-explore-link">Explore all trips →</span>
+          <span
+            className="exclusive-explore-link"
+            onClick={() => navigate("/alldestinations")}
+            style={{ cursor: "pointer" }}
+          >
+            Explore all trips →
+          </span>
         </div>
       </div>
 

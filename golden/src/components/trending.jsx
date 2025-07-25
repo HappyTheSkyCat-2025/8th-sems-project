@@ -169,7 +169,7 @@ export default function TrendingTours() {
       </div>
 
       <div className="trend-btn-wrapper">
-        <button className="trend-view-btn" onClick={() => navigate("/destinations/group-tours")}>
+        <button className="trend-view-btn" onClick={() => navigate("/alldestinations")}>
           View All Destinations <IoIosArrowForward />
         </button>
       </div>
