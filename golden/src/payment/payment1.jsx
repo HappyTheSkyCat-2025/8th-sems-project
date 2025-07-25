@@ -16,7 +16,7 @@ export default function Payment1() {
   const countrySlug = queryParams.get("country");
   const dealSlug = queryParams.get("deal");
   const dateId = queryParams.get("date");
-
+ 
   const [travellers, setTravellers] = useState(1);
   const [roomOption, setRoomOption] = useState("shared");
   const [title, setTitle] = useState("");
@@ -149,7 +149,7 @@ export default function Payment1() {
 
   return (
     <div className="traveller-container">
-      <StepIndicator current={0} />
+      <StepIndicator current={0} steps={["Your details", "Trip extras", "Payment"]} />
       <div className="main-content">
         <div className="left-section">
           <h2>Traveller details</h2>

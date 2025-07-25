@@ -184,7 +184,7 @@ export default function Navbar() {
                             onMouseEnter={() => setActiveRegion(r)}
                           >
                             {r}
-                          </li>
+                          </li> 
                         ))}
                       </ul>
                     </div>

@@ -19,7 +19,7 @@ export default function Payment2() {
   const [flightHelp, setFlightHelp] = useState(false);
   const [donation, setDonation] = useState(false);
 
-  // Modal states
+  // Modal states 
   const [showLateModal, setShowLateModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
 
@@ -104,7 +104,7 @@ export default function Payment2() {
 
   return (
     <div className="payment-container">
-      <StepIndicator current={1} />
+      <StepIndicator current={1} steps={["Your details", "Trip extras", "Payment"]} />
       <h2 className="trip-title">Trip Extras</h2>
 
       <div className="payment-grid">
@@ -138,8 +138,8 @@ export default function Payment2() {
 
           <div className="room-options">
             <h3>Room options</h3>
-            <form>
-              <label>
+            <form className="room-radio-group">
+              <label className="room-radio-label">
                 <input
                   type="radio"
                   name="room"
@@ -153,7 +153,7 @@ export default function Payment2() {
                   {(roomPricePerTraveller * numTravellers).toFixed(2)})
                 </span>
               </label>
-              <label>
+              <label className="room-radio-label">
                 <input
                   type="radio"
                   name="room"
@@ -188,7 +188,7 @@ export default function Payment2() {
           </div>
 
           <div className="additional-services">
-            <label>
+            <label className="checkbox-label">
               <input
                 type="checkbox"
                 checked={flightHelp}
@@ -200,7 +200,7 @@ export default function Payment2() {
           </div>
 
           <div className="donation-box">
-            <label>
+            <label className="checkbox-label">
               <input
                 type="checkbox"
                 checked={donation}

@@ -64,10 +64,13 @@ const CheckoutForm = ({ amount, onSuccess, onError, disabled }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: "400px", opacity: disabled ? 0.6 : 1 }}>
-      <CardElement options={{ hidePostalCode: true, disabled }} />
-      <button type="submit" disabled={!stripe || loading || disabled} style={{ marginTop: "20px" }}>
-        {loading ? "Processing..." : `Pay $${amount}`}
+    <form className="stripe-form" onSubmit={handleSubmit} style={{ opacity: disabled ? 0.6 : 1 }}>
+      <label htmlFor="card-element">Card details</label>
+      <div style={{ background: '#fafbfc', borderRadius: '7px', padding: '12px', border: '1.5px solid #e0e0e0', marginBottom: '1rem' }}>
+        <CardElement id="card-element" options={{ hidePostalCode: true, disabled }} />
+      </div>
+      <button type="submit" className="stripe-pay-btn" disabled={!stripe || loading || disabled}>
+        <span className="stripe-icon" role="img" aria-label="Stripe">💳</span> {loading ? "Processing..." : `Pay $${amount}`}
       </button>
       {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
       {success && <div style={{ color: "green", marginTop: "10px" }}>{success}</div>}
