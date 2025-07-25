@@ -1,0 +1,102 @@
+/* travelDealDate.css */
+
+.list-container {
+  padding: 20px;
+  background-color: #fff;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.data-table th, .data-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.add-btn {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit-btn, .delete-btn {
+  margin-right: 5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.pagination {
+  margin-top: 15px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}
+
+.modal-box h3 {
+  margin-top: 0;
+}
+
+.modal-box label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.modal-box input,
+.modal-box select {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.form-buttons button {
+  padding: 8px 12px;
+  margin-left: 10px;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: white;
+}

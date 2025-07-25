@@ -4,7 +4,7 @@ import {
   deleteBlog,
   createBlog,
   updateBlog,
-  getBlog
+  getBlog,
 } from "../api/blogApi";
 import BlogForm from "../components/BlogForm";
 import "./blog.css";
@@ -38,12 +38,12 @@ const BlogList = () => {
     }
   };
 
-  const handleSave = async (data) => {
+  const handleSave = async (formData) => {
     try {
-      if (data.id) {
-        await updateBlog(data.id, data);
+      if (selectedBlog && selectedBlog.id) {
+        await updateBlog(selectedBlog.id, formData);
       } else {
-        await createBlog(data);
+        await createBlog(formData);
       }
       setShowForm(false);
       setSelectedBlog(null);
@@ -70,7 +70,13 @@ const BlogList = () => {
   return (
     <div>
       <h2>Blog Management</h2>
-      <button className="create-btn" onClick={() => { setSelectedBlog(null); setShowForm(true); }}>
+      <button
+        className="create-btn"
+        onClick={() => {
+          setSelectedBlog(null);
+          setShowForm(true);
+        }}
+      >
         + Create Blog
       </button>
 
@@ -94,8 +100,18 @@ const BlogList = () => {
               <td>{b.status}</td>
               <td>{b.views}</td>
               <td>
-                <button onClick={() => handleEdit(b.id)} className="edit-btn">Edit</button>
-                <button onClick={() => handleDelete(b.id)} className="delete-btn">Delete</button>
+                <button
+                  onClick={() => handleEdit(b.id)}
+                  className="edit-btn"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(b.id)}
+                  className="delete-btn"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
@@ -108,7 +124,11 @@ const BlogList = () => {
       </div>
 
       {showForm && (
-        <BlogForm blog={selectedBlog} onSave={handleSave} onClose={() => setShowForm(false)} />
+        <BlogForm
+          blog={selectedBlog}
+          onSave={handleSave}
+          onClose={() => setShowForm(false)}
+        />
       )}
     </div>
   );

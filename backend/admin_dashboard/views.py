@@ -1,5 +1,6 @@
 from rest_framework import viewsets, permissions
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.response import Response
 from accounts.models import User
 from blogs.models import Category, Blog, Comment, Story
 from contacts.models import ContactMessage
@@ -52,7 +53,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all().order_by('-created_at')
     serializer_class = BlogSerializer
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
     permission_classes = [permissions.IsAdminUser]
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -117,6 +118,20 @@ class TravelDealViewSet(viewsets.ModelViewSet):
     queryset = TravelDeal.objects.all().order_by('-id')
     serializer_class = TravelDealSerializer
     permission_classes = [permissions.IsAdminUser]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            print("Validation errors:", serializer.errors)
+            return Response(serializer.errors, status=400)
+        return super().create(request, *args, **kwargs)
+
+
+    def update(self, request, *args, **kwargs):
+        print("DEBUG: Incoming PUT data:", request.data)  # <-- debug print input data for update
+        response = super().update(request, *args, **kwargs)
+        print("DEBUG: Update response data:", response.data)  # <-- debug print response
+        return response
 
 class TravelImageViewSet(viewsets.ModelViewSet):
     queryset = TravelImage.objects.all()
