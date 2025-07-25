@@ -4,7 +4,7 @@ import {
   Routes,
   Route,
   useLocation,
-  matchPath,
+  matchPath, 
 } from "react-router-dom";
 
 // Layout components
@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/footer";
 import ScrollToTop from "./components/ScrollToTop";
 import ChatBot from "./components/chatbot";
+import Contact from "./components/Contact";
 
 // Auth pages
 import Login from "./Auth/login";
@@ -33,7 +34,7 @@ import Trending from "./components/trending";
 import Roof from "./components/roof";
 import Trip from "./components/trip";
 import Journal from "./components/journal";
-import Contact from "./components/Contact";
+
 
 // Pages
 import AboutUs from "./pages/Aboutus";
@@ -129,6 +130,7 @@ function UserLayout() {
         />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
+
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />

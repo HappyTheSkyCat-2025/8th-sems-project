@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance from "../utils/axiosInstance";
+import "../styles/blogd.css";
 
 export default function BlogDetail() {
   const { slug } = useParams();
@@ -15,7 +16,7 @@ export default function BlogDetail() {
   const [newComment, setNewComment] = useState("");
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
 
@@ -296,136 +297,124 @@ export default function BlogDetail() {
   const renderComment = (comment, isReply = false) => (
     <div
       key={comment.id}
-      className={`card mb-3 ${isReply ? "ms-4" : ""}`}
-      style={isReply ? { borderLeft: "4px solid #0d6efd" } : {}}
+      className={`blog-detail-comment-card${isReply ? " blog-detail-comment-reply" : ""}`}
     >
-      <div className="card-body p-3">
-        <div className="d-flex justify-content-between align-items-center mb-1">
-          <strong>{comment.author?.username || "Unknown"}</strong>
-          <small className="text-muted" style={{ fontSize: "0.8rem" }}>
-            {new Date(comment.created_at).toLocaleString()}
-          </small>
-        </div>
-
-        {editingCommentId === comment.id ? (
-          <>
-            <textarea
-              className="form-control mb-2"
-              value={editedCommentText}
-              onChange={(e) => setEditedCommentText(e.target.value)}
+      <div className="blog-detail-comment-header">
+        <span className="blog-detail-comment-author">{comment.author?.username || "Unknown"}</span>
+        <span className="blog-detail-comment-date">{new Date(comment.created_at).toLocaleString()}</span>
+      </div>
+      {editingCommentId === comment.id ? (
+        <>
+          <textarea
+            className="blog-detail-comment-textarea"
+            value={editedCommentText}
+            onChange={(e) => setEditedCommentText(e.target.value)}
+            disabled={actionLoading}
+            rows={3}
+          />
+          <div className="blog-detail-comment-actions">
+            <button
+              className="blog-detail-btn is-primary"
+              onClick={saveEditedComment}
+              disabled={!editedCommentText.trim() || actionLoading}
+            >
+              Save
+            </button>
+            <button
+              className="blog-detail-btn is-secondary"
+              onClick={cancelEditing}
               disabled={actionLoading}
-              rows={3}
-            />
-            <div>
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="blog-detail-comment-text">{comment.text}</div>
+      )}
+      {editingCommentId !== comment.id && (
+        <div className="blog-detail-comment-actions">
+          <button
+            type="button"
+            className={`blog-detail-btn is-like${comment.is_liked ? " is-active-red" : ""}`}
+            onClick={() => toggleCommentLike(comment.id)}
+            disabled={actionLoading}
+          >
+            ❤️ {comment.likes_count}
+          </button>
+          <button
+            type="button"
+            className="blog-detail-btn is-reply"
+            onClick={() => toggleReplyBox(comment.id)}
+            disabled={actionLoading}
+          >
+            Reply
+          </button>
+          {currentUserId === comment.author?.id && (
+            <>
               <button
-                className="btn btn-primary me-2"
-                onClick={saveEditedComment}
-                disabled={!editedCommentText.trim() || actionLoading}
-              >
-                Save
-              </button>
-              <button
-                className="btn btn-secondary"
-                onClick={cancelEditing}
+                type="button"
+                className="blog-detail-btn is-edit"
+                onClick={() => startEditing(comment)}
                 disabled={actionLoading}
               >
-                Cancel
+                Edit
               </button>
-            </div>
-          </>
-        ) : (
-          <p>{comment.text}</p>
-        )}
-
-        {editingCommentId !== comment.id && (
-          <div className="d-flex flex-wrap gap-2">
-            <button
-              type="button"
-              className={`btn btn-sm btn-outline-primary d-flex align-items-center gap-1 ${
-                comment.is_liked ? "active" : ""
-              }`}
-              onClick={() => toggleCommentLike(comment.id)}
-              disabled={actionLoading}
-            >
-              <span role="img" aria-label="like">
-                ❤️
-              </span>{" "}
-              {comment.likes_count}
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-sm btn-outline-secondary"
-              onClick={() => toggleReplyBox(comment.id)}
-              disabled={actionLoading}
-            >
-              Reply
-            </button>
-
-            {currentUserId === comment.author?.id && (
-              <>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline-warning"
-                  onClick={() => startEditing(comment)}
-                  disabled={actionLoading}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline-danger"
-                  onClick={() => deleteComment(comment.id)}
-                  disabled={actionLoading}
-                >
-                  Delete
-                </button>
-              </>
-            )}
-          </div>
-        )}
-
-        {showReplyBox[comment.id] && (
-          <div className="mt-3">
-            <textarea
-              className="form-control mb-2"
-              rows={2}
-              placeholder="Write a reply..."
-              value={replyText[comment.id] || ""}
-              onChange={(e) => handleReplyTextChange(comment.id, e.target.value)}
-              disabled={actionLoading}
-            />
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => handleReplySubmit(comment.id)}
-              disabled={!replyText[comment.id]?.trim() || actionLoading}
-            >
-              Post Reply
-            </button>
-          </div>
-        )}
-
-        {comment.replies &&
-          comment.replies.length > 0 &&
-          comment.replies.map((reply) => renderComment(reply, true))}
-      </div>
+              <button
+                type="button"
+                className="blog-detail-btn is-delete"
+                onClick={() => deleteComment(comment.id)}
+                disabled={actionLoading}
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      {showReplyBox[comment.id] && (
+        <div className="blog-detail-reply-box">
+          <textarea
+            className="blog-detail-comment-textarea"
+            rows={2}
+            placeholder="Write a reply..."
+            value={replyText[comment.id] || ""}
+            onChange={(e) => handleReplyTextChange(comment.id, e.target.value)}
+            disabled={actionLoading}
+          />
+          <button
+            className="blog-detail-btn is-primary"
+            onClick={() => handleReplySubmit(comment.id)}
+            disabled={!replyText[comment.id]?.trim() || actionLoading}
+          >
+            Post Reply
+          </button>
+        </div>
+      )}
+      {comment.replies &&
+        comment.replies.length > 0 &&
+        comment.replies.map((reply) => renderComment(reply, true))}
     </div>
   );
 
-  if (loading) return <div className="text-center py-5">Loading blog...</div>;
-  if (error) return <div className="alert alert-danger text-center">{error}</div>;
-  if (!blog) return <div className="alert alert-warning text-center">Blog not found.</div>;
+  if (loading) return <div className="blog-detail-loading">Loading blog...</div>;
+  if (error) return <div className="blog-detail-error">{error}</div>;
+  if (!blog) return <div className="blog-detail-warning">Blog not found.</div>;
 
   return (
-    <div className="container my-4">
-      <div className="card p-4 mb-5 shadow-sm">
-        <h1 className="display-4 mb-3">{blog.title}</h1>
-
-        <div className="d-flex align-items-center gap-3 mb-3">
+    <div className="blog-detail-container">
+      {/* Breadcrumbs */}
+      <nav className="blog-detail-breadcrumbs">
+        <Link to="/blogs">Blogs</Link>
+        <span className="blog-detail-breadcrumb-sep">/</span>
+        <span>{blog.title}</span>
+      </nav>
+      <div className="blog-detail-card">
+        <h1 className="blog-detail-title">{blog.title}</h1>
+        <div className="blog-detail-author">
           {blog.author?.profile_image && (
             <img
-              className="rounded-circle"
-              style={{ width: 60, height: 60, objectFit: "cover" }}
+              className="blog-detail-author-img"
               src={
                 blog.author.profile_image.startsWith("http")
                   ? blog.author.profile_image
@@ -435,54 +424,46 @@ export default function BlogDetail() {
             />
           )}
           <div>
-            <h5 className="text-primary mb-1">{blog.author?.username}</h5>
+            <span className="blog-detail-author-name">{blog.author?.username}</span>
             {blog.category_details && (
-              <Link to={`/blogs?category=${blog.category_details.id}`} className="badge bg-secondary text-decoration-none">
+              <Link to={`/blogs?category=${blog.category_details.id}`} className="blog-detail-category">
                 {blog.category_details.name}
               </Link>
             )}
           </div>
         </div>
-
         {blog.thumbnail && (
-          <img src={blog.thumbnail} alt={blog.title} className="img-fluid rounded mb-4 shadow-sm" />
+          <img src={blog.thumbnail} alt={blog.title} className="blog-detail-thumbnail" />
         )}
-
         <div
-          className="mb-4"
-          style={{ fontSize: "1.125rem", lineHeight: 1.6, color: "#444" }}
+          className="blog-detail-content"
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />
-
         {blog.tags && (
-          <div className="mb-3">
-            <strong>Tags: </strong>
+          <div className="blog-detail-tags">
             {blog.tags.split(",").map((tag, i) => (
-              <span key={i} className="badge bg-light text-secondary me-1">
+              <span key={i} className="blog-detail-tag">
                 #{tag.trim()}
               </span>
             ))}
           </div>
         )}
-
-        <div className="d-flex align-items-center gap-3 mb-5">
+        <div className="blog-detail-actions">
           <button
-            className={`btn btn-${liked ? "danger" : "primary"}`}
+            className={`blog-detail-like-btn${liked ? " is-active-red" : ""}`}
             onClick={handleLike}
             disabled={actionLoading}
           >
-            {liked ? "Liked" : "Like"} <span className="badge bg-light text-dark ms-2">{likesCount}</span>
+            {liked ? "Liked" : "Like"} <span>{likesCount}</span>
           </button>
-          <span className="text-muted">Views: {blog.views}</span>
+          <span className="blog-detail-views">Views: {blog.views}</span>
         </div>
       </div>
-
-      <div>
-        <h4 className="mb-3">Comments ({totalCount})</h4>
-
-        <form onSubmit={handleCommentSubmit} className="mb-4">
+      <div className="blog-detail-comments">
+        <h4>Comments ({totalCount})</h4>
+        <form onSubmit={handleCommentSubmit} className="blog-detail-comment-form">
           <textarea
-            className="form-control mb-2"
+            className="blog-detail-comment-textarea"
             rows={3}
             placeholder="Write a comment..."
             value={newComment}
@@ -492,46 +473,36 @@ export default function BlogDetail() {
           />
           <button
             type="submit"
-            className="btn btn-primary"
+            className="blog-detail-comment-submit"
             disabled={!newComment.trim() || actionLoading}
           >
             Post Comment
           </button>
         </form>
-
         {comments.length > 0 ? (
           comments.map((comment) => renderComment(comment))
         ) : (
-          <p className="text-muted fst-italic">No comments yet.</p>
+          <p className="blog-detail-no-comments">No comments yet.</p>
         )}
-
         {totalPages > 1 && (
-          <nav aria-label="Comments pagination">
-            <ul className="pagination justify-content-center gap-2 mt-4">
-              <li className={`page-item ${!prevPageUrl ? "disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-                  disabled={!prevPageUrl}
-                >
-                  Previous
-                </button>
-              </li>
-              <li className="page-item disabled">
-                <span className="page-link">
-                  Page {currentPage} of {totalPages}
-                </span>
-              </li>
-              <li className={`page-item ${!nextPageUrl ? "disabled" : ""}`}>
-                <button
-                  className="page-link"
-                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
-                  disabled={!nextPageUrl}
-                >
-                  Next
-                </button>
-              </li>
-            </ul>
+          <nav className="blog-detail-pagination">
+            <button
+              className={`blog-detail-pagination-btn${!prevPageUrl ? " is-disabled" : ""}`}
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={!prevPageUrl}
+            >
+              Previous
+            </button>
+            <span className="blog-detail-pagination-info">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              className={`blog-detail-pagination-btn${!nextPageUrl ? " is-disabled" : ""}`}
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={!nextPageUrl}
+            >
+              Next
+            </button>
           </nav>
         )}
       </div>
