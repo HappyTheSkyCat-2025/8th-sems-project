@@ -14,6 +14,7 @@ from reportlab.lib.pagesizes import letter
 from destinations.models import TravelDealDate
 from .models import Booking, BookingLocation
 from .serializers import BookingSerializer, BookingLocationSerializer
+from .emails import send_booking_success_email, send_booking_cancellation_email
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -104,6 +105,9 @@ class BookingPaymentUpdateAPIView(generics.UpdateAPIView):
         booking.transaction_id = data.get("transaction_id", booking.transaction_id)
         booking.status = "confirmed"
         booking.save()
+
+        # ✅ Send confirmation email
+        send_booking_success_email(booking)
 
         serializer = self.get_serializer(booking)
         return Response(serializer.data)
@@ -286,18 +290,24 @@ def download_invoice(request, id):
 # --------------------------
 
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([permissions.IsAuthenticated])
 def cancel_booking(request, booking_id):
     try:
         booking = Booking.objects.get(id=booking_id, user=request.user)
         if booking.can_be_canceled():
+            # Free up the date slot
             booking.date_option.capacity += booking.travellers
             booking.date_option.save()
+
             booking.cancel()
+
+            # ✅ Send cancellation email with manual refund info
+            send_booking_cancellation_email(booking)
+
             return Response({"message": "Booking canceled successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Booking cannot be canceled."}, status=status.HTTP_400_BAD_REQUEST)
-    except Booking.DoesNotExist:
+    except ObjectDoesNotExist:
         return Response({"error": "Booking not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
