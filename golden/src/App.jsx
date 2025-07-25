@@ -34,7 +34,7 @@ import Trending from "./components/trending";
 import Roof from "./components/roof";
 import Trip from "./components/trip";
 import Journal from "./components/journal";
-import Contact from "./components/Contact";
+
 
 // Pages
 import AboutUs from "./pages/Aboutus";
@@ -126,7 +126,7 @@ function Layout() {
           element={<DestDescription />}
         />
         <Route path="/about" element={<AboutUs />} />
-        <Route path="/contact" element={<Contact />} />
+
 
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
