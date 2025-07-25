@@ -42,7 +42,7 @@ export default function Navbar() {
   const [mobileView, setMobileView] = useState("main");
   const [mobileActiveRegion, setMobileActiveRegion] = useState(null);
   const [activeCountry, setActiveCountry] = useState(null);
-
+  const [move, setMove] = useState(false);
   useEffect(() => {
     axiosInstance.get("destinations/").then((res) => {
       const regionList = res.data.regions.map((r) => r.region_name);
@@ -178,7 +178,9 @@ export default function Navbar() {
                               setActiveRegion(r);
                               setActiveCountry(null);
                             }}
-                            className={activeRegion === r ? "region-active" : ""}
+                            className={
+                              activeRegion === r ? "region-active" : ""
+                            }
                             onMouseEnter={() => setActiveRegion(r)}
                           >
                             {r}
@@ -190,7 +192,8 @@ export default function Navbar() {
                     <div className="column countries-column">
                       <div className="countries-subcolumns">
                         {(() => {
-                          const countries = countriesByRegion[activeRegion] || [];
+                          const countries =
+                            countriesByRegion[activeRegion] || [];
                           const firstCol = countries.slice(0, 6);
                           const secondCol = countries.slice(6, 12);
                           return (
@@ -232,10 +235,15 @@ export default function Navbar() {
                         })()}
                       </div>
                       <button
-                        className="view-all-region-btn"
+                        className={`view-all-region-btn ${
+                          move ? "move-right" : ""
+                        }`}
                         onClick={() => {
+                          setMove(true);
                           setShowDestinations(false);
-                          navigate(`/destinations/${activeRegion.toLowerCase()}`);
+                          navigate(
+                            `/destinations/${activeRegion.toLowerCase()}`
+                          );
                         }}
                       >
                         View all {activeRegion}
@@ -247,13 +255,13 @@ export default function Navbar() {
                         <div className="featured-image-wrapper">
                           <img
                             src={baliImage}
-                            alt={activeCountry ? activeCountry.name : activeRegion}
+                            alt={
+                              activeCountry ? activeCountry.name : activeRegion
+                            }
                             className="featured-image"
                           />
                           <div className="featured-overlay">
-                            <div className="featured-title">
-                              {activeRegion}
-                            </div>
+                            <div className="featured-title">{activeRegion}</div>
                             <div className="featured-desc">
                               {activeCountry
                                 ? `Explore ${activeCountry.name} with all our heart and money.`
@@ -413,7 +421,11 @@ export default function Navbar() {
             <div className="language-switch">
               <IoLanguageOutline size={20} />
             </div>
-            <Link to="/profile" state={{ tab: "favourites" }} className="wishlist-icon">
+            <Link
+              to="/profile"
+              state={{ tab: "favourites" }}
+              className="wishlist-icon"
+            >
               <Heart size={18} />
             </Link>
             <div className="profile-dropdown">

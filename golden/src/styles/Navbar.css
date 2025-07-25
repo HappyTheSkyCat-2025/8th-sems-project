@@ -103,7 +103,7 @@
   border-radius: 0 0 20px 20px;
   overflow: hidden;
 }
-
+ 
 /* === Mega Menu Columns === */
 .column {
   flex: 1;
@@ -116,7 +116,7 @@
 /* Region active/hover styles */
 .column ul li.region-active,
 .column ul li:hover {
-  background: #222;
+  background: #777;
   color: #fff !important;
   font-weight: bold;
   border-radius: 8px;
@@ -178,8 +178,8 @@
 .featured-btn {
   display: inline-block;
   padding: 10px 22px;
-  background: #fff;
-  color: #222;
+  background: var(--highlight-color);
+  color: white;
   border: none;
   border-radius: 24px;
   font-size: 1rem;
@@ -189,10 +189,7 @@
   transition: background 0.2s, color 0.2s;
   cursor: pointer;
 }
-.featured-btn:hover {
-  background: #222;
-  color: #fff;
-}
+
 
 .mega-columns .column:first-child {
   border-left: none;
@@ -695,7 +692,7 @@
 .view-all-region-btn {
   margin-top: 8px;
   padding: 8px 18px;
-  background: #222;
+  background: var(--highlight-color);
   color: #fff;
   border: none;
   border-radius: 20px;
@@ -703,10 +700,6 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
-}
-.view-all-region-btn:hover {
-  background: #444;
-  color: #fff;
 }
 
 /* hide desktop nav & icons on very small screens (redundant safety) */
