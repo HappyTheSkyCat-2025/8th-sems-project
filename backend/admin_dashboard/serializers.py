@@ -154,8 +154,9 @@ class TravelDealSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
     category = DealCategorySerializer(read_only=True)
     places = PlaceSerializer(many=True, read_only=True)
-    gallery = TravelImageSerializer(many=True, read_only=True)
-    itinerary = ItineraryDaySerializer(many=True, read_only=True)
+    days = serializers.IntegerField(required=False)
+    gallery = TravelImageSerializer(many=True, required=False)
+    itinerary = ItineraryDaySerializer(many=True, required=False)
 
     class Meta:
         model = TravelDeal
@@ -163,8 +164,15 @@ class TravelDealSerializer(serializers.ModelSerializer):
             'id', 'title', 'subtitle', 'slug', 'days', 'price', 'image', 'themes', 'tag', 'style',
             'description', 'on_sale', 'last_minute', 'discount_percent',
             'included', 'not_included',
-            'country', 'category', 'places', 'gallery', 'itinerary', 'city', 'map_zoom'
+            'country', 'country_id',
+            'category', 'category_id',
+            'places', 'gallery', 'itinerary', 'city', 'map_zoom'
         ]
+        extra_kwargs = {
+            'days': {'required': False},
+            'gallery': {'required': False},
+            'itinerary': {'required': False},
+        }
 
 
 class WishlistItemSerializer(serializers.ModelSerializer):
@@ -210,12 +218,14 @@ class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
 
 
 class TravelDealDateSerializer(serializers.ModelSerializer):
+    travel_deal_title = serializers.SerializerMethodField()
+
     class Meta:
         model = TravelDealDate
-        fields = [
-            'id', 'start_date', 'end_date', 'language', 'guaranteed', 'rooms',
-            'original_price', 'discounted_price', 'discount_percent', 'capacity'
-        ]
+        fields = ['id', 'travel_deal', 'travel_deal_title', 'start_date', 'end_date']
+
+    def get_travel_deal_title(self, obj):
+        return obj.travel_deal.title if obj.travel_deal else None
 
 
 # ----------------------

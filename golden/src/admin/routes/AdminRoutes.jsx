@@ -5,6 +5,11 @@ import AdminDashboard from '../pages/AdminDashboard';
 import BlogList from '../pages/BlogList';
 import UserList from '../pages/UserList';
 import ContactList from "../pages/ContactList";
+import BookingList from '../pages/BookingList';
+import RegionList from '../pages/RegionList';
+import CountryList from '../pages/CountryList';
+import TravelDealList from '../pages/TravelDealList';
+import TravelDealDateList from '../pages/TravelDealDateList';
 
 const AdminRoutes = () => {
   return (
@@ -14,6 +19,11 @@ const AdminRoutes = () => {
         <Route path="users" element={<UserList />} />
         <Route path="blogs" element={<BlogList />} />
         <Route path="contacts" element={<ContactList />} />
+        <Route path="bookings" element={<BookingList />} />
+        <Route path="regions" element={<RegionList />} />
+        <Route path="countries" element={<CountryList />} />
+        <Route path="travel-deals" element={<TravelDealList />} />
+        <Route path="travel-deal-dates" element={<TravelDealDateList />} />
       </Route>
     </Routes>
   );

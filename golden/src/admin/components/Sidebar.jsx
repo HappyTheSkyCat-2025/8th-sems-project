@@ -9,7 +9,12 @@ const Sidebar = () => {
         <Link className="nav-link" to="/admin">Dashboard</Link>
         <Link className="nav-link" to="/admin/users">Users</Link>
         <Link className="nav-link" to="/admin/blogs">Blogs</Link>
-        <Link className="nav-link" to="/admin/contacts">contacts</Link>
+        <Link className="nav-link" to="/admin/contacts">Contacts</Link>
+        <Link className="nav-link" to="/admin/bookings">Bookings</Link> 
+        <Link className="nav-link" to="/admin/regions">Regions</Link>
+        <Link className="nav-link" to="/admin/countries">Countries</Link>
+        <Link className="nav-link" to="/admin/travel-deals">Travel Deals</Link>
+        <Link className="nav-link" to="/admin/travel-deal-dates">Travel Deal Dates</Link>
       </nav>
     </aside>
   );

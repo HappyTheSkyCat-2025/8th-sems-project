@@ -23,6 +23,8 @@ import ResetPassword from "./Auth/ResetPassword";
 import Profile from "./Auth/profile";
 import ChangePassword from "./Auth/ChangePassword";
 import BookingDetail from "./Auth/BookingDetail";
+import FavouritePackages from "./Auth/fav";
+import MyBookings from "./Auth/booking";
 
 // Home page sections
 import Home from "./components/Home";
@@ -157,6 +159,13 @@ function UserLayout() {
 
         {/* Search */}
         <Route path="/search" element={<Search />} />
+        
+        {/* Contact */}
+        <Route path="/contact" element={<Contact />} />
+        
+        {/* Wishlist and Bookings */}
+        <Route path="/wishlist" element={<FavouritePackages />} />
+        <Route path="/manage-booking" element={<MyBookings />} />
       </Routes>
 
       {!hideLayout && <Footer />}
