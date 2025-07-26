@@ -6,7 +6,8 @@ from .views import (
     ChangePasswordView,
     PasswordResetRequestView,
     PasswordResetConfirmView,
-    GoogleLoginView
+    GoogleLoginView,
+    NewsletterSubscriptionView
 )
 
 urlpatterns = [
@@ -29,4 +30,9 @@ urlpatterns = [
     # --------------------
     path('password-reset/request/', PasswordResetRequestView.as_view(), name='password-reset-request'),
     path('password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+
+    # --------------------
+    # Newsletter Subscription
+    # --------------------
+    path('newsletter/subscribe/', NewsletterSubscriptionView.as_view(), name='newsletter-subscribe'),
 ]

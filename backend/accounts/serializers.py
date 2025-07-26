@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 
-from .models import UserOTP, EmergencyContact
+from .models import NewsletterSubscriber, UserOTP, EmergencyContact
 
 User = get_user_model()
 
@@ -110,3 +110,9 @@ class EmergencyContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmergencyContact
         fields = '__all__'
+
+
+class NewsletterSubscriberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ['id', 'email', 'subscribed_at']

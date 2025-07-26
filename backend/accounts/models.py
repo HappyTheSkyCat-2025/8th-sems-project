@@ -40,9 +40,11 @@ class UserOTP(models.Model):
     otp = models.CharField(max_length=6)
     otp_type = models.CharField(max_length=20, choices=OTP_TYPE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField(blank=True)
+    expires_at = models.DateTimeField(blank=True, null=True)  # Allow null in DB
 
     def is_expired(self):
+        if self.expires_at is None:
+            return False  # Treat no expiry date as not expired
         return timezone.now() > self.expires_at
 
     def save(self, *args, **kwargs):
@@ -69,3 +71,10 @@ class EmergencyContact(models.Model):
 
     def __str__(self):
         return f"Emergency Contact for {self.user.username}"
+
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
