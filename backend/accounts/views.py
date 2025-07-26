@@ -17,6 +17,7 @@ from .serializers import (
     ChangePasswordSerializer,
     PasswordResetRequestSerializer,
     PasswordResetConfirmSerializer,
+    NewsletterSubscriberSerializer
 )
 
 User = get_user_model()
@@ -239,4 +240,18 @@ class PasswordResetConfirmView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Password has been reset successfully."})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# ----------------------------------------
+# 📰 Newsletter Subscription
+# ----------------------------------------
+
+class NewsletterSubscriptionView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = NewsletterSubscriberSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Subscribed to newsletter successfully."})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

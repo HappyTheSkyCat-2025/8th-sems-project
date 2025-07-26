@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axiosInstance from "../utils/axiosInstance";
 import {
   FaFacebookF,
   FaTwitter,
@@ -11,15 +12,28 @@ import "../styles/footer.css";
 export default function Footer() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
+
     if (!email || !email.includes("@")) {
       setMessage("Please enter a valid email.");
+      setIsError(true);
       return;
     }
-    setMessage("Thank you for subscribing!");
-    setEmail("");
+
+    try {
+      const response = await axiosInstance.post("accounts/newsletter/subscribe/", { email });
+      setMessage(response.data.message || "Thank you for subscribing!");
+      setIsError(false);
+      setEmail("");
+    } catch (error) {
+      setMessage(
+        error.response?.data?.email?.[0] || "Subscription failed. Try again."
+      );
+      setIsError(true);
+    }
   };
 
   return (
@@ -84,8 +98,8 @@ export default function Footer() {
               <button type="submit">📩</button>
             </div>
             {message && (
-              <p className={`subscription-message ${message.includes("valid") ? "error" : "success"}`}>
-                {message.includes("valid") && <BiErrorCircle className="error-icon" />}
+              <p className={`subscription-message ${isError ? "error" : "success"}`}>
+                {isError && <BiErrorCircle className="error-icon" />}
                 {message}
               </p>
             )}
