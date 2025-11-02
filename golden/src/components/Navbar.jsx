@@ -38,14 +38,11 @@ export default function Navbar() {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [showSearchIcon, setShowSearchIcon] = useState(false);
 
-  const [searchQuery, setSearchQuery] = useState("");
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileView, setMobileView] = useState("main");
   const [mobileActiveRegion, setMobileActiveRegion] = useState(null);
   const [activeCountry, setActiveCountry] = useState(null);
   const [move, setMove] = useState(false);
-
   useEffect(() => {
     axiosInstance.get("destinations/").then((res) => {
       const regionList = res.data.regions.map((r) => r.region_name);
@@ -82,11 +79,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => setShowSearchIcon(window.scrollY > 100);
-    if (location.pathname !== "/") {
-      setShowSearchIcon(true);
-    } else {
-      window.addEventListener("scroll", handleScroll);
-    }
+    if (location.pathname !== "/") setShowSearchIcon(true);
+    else window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [location.pathname]);
 
@@ -134,20 +128,12 @@ export default function Navbar() {
     else setMobileView("main");
   };
 
-  const submitSearch = (e) => {
-    e.preventDefault();
-    const q = searchQuery.trim();
-    if (!q) return;
-    navigate(`/search?query=${encodeURIComponent(q)}`);
-    setShowSearchBar(false);
-  };
-
   return (
     <>
       <header className="navbar">
         <div className="navbar-container">
           <div className="navbar-logo" onClick={handleLogoClick}>
-          <img src={logo} alt="Golden Leaf Travels" />
+            <img src={logo} alt="Golden Leaf Travels" />
             <span>
               Golden Leaf
               <br />
@@ -192,7 +178,9 @@ export default function Navbar() {
                               setActiveRegion(r);
                               setActiveCountry(null);
                             }}
-                            className={activeRegion === r ? "region-active" : ""}
+                            className={
+                              activeRegion === r ? "region-active" : ""
+                            }
                             onMouseEnter={() => setActiveRegion(r)}
                           >
                             {r}
@@ -204,7 +192,8 @@ export default function Navbar() {
                     <div className="column countries-column">
                       <div className="countries-subcolumns">
                         {(() => {
-                          const countries = countriesByRegion[activeRegion] || [];
+                          const countries =
+                            countriesByRegion[activeRegion] || [];
                           const firstCol = countries.slice(0, 6);
                           const secondCol = countries.slice(6, 12);
                           return (
@@ -215,7 +204,7 @@ export default function Navbar() {
                                     <Link
                                       to={`/destinations/${c.slug}`}
                                       className="plain-link"
-                                      onClick={() => {
+                                      onClick={(e) => {
                                         setActiveCountry(c);
                                         setShowDestinations(false);
                                       }}
@@ -231,12 +220,12 @@ export default function Navbar() {
                                     <Link
                                       to={`/destinations/${c.slug}`}
                                       className="plain-link"
-                                      onClick={() => {
+                                      onClick={(e) => {
                                         setActiveCountry(c);
                                         setShowDestinations(false);
                                       }}
                                     >
-                                      {c.name}
+                                      {c.name} 
                                     </Link>
                                   </li>
                                 ))}
@@ -246,11 +235,15 @@ export default function Navbar() {
                         })()}
                       </div>
                       <button
-                        className={`view-all-region-btn ${move ? "move-right" : ""}`}
+                        className={`view-all-region-btn ${
+                          move ? "move-right" : ""
+                        }`}
                         onClick={() => {
                           setMove(true);
                           setShowDestinations(false);
-                          navigate(`/destinations/${activeRegion.toLowerCase()}`);
+                          navigate(
+                            `/destinations/${activeRegion.toLowerCase()}`
+                          );
                         }}
                       >
                         View all {activeRegion}
@@ -262,7 +255,9 @@ export default function Navbar() {
                         <div className="featured-image-wrapper">
                           <img
                             src={baliImage}
-                            alt={activeCountry ? activeCountry.name : activeRegion}
+                            alt={
+                              activeCountry ? activeCountry.name : activeRegion
+                            }
                             className="featured-image"
                           />
                           <div className="featured-overlay">
@@ -382,7 +377,8 @@ export default function Navbar() {
                     <div className="column image-column">
                       <img src={baliImage} alt={activeDealCategory} />
                       <p className="image-description">
-                        Grab hot deals in <strong>{activeDealCategory}</strong> now!
+                        Grab hot deals in <strong>{activeDealCategory}</strong>{" "}
+                        now!
                       </p>
                       <Link
                         to={`/deals/${activeDealCategory.toLowerCase()}`}
@@ -461,28 +457,17 @@ export default function Navbar() {
         {/* Search Bar */}
         {showSearchBar && (
           <div className="search-bar-wrapper">
-            <form className="search-bar-form" onSubmit={submitSearch}>
-              <input
-                type="text"
-                placeholder="Search destinations, deals..."
-                autoFocus
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Escape") setShowSearchBar(false);
-                }}
-              />
-              <button type="submit" className="search-submit-btn">
-                <Search size={18} />
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowSearchBar(false)}
-                className="search-close-btn"
-              >
-                ×
-              </button>
-            </form>
+            <input
+              type="text"
+              placeholder="Search destinations, deals..."
+              autoFocus
+            />
+            <button
+              onClick={() => setShowSearchBar(false)}
+              className="search-close-btn"
+            >
+              ×
+            </button>
           </div>
         )}
       </header>
@@ -544,11 +529,7 @@ export default function Navbar() {
             </li>
             <li>
               <Phone size={18} />{" "}
-              <Link
-                to="/contact"
-                className="with-icon"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link to="/contact" className="with-icon" onClick={() => setIsMobileMenuOpen(false)}>
                 Contact Us
               </Link>
             </li>
@@ -612,20 +593,20 @@ export default function Navbar() {
 
         {mobileView === "deals" && (
           <>
-          <h2 className="mobile-subtitle">Deals</h2>
-          <ul className="mobile-menu-list sub">
-            {dealCategories.map((d) => (
-              <li key={d}>
-                <Link
-                  to={`/deals/${d.toLowerCase()}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {d}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </>
+            <h2 className="mobile-subtitle">Deals</h2>
+            <ul className="mobile-menu-list sub">
+              {dealCategories.map((d) => (
+                <li key={d}>
+                  <Link
+                    to={`/deals/${d.toLowerCase()}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {d}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </aside>
     </>
