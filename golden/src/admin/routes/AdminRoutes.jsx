@@ -10,6 +10,7 @@ import RegionList from '../pages/RegionList';
 import CountryList from '../pages/CountryList';
 import TravelDealList from '../pages/TravelDealList';
 import TravelDealDateList from '../pages/TravelDealDateList';
+import Newsletter from '../pages/Newsletter'; 
 
 const AdminRoutes = () => {
   return (
@@ -17,6 +18,7 @@ const AdminRoutes = () => {
       <Route path="/" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<UserList />} />
+        <Route path="Newsletter" element={<Newsletter />} />  
         <Route path="blogs" element={<BlogList />} />
         <Route path="contacts" element={<ContactList />} />
         <Route path="bookings" element={<BookingList />} />

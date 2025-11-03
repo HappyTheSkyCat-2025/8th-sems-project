@@ -3,7 +3,7 @@ import React from 'react';
 const Header = () => {
   return (
     <header className="admin-header">
-      <h2>Admin Dashboard</h2>
+      <h2>Admin sites</h2>
     </header>
   );
 };

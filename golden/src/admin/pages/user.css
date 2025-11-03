@@ -1,31 +1,38 @@
+.user-container {
+  padding: 20px;
+}
+
 .user-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   background: #fff;
   box-shadow: 0 0 8px rgba(0,0,0,0.05);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .user-table th, .user-table td {
   padding: 12px 16px;
-  border: 1px solid #ddd;
-  text-align: left;
+  border-bottom: 1px solid #ddd;
+  text-align: left; 
 }
 
 .user-table th {
   background-color: #f5f5f5;
 }
 
-.edit-btn, .delete-btn, .create-btn {
+.details-btn, .delete-btn {
   padding: 6px 10px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   margin-right: 5px;
+  font-size: 0.9rem;
 }
 
-.edit-btn {
-  background-color: #007bff;
+.details-btn {
+  background-color: #17a2b8;
   color: white;
 }
 
@@ -34,49 +41,78 @@
   color: white;
 }
 
-.create-btn {
-  background-color: #28a745;
-  color: white;
-  margin-bottom: 10px;
+/* Profile Image */
+.profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
 }
 
-.pagination {
-  margin-top: 20px;
-}
-
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
   display: flex; align-items: center; justify-content: center;
   z-index: 999;
+  padding: 10px; /* prevent full width on small screens */
 }
 
 .modal-box {
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  min-width: 300px;
+  width: 400px; /* fixed width for desktop */
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.modal-box form {
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-box input {
-  margin-bottom: 10px;
-  padding: 8px;
-  font-size: 1rem;
-}
-
-.modal-box button {
+.modal-box img.profile-img-modal {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   margin-top: 10px;
-  padding: 8px;
-  font-size: 1rem;
 }
 
 .cancel-btn {
+  margin-top: 10px;
   background-color: gray;
   color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Desktop-only */
+.desktop-only {
+  display: table-cell;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .user-table th, .user-table td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .details-btn, .delete-btn {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+
+  .modal-box {
+    width: 350px; /* maintain size on mobile */
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+
+  .modal-box img.profile-img-modal {
+    width: 80px;
+    height: 80px;
+  }
 }

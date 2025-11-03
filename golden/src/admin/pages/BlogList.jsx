@@ -1,135 +1,109 @@
-import React, { useEffect, useState } from "react";
-import {
-  getBlogs,
-  deleteBlog,
-  createBlog,
-  updateBlog,
-  getBlog,
-} from "../api/blogApi";
-import BlogForm from "../components/BlogForm";
+import React, { useState } from "react";
 import "./blog.css";
 
 const BlogList = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [next, setNext] = useState(null);
-  const [previous, setPrevious] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [selectedBlog, setSelectedBlog] = useState(null);
+  const [blogs, setBlogs] = useState([
+    { id: 1, title: "Summer in Bali", author: "John Doe", category: "Travel", status: "Published", country: "Indonesia" },
+    { id: 2, title: "Mountain Trekking", author: "Jane Smith", category: "Adventure", status: "Draft", country: "Nepal" },
+    { id: 3, title: "City Guide: Paris", author: "Alice Brown", category: "Travel", status: "Published", country: "France" },
+    { id: 4, title: "Local Cuisine", author: "Bob White", category: "Food", status: "Published", country: "Italy" },
+  ]);
 
-  const fetchBlogs = async (url = null) => {
-    try {
-      const res = await getBlogs(url);
-      setBlogs(res.data.results);
-      setNext(res.data.next);
-      setPrevious(res.data.previous);
-    } catch (err) {
-      console.error("Failed to fetch blogs", err);
-    }
-  };
+  const [categories, setCategories] = useState(["All", "Travel", "Adventure", "Food", "Culture", "Lifestyle"]);
+  const [filterCategory, setFilterCategory] = useState("All");
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
 
-  const handleDelete = async (id) => {
+  const filteredBlogs = filterCategory === "All"
+    ? blogs
+    : blogs.filter(blog => blog.category === filterCategory);
+
+  const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
-      try {
-        await deleteBlog(id);
-        setBlogs((prev) => prev.filter((blog) => blog.id !== id));
-      } catch (err) {
-        console.error("Failed to delete blog", err);
-      }
+      setBlogs(blogs.filter(blog => blog.id !== id));
     }
   };
 
-  const handleSave = async (formData) => {
-    try {
-      if (selectedBlog && selectedBlog.id) {
-        await updateBlog(selectedBlog.id, formData);
-      } else {
-        await createBlog(formData);
-      }
-      setShowForm(false);
-      setSelectedBlog(null);
-      fetchBlogs();
-    } catch (err) {
-      console.error("Failed to save blog", err);
+  const handleAddCategory = () => {
+    if (newCategory.trim() !== "" && !categories.includes(newCategory.trim())) {
+      setCategories([...categories, newCategory.trim()]);
+      setNewCategory("");
+      setShowAddCategory(false);
     }
   };
-
-  const handleEdit = async (id) => {
-    try {
-      const res = await getBlog(id);
-      setSelectedBlog(res.data);
-      setShowForm(true);
-    } catch (err) {
-      console.error("Failed to load blog", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
 
   return (
-    <div>
+    <div className="blog-container">
       <h2>Blog Management</h2>
-      <button
-        className="create-btn"
-        onClick={() => {
-          setSelectedBlog(null);
-          setShowForm(true);
-        }}
-      >
-        + Create Blog
-      </button>
 
-      <table className="blog-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Status</th>
-            <th>Views</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {blogs.map((b) => (
-            <tr key={b.id}>
-              <td>{b.id}</td>
-              <td>{b.title}</td>
-              <td>{b.author}</td>
-              <td>{b.status}</td>
-              <td>{b.views}</td>
-              <td>
-                <button
-                  onClick={() => handleEdit(b.id)}
-                  className="edit-btn"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(b.id)}
-                  className="delete-btn"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="blog-controls">
+        <div className="category-dropdown">
+          <label htmlFor="category">Filter by Category: </label>
+          <select
+            id="category"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            {categories.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+          <button 
+            className="add-category-btn" 
+            onClick={() => setShowAddCategory(!showAddCategory)}
+          >
+            + Add Category
+          </button>
+        </div>
 
-      <div className="pagination">
-        {previous && <button onClick={() => fetchBlogs(previous)}>← Previous</button>}
-        {next && <button onClick={() => fetchBlogs(next)}>Next →</button>}
+        {showAddCategory && (
+          <div className="add-category-form">
+            <input 
+              type="text" 
+              value={newCategory} 
+              onChange={(e) => setNewCategory(e.target.value)} 
+              placeholder="New Category"
+            />
+            <button onClick={handleAddCategory}>Save</button>
+          </div>
+        )}
       </div>
 
-      {showForm && (
-        <BlogForm
-          blog={selectedBlog}
-          onSave={handleSave}
-          onClose={() => setShowForm(false)}
-        />
-      )}
+      <div className="table-wrapper">
+        <table className="blog-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Country</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredBlogs.map(blog => (
+              <tr key={blog.id}>
+                <td data-label="Title">{blog.title}</td>
+                <td data-label="Author">{blog.author}</td>
+                <td data-label="Category">{blog.category}</td>
+                <td data-label="Status">{blog.status}</td>
+                <td data-label="Country">{blog.country}</td>
+                <td data-label="Actions">
+                  <button className="delete-btn" onClick={() => handleDelete(blog.id)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+            {filteredBlogs.length === 0 && (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  No blogs found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
