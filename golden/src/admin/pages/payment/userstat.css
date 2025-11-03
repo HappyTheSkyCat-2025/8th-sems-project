@@ -1,0 +1,167 @@
+/* ------------------------------
+   User Status Table Styles
+--------------------------------*/
+
+.userstat-container {
+  padding: 2rem;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  color: #0f172a;
+}
+
+.userstat-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.userstat-desc {
+  color: #64748b;
+  margin-bottom: 1.5rem;
+}
+
+/* --- Table --- */
+.userstat-table-wrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.userstat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.userstat-table th,
+.userstat-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.userstat-table th {
+  background: #f1f5f9;
+  color: #334155;
+  font-weight: 600;
+}
+
+.userstat-table td {
+  color: #475569;
+}
+
+/* --- Buttons --- */
+.btn-details,
+.btn-delete,
+.btn-close {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-right: 6px;
+}
+
+.btn-details {
+  background: #38bdf8;
+  color: white;
+}
+
+.btn-details:hover {
+  background: #0ea5e9;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}
+
+.btn-close {
+  background: #64748b;
+  color: white;
+  margin-top: 1rem;
+}
+
+.btn-close:hover {
+  background: #475569;
+}
+
+/* --- Modal --- */
+.userstat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.userstat-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s ease;
+}
+
+.userstat-modal h3 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.userstat-modal p {
+  color: #334155;
+  margin: 4px 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Mobile View --- */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  .userstat-table th,
+  .userstat-table td {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .userstat-table th:first-child,
+  .userstat-table td:first-child {
+    width: 60%;
+  }
+
+  .btn-details,
+  .btn-delete {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+
+  .userstat-modal {
+    width: 95%;
+  }
+}

@@ -1,6 +1,7 @@
 /* ------------------------------
-   Modern Travel Admin Sidebar
+   Modern Travel Admin Sidebar (Updated)
 --------------------------------*/
+
 * {
   box-sizing: border-box;
 }
@@ -14,8 +15,8 @@ body {
 /* --- Sidebar Container --- */
 .custom-sidebar {
   position: fixed;
-  left: 0;
   top: 0;
+  left: 0;
   height: 100vh;
   width: 260px;
   background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
@@ -28,7 +29,6 @@ body {
   overflow-y: auto;
 }
 
-/* Open State */
 .custom-sidebar.open {
   transform: translateX(0);
 }
@@ -52,43 +52,113 @@ body {
   color: #94a3b8;
 }
 
-/* --- Nav Links --- */
+/* --- Nav --- */
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px; /* increased vertical spacing */
 }
 
+/* --- Nav Items --- */
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 12px; /* slightly larger horizontal gap */
+  padding: 13px 14px;
   color: #cbd5e1;
   text-decoration: none;
   border-radius: 8px;
   transition: all 0.3s ease;
-  font-size: 0.95rem;
+  font-size: 0.96rem;
+  cursor: pointer;
+}
+
+.nav-item svg {
+  width: 22px; /* increased icon size */
+  height: 22px;
 }
 
 .nav-item:hover {
   background: rgba(56, 189, 248, 0.1);
   color: #38bdf8;
-  transform: translateX(5px);
 }
 
 .nav-item.active {
   background: #38bdf8;
   color: #ffffff;
   font-weight: 600;
-  box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3);
+}
+
+/* --- Dropdown Group --- */
+.dropdown-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* matches main nav gap */
+}
+
+/* --- Dropdown Header --- */
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 14px;
+  color: #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.dropdown-header svg:first-child {
+  width: 22px; /* match icon size */
+  height: 22px;
+  margin-right: 12px; /* match icon-text gap */
+  flex-shrink: 0;
+}
+
+.dropdown-header:hover {
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+}
+
+/* Chevron */
+.dropdown-header .chevron {
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+.chevron.rotate {
+  transform: rotate(180deg);
+}
+
+/* --- Dropdown Items --- */
+.dropdown-items.single-line {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 4px;
+  margin-left: 12px;
+}
+
+.dropdown-items.single-line a {
+  padding: 7px 10px;
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.dropdown-items.single-line a:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
 }
 
 /* --- Toggle Button --- */
 .sidebar-toggle {
   position: fixed;
   top: 15px;
-  right: 50px; /* when sidebar is closed */
+  right: 2px;
   background: #38bdf8;
   color: white;
   border: none;
@@ -97,19 +167,18 @@ body {
   z-index: 2100;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
 }
-
 
 .sidebar-toggle:hover {
-  transform: scale(1.05);
   background: #0ea5e9;
+  transform: scale(1.05);
 }
 
-/* --- Overlay for mobile --- */
+/* --- Overlay --- */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -120,7 +189,7 @@ body {
   z-index: 1900;
 }
 
-/* --- Scrollbar Styling --- */
+/* --- Scrollbar --- */
 .custom-sidebar::-webkit-scrollbar {
   width: 8px;
 }
@@ -137,8 +206,8 @@ body {
   .sidebar-toggle {
     display: none;
   }
-
   .custom-sidebar {
+    left: 0;
     transform: translateX(0);
     position: sticky;
   }
