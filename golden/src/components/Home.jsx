@@ -23,9 +23,7 @@ export default function Home() {
   const onStartDateChange = (date) => {
     setStartDate(date);
     setEndDateError("");
-    if (endDate && date && endDate < date) {
-      setEndDate(null);
-    }
+    if (endDate && date && endDate < date) setEndDate(null);
   };
 
   const onEndDateChange = (date) => {
@@ -54,40 +52,43 @@ export default function Home() {
   };
 
   return (
-    <section className="home-section">
+    <section className="home">
       <video autoPlay muted loop className="home-video">
         <source src={homevid1} type="video/mp4" />
       </video>
-      <div className="overlay">
+
+      <div className="home-overlay">
         <div className="home-content">
-          <h1 className="hero-title">Find Your Perfect Journey</h1>
-          <p className="hero-description">
+          <h1 className="home-title">Find Your Perfect Journey</h1>
+          <p className="home-subtitle">
             Explore handpicked destinations and customize your travel experiences. Where will you go next?
           </p>
- 
-          <div className="search-field-wrapper">
-            <div className="search-field-container">
-              <div className="search-boxes">
-                <MapPin size={18} className="icon" />
+
+          <div className="home-search-wrapper">
+            <div className="home-search-bar">
+              {/* Search Box */}
+              <div className="home-search-input">
+                <MapPin size={18} className="home-icon" />
                 <input
                   type="text"
-                  placeholder="Search"
+                  placeholder="Search destination"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
 
-              <div className="vertical-separator"></div>
+              <div className="home-divider"></div>
 
-              <div className="date-inline-box">
-                <div className="date-inline-field" ref={startDateRef}>
-                  <Calendar size={16} className="calendar-icon" />
+              {/* Date Range */}
+              <div className="home-date-box">
+                <div className="home-date-field" ref={startDateRef}>
+                  <Calendar size={16} className="home-calendar-icon" />
                   <DatePicker
                     selected={startDate}
                     onChange={onStartDateChange}
                     placeholderText="Start date"
                     dateFormat="MM/dd/yyyy"
-                    className="inline-datepicker"
+                    className="home-datepicker"
                     autoComplete="off"
                     onKeyDown={(e) => e.preventDefault()}
                     minDate={new Date()}
@@ -98,17 +99,17 @@ export default function Home() {
                   />
                 </div>
 
-                <span className="separator">—</span>
+                <span className="home-date-separator">—</span>
 
-                <div className="date-inline-field end-date-wrapper" ref={endDateRef}>
-                  <Calendar size={16} className="calendar-icon" />
+                <div className="home-date-field" ref={endDateRef}>
+                  <Calendar size={16} className="home-calendar-icon" />
                   <DatePicker
                     selected={endDate}
                     onChange={onEndDateChange}
                     onCalendarOpen={onEndCalendarOpen}
                     placeholderText="End date"
                     dateFormat="MM/dd/yyyy"
-                    className="inline-datepicker"
+                    className="home-datepicker"
                     autoComplete="off"
                     onKeyDown={(e) => e.preventDefault()}
                     minDate={startDate || new Date()}
@@ -120,13 +121,13 @@ export default function Home() {
                 </div>
               </div>
 
-              <button className="search-btn" onClick={handleSearch}>
+              <button className="home-search-btn" onClick={handleSearch}>
                 Search <Search size={16} />
               </button>
             </div>
 
             {endDateError && (
-              <div className="error-popup" role="alert">
+              <div className="home-error" role="alert">
                 <AlertCircle size={16} />
                 <span>{endDateError}</span>
               </div>

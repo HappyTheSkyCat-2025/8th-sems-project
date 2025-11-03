@@ -42,7 +42,7 @@ export default function WhyGolden() {
           >
             Read More About Our Story
           </button>
-        </div>
+        </div> 
 
         <div className="why-golden-image">
           <img src={img2} alt="Why Golden" />

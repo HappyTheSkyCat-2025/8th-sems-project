@@ -15,9 +15,9 @@ export default function TripStyles() {
         {trips.map((trip) => (
           <div key={trip.id} className="tripstyles-card">
             <img src={trip.image} alt={trip.title} className="tripstyles-img" />
+            <div className="tripstyles-fade" />
             <h3 className="tripstyles-card-title">{trip.title}</h3>
             <p className="tripstyles-card-description">{trip.description}</p>
-            
           </div>
         ))}
       </div>

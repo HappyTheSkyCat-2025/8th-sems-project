@@ -38,7 +38,7 @@
   justify-items: center;
 }
 
-/* Card layout with image background and overlay text */
+/* Card layout */
 .tripstyles-card {
   position: relative;
   height: 320px;
@@ -63,11 +63,20 @@
   width: 100%;
   object-fit: cover;
   z-index: 1;
-} 
+}
 
-/* Dark overlay */
+/* Black vintage fade at bottom */
+.tripstyles-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 60%;
+  width: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  z-index: 2;
+}
 
-/* Text on top of image */
+/* Text styling */
 .tripstyles-card-title,
 .tripstyles-card-description {
   position: relative;
@@ -81,7 +90,7 @@
 .tripstyles-card-title {
   font-size: 0.9rem;
   font-weight: 400;
-  margin-top: 230px; /* adjust if needed */
+  margin-top: 230px;
   margin-bottom: 6px;
 }
 
@@ -90,8 +99,6 @@
   line-height: 1.4;
   font-weight: 300;
 }
-
-
 
 /* Responsive */
 @media (max-width: 1024px) {

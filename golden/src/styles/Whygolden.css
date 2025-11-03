@@ -64,7 +64,6 @@
 }
 .read-more-btn:hover {
   background: var(--primary-dark);
-  border: 2px solid var(--primary-dark);
   color: #fff;
 }
 
