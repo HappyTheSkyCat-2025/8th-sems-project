@@ -1,14 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../../utils/axiosInstance";
 
 const Region = () => {
-  const [regions, setRegions] = useState([
-    { id: 1, name: "Asia" },
-    { id: 2, name: "Europe" },
-    { id: 3, name: "North America" },
-  ]);
-
+  const [regions, setRegions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [current, setCurrent] = useState({ id: null, name: "" });
+
+  const REGION_API = "admin-dashboard/regions/";
+
+  // Fetch regions
+  const fetchRegions = async () => {
+    setLoading(true);
+    try {
+      const res = await axiosInstance.get(REGION_API);
+      const data = res.data.results || res.data;
+      setRegions(data);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load regions. Are you an admin?");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRegions();
+  }, []);
 
   const openAddModal = () => {
     setCurrent({ id: null, name: "" });
@@ -27,20 +46,36 @@ const Region = () => {
     setCurrent((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    if (current.id) {
-      setRegions((prev) =>
-        prev.map((r) => (r.id === current.id ? current : r))
-      );
-    } else {
-      setRegions((prev) => [...prev, { ...current, id: Date.now() }]);
+  const handleSave = async () => {
+    try {
+      if (current.id) {
+        await axiosInstance.put(`${REGION_API}${current.id}/`, current);
+      } else {
+        await axiosInstance.post(REGION_API, current);
+      }
+      fetchRegions();
+      setModalOpen(false);
+      setCurrent({ id: null, name: "" });
+    } catch (err) {
+      console.error("Failed to save region", err);
+      alert("Failed to save region.");
     }
-    setModalOpen(false);
   };
 
-  const handleDelete = (id) => {
-    setRegions(regions.filter((r) => r.id !== id));
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this region?")) {
+      try {
+        await axiosInstance.delete(`${REGION_API}${id}/`);
+        setRegions(regions.filter((r) => r.id !== id));
+      } catch (err) {
+        console.error("Failed to delete region", err);
+        alert("Failed to delete region.");
+      }
+    }
   };
+
+  if (loading) return <p>Loading regions...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="region-container">
@@ -244,12 +279,8 @@ const Region = () => {
             <tr key={r.id}>
               <td>{r.name}</td>
               <td>
-                <button className="edit-btn" onClick={() => openEditModal(r)}>
-                  Edit
-                </button>
-                <button className="delete-btn" onClick={() => handleDelete(r.id)}>
-                  Delete
-                </button>
+                <button className="edit-btn" onClick={() => openEditModal(r)}>Edit</button>
+                <button className="delete-btn" onClick={() => handleDelete(r.id)}>Delete</button>
               </td>
             </tr>
           ))}

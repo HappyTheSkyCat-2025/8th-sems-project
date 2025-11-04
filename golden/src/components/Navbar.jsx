@@ -167,7 +167,7 @@ export default function Navbar() {
               </span>
               {showDestinations && activeRegion && (
                 <div className="mega-menu-dest">
-                  <div className="mega-columns">
+                  <div className="mega-columns"> 
                     {/* Regions column */}
                     <div className="column">
                       <ul>

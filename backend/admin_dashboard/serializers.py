@@ -97,13 +97,16 @@ class RegionSerializer(serializers.ModelSerializer):
 
 
 class CountrySerializer(serializers.ModelSerializer):
-    region = RegionSerializer(read_only=True)
+    region = RegionSerializer(read_only=True)  # for GET
+    region_id = serializers.PrimaryKeyRelatedField(
+        queryset=Region.objects.all(), write_only=True, source='region'
+    )  # for POST/PUT
 
     class Meta:
         model = Country
         fields = [
             'id', 'name', 'code', 'currency_code', 'slug', 'subtitle',
-            'section_title', 'description', 'image', 'video', 'region'
+            'section_title', 'description', 'image', 'video', 'region', 'region_id'
         ]
 
 

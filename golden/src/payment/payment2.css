@@ -18,11 +18,11 @@
   flex-direction: column;
   align-items: center;
   color: #999;
-  position: relative; 
+  position: relative;
   font-weight: 500;
 }
 
-/* Remove the extra circle below each step */
+/* Remove extra circles below steps */
 .step::after,
 .step.done::after,
 .step.current::after {
@@ -78,7 +78,6 @@
   border-left: 8px solid #e0b200;
   padding: 20px 24px;
   border-radius: 6px;
-  box-shadow: none;
   margin-bottom: 18px;
   cursor: default;
 }
@@ -127,6 +126,7 @@
   border: 1px solid #e5e5e5;
   margin-bottom: 22px;
 }
+
 .room-options h3,
 .prepost-section h3,
 .additional-services h3,
@@ -136,12 +136,20 @@
   margin-bottom: 12px;
   color: #111;
 }
-.room-options form {
+
+/* Radio & Checkbox Groups */
+.room-radio-group,
+.additional-services form,
+.donation-box form {
   display: flex;
   flex-direction: column;
   gap: 16px;
   margin-top: 10px;
 }
+
+/* Labels for radio/checkbox (aligned perfectly) */
+.room-radio-label,
+.checkbox-label,
 .room-options label,
 .additional-services label,
 .donation-box label {
@@ -151,28 +159,43 @@
   cursor: pointer;
   font-size: 1rem;
   color: #222;
-  flex-wrap: wrap;
-  padding: 10px 0;
-  width: auto;
+  font-weight: 500;
+  padding: 8px 0;
+  line-height: 1.4;
 }
 
+.room-radio-label input[type="radio"],
+.checkbox-label input[type="checkbox"],
 .room-options label input[type="radio"],
 .additional-services label input[type="checkbox"],
 .donation-box label input[type="checkbox"] {
-  margin-right: 10px;
-  margin-left: 0;
+  accent-color: var(--primary-color);
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  transform: translateY(1px); /* perfect alignment with text */
 }
 
+.room-radio-label .room-option,
+.checkbox-label .checkbox-option,
+.room-options .room-option {
+  display: inline-block;
+  max-width: 100%;
+  word-break: break-word;
+  color: #222;
+}
+
+/* Text & Price Styling */
 .room-option {
   font-weight: 500;
-  color: #222;
 }
 .price {
   color: #222;
   font-weight: 600;
 }
 
-/* Extras */
+/* Extras Section */
 .prepost-info {
   background: #f8f8f8;
   padding: 1rem;
@@ -194,26 +217,10 @@
   font-size: 1rem;
   transition: background 0.2s, border 0.2s;
 }
+
 .prepost-section button.extras-btn:hover {
   background: #f7f7f7;
   border-color: #888;
-}
-
-.extras-btn {
-  display: block;
-  width: 100%;
-  background-color: transparent;
-  border: 1px solid #ccc;
-  border-radius: var(--radius);
-  padding: 0.75rem;
-  margin-top: 0.5rem;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color var(--transition);
-}
-
-.extras-btn:hover {
-  background-color: #eee;
 }
 
 .small {
@@ -350,6 +357,8 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* Footer */
 .footer-links {
   display: flex;
   gap: 18px;
@@ -380,40 +389,4 @@
     min-width: 0;
     width: 100%;
   }
-}
-
-.room-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-top: 10px;
-}
-.room-radio-label,
-.checkbox-label {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  font-size: 1rem;
-  color: #222;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 8px 0;
-}
-.room-radio-label input[type="radio"],
-.checkbox-label input[type="checkbox"] {
-  margin-right: 10px;
-}
-.room-radio-label .room-option,
-.checkbox-label .checkbox-option {
-  max-width: 100%;
-  word-break: break-word;
-  display: inline-block;
-}
-
-.additional-services form,
-.donation-box form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }

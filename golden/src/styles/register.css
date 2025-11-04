@@ -1,4 +1,4 @@
-.register-container {
+.reg-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -6,244 +6,189 @@
   min-height: 100vh;
 }
 
-.register-wrapper {
+.reg-wrapper {
   display: flex;
   background: white;
   max-width: 950px;
   width: 100%;
+  border-radius: 10px;
   box-shadow: var(--shadow-light);
-  border-radius: var(--radius);
   overflow: hidden;
-  flex-wrap: wrap;
-  height: 100%;
 }
 
-.register-image {
+.reg-image {
   flex: 0 0 450px;
   background: #eee;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  height: auto;
 }
 
-.register-image img {
+.reg-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
-.or-separator {
+.reg-form {
+  flex: 1;
+  padding: 40px 30px;
+  background: #fff;
+}
+
+.reg-form h2 {
+  text-align: center;
+  color: var(--highlight-color);
+  margin-bottom: 10px;
+}
+
+.reg-sub {
+  text-align: center;
+  color: #777;
+  margin-bottom: 25px;
+}
+
+.reg-google {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.reg-separator {
   display: flex;
   align-items: center;
-  text-align: center;
-  color: #999;
+  justify-content: center;
+  color: #aaa;
   margin: 20px 0;
-  font-size: 0.9rem;
 }
 
-.or-separator::before,
-.or-separator::after {
+.reg-separator::before,
+.reg-separator::after {
   content: "";
   flex: 1;
   border-bottom: 1px solid #ccc;
   margin: 0 10px;
 }
 
-/* Form */
-.register-form {
-  flex: 1 1 500px;
-  padding: 40px 30px;
-  background-color: #fff;
-}
-
-.register-form h2 {
-  font-size: 2rem;
-  font-family: var(--font-family);
-  color: var(--highlight-color);
-  text-align: center;
-  margin-bottom: 5px;
-}
-
-.register-form .sub-text {
-  text-align: center;
-  font-size: 1rem;
-  margin-bottom: 25px;
-  color: #777;
-}
-
-/* Google sign-in */
-.google-signup {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-form {
-  width: 100%;
-}
-
-.form-group {
+.reg-input-group {
   position: relative;
-  margin-bottom: 25px;
+  margin-bottom: 20px;
 }
 
-/* Full Name input */
-.fullname-input {
+.reg-input-group input {
   width: 100%;
   padding: 12px 40px 12px 40px;
   border: 1px solid #ccc;
-  border-radius: var(--radius);
+  border-radius: 8px;
   font-size: 1rem;
-  background: transparent;
   outline: none;
 }
 
-.label-fullname {
+.reg-icon {
   position: absolute;
-  top: 50%;
-  left: 40px;
-  transform: translateY(-50%);
-  background: #fff;
-  padding: 0 5px;
-  font-size: 0.95rem;
-  color:#777;
-  transition: var(--transition);
-  pointer-events: none;
-}
-
-.fullname-input:focus + .label-fullname,
-.fullname-input:not(:placeholder-shown) + .label-fullname {
-  top: -8px;
-  left: 35px;
-  font-size: 0.8rem;
-  color:#777;
-  background-color: #fff;
-}
-
-.input-icon-fullname {
-  position: absolute;
-  top: 50%;
   left: 12px;
-  transform: translateY(-50%);
-  color: #777;
-  font-size: 1.1rem;
-}
-
-/* Standard inputs: email, password, confirm password */
-.form-input {
-  width: 100%;
-  padding: 12px 40px 12px 40px;
-  border: 1px solid #ccc;
-  border-radius: var(--radius);
-  font-size: 1rem;
-  background: transparent;
-  outline: none;
-}
-
-.label-standard {
-  position: absolute;
   top: 50%;
-  left: 40px;
   transform: translateY(-50%);
-  background: #fff;
-  padding: 0 5px;
-  font-size: 0.95rem;
   color: #777;
-  transition: var(--transition);
-  pointer-events: none;
 }
 
-.form-input:focus + .label-standard,
-.form-input:not(:placeholder-shown) + .label-standard {
-  top: -8px;
-  left: 35px;
-  font-size: 0.8rem;
-  color: #777;
-  background-color: #fff;
-}
-
-.input-icon-standard {
+.reg-eye {
   position: absolute;
+  right: 10px;
   top: 50%;
-  left: 12px;
   transform: translateY(-50%);
-  color: #777;
-  font-size: 1.1rem;
-}
-
-/* Toggle eye button */
-.toggle-eye {
-  position: absolute;
-  top: 50%;
-  right: 12px;
-  transform: translateY(-50%);
-  background: transparent;
+  background: none;
   border: none;
   cursor: pointer;
-  color: #ccc;
-  font-size: 1.1rem;
+  color: #777;
 }
 
-/* Checkbox */
-input[type="checkbox"] {
-  accent-color: var(--primary-dark);
-  transform: scale(1.1);
+/* ✅ Terms and Privacy Section */
+.reg-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
-/* Create Account button */
-.create-account-btn {
+.reg-checkbox {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  accent-color: var(--highlight-color);
+  cursor: pointer;
+}
+
+.reg-terms-text {
+  color: #555;
+  flex: 1;
+}
+
+.reg-link {
+  color: var(--highlight-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.reg-link:hover {
+  text-decoration: underline;
+}
+
+/* Submit button */
+.reg-btn {
   width: 100%;
-  background-color: var(--highlight-color);
-  color: #fff;
   padding: 12px;
-  font-size: 1rem;
   border: none;
-  border-radius: var(--radius);
+  border-radius: 8px;
+  background: var(--highlight-color);
+  color: #fff;
+  font-size: 1rem;
   cursor: pointer;
-  transition: var(--transition);
+  transition: 0.3s;
 }
 
-.create-account-btn:disabled {
-  background-color: var(--highlight-color);
-  opacity: 0.7;
+.reg-btn:hover {
+  opacity: 0.9;
+}
+
+.reg-btn:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-.create-account-btn:hover:not(:disabled) {
-  background-color: var(--highlight-color);
-}
-
-/* Bottom link */
-.bottom-text {
+/* Bottom text */
+.reg-bottom {
   text-align: center;
   margin-top: 20px;
+  color: #555;
   font-size: 0.9rem;
-  color: var(--text-color);
 }
 
-.bottom-text a {
+.reg-bottom a {
   color: var(--highlight-color);
   text-decoration: none;
 }
 
-.bottom-text a:hover {
-  text-decoration: underline;
-}
-
-/* Responsive */
-@media screen and (max-width: 768px) {
-  .register-wrapper {
+/* ✅ Responsive adjustments */
+@media (max-width: 768px) {
+  .reg-wrapper {
     flex-direction: column;
   }
 
-  .register-image {
-    order: -1;
-    padding: 20px;
+  .reg-image {
+    display: none; /* ✅ hide image on mobile */
   }
 
-  .register-form {
+  .reg-form {
     padding: 30px 20px;
+  }
+
+  .reg-terms {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .reg-checkbox {
+    margin-top: 0;
   }
 }

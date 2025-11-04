@@ -16,7 +16,7 @@ export default function Payment1() {
   const countrySlug = queryParams.get("country");
   const dealSlug = queryParams.get("deal");
   const dateId = queryParams.get("date");
- 
+
   const [travellers, setTravellers] = useState(1);
   const [roomOption, setRoomOption] = useState("shared");
   const [title, setTitle] = useState("");
@@ -106,9 +106,9 @@ export default function Payment1() {
 
     if (!canBook) {
       setError(
-        `Cannot book ${travellers} traveller${travellers > 1 ? "s" : ""}. Only ${capacity} place${
-          capacity !== 1 ? "s" : ""
-        } remaining.`
+        `Cannot book ${travellers} traveller${
+          travellers > 1 ? "s" : ""
+        }. Only ${capacity} place${capacity !== 1 ? "s" : ""} remaining.`
       );
       return;
     }
@@ -120,7 +120,9 @@ export default function Payment1() {
       const payload = {
         travel_deal_id: dealData.id,
         date_option_id: dateOptionData.id,
-        full_name: `${title} ${firstName} ${middleName ? middleName + " " : ""}${lastName}`,
+        full_name: `${title} ${firstName} ${
+          middleName ? middleName + " " : ""
+        }${lastName}`,
         dob,
         email,
         phone,
@@ -134,7 +136,10 @@ export default function Payment1() {
         room_option: roomOption,
       };
 
-      const response = await axiosInstance.post("/payments/bookings/create/", payload);
+      const response = await axiosInstance.post(
+        "/payments/bookings/create/",
+        payload
+      );
       const booking = response.data;
       navigate(`/payment/payment2/${booking.id}`, { state: { booking } });
     } catch (err) {
@@ -145,29 +150,30 @@ export default function Payment1() {
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div style={{ color: "red", marginBottom: 10 }}>{error}</div>;
+  if (error)
+    return <div style={{ color: "red", marginBottom: 10 }}>{error}</div>;
 
   return (
     <div className="traveller-container">
-      <StepIndicator current={0} steps={["Your details", "Trip extras", "Payment"]} />
+      <StepIndicator
+        current={0}
+        steps={["Your details", "Trip extras", "Payment"]}
+      />
       <div className="main-content">
         <div className="left-section">
           <h2>Traveller details</h2>
 
           <div className="late-request-box">
-            <div className="late-request-icon">
-              <FaInfo size={14} />
-            </div>
+            <div className="late-request-icon">i</div>
             <div className="late-request-content">
-              <strong>Late request</strong>
+              <h6>Late request</h6>
               <p>
-                For bookings close to departure date, full payment is required. This usually takes 2
-                to 4 business days.
+                For bookings close to departure date, full payment is required.
+                This usually takes 2 to 4 business days.
               </p>
               <p>
-                <br />
-                Please wait for confirmation before booking flights or non-refundable travel
-                arrangements.
+                Please wait for confirmation before booking flights or
+                non-refundable travel arrangements.
               </p>
             </div>
           </div>
@@ -177,14 +183,17 @@ export default function Payment1() {
               <div className="notice-box selling-fast">
                 <div className="icon">i</div>
                 <div className="notice-content">
-                  This departure is selling fast, only <strong>{capacity}</strong> place
+                  This departure is selling fast, only{" "}
+                  <strong>{capacity}</strong> place
                   {capacity > 1 ? "s" : ""} remaining.
                 </div>
               </div>
             ) : capacity === 0 ? (
               <div className="notice-box sold-out">
                 <div className="icon">!</div>
-                <div className="notice-content">Sorry, this departure is fully booked.</div>
+                <div className="notice-content">
+                  Sorry, this departure is fully booked.
+                </div>
               </div>
             ) : null
           ) : null}
@@ -192,7 +201,11 @@ export default function Payment1() {
           <div className="traveller-counter">
             <label>How many travellers?</label>
             <div className="counter-buttons">
-              <button onClick={() => setTravellers(Math.max(1, travellers - 1))}>-</button>
+              <button
+                onClick={() => setTravellers(Math.max(1, travellers - 1))}
+              >
+                -
+              </button>
               <span>{travellers}</span>
               <button onClick={() => setTravellers(travellers + 1)}>+</button>
             </div>
@@ -200,7 +213,10 @@ export default function Payment1() {
 
           <h3 className="traveller-heading">
             <BsFillPersonFill /> 1. Primary traveller details
-            <span className="info-icon" onClick={() => setShowPrimaryModal(true)}>
+            <span
+              className="info-icon"
+              onClick={() => setShowPrimaryModal(true)}
+            >
               ⓘ
             </span>
           </h3>
@@ -211,7 +227,11 @@ export default function Payment1() {
             <div className="title-group-modern">
               <div className="title-select-container">
                 <label>Title *</label>
-                <select required value={title} onChange={(e) => setTitle(e.target.value)}>
+                <select
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                >
                   <option value="">Select</option>
                   <option>Mr</option>
                   <option>Ms</option>
@@ -316,7 +336,10 @@ export default function Payment1() {
             />
 
             <h4>Room Option</h4>
-            <select value={roomOption} onChange={(e) => setRoomOption(e.target.value)}>
+            <select
+              value={roomOption}
+              onChange={(e) => setRoomOption(e.target.value)}
+            >
               <option value="shared">Shared</option>
               <option value="private">Private</option>
             </select>
@@ -326,19 +349,23 @@ export default function Payment1() {
                 <span className="deposit-icon">💳</span> Deposit
               </h4>
               <p>
-                Lock in your trip with a deposit if it departs 30+ days from now. Read{" "}
-                <a href="#">booking conditions</a>.
+                Lock in your trip with a deposit if it departs 30+ days from
+                now. Read <a href="#">booking conditions</a>.
               </p>
               <p className="privacy-text">
                 Please see our <a href="#">Privacy and Collection notice</a>.
               </p>
-              <button className="continue-button" type="submit" disabled={loading || !canBook}>
+              <button
+                className="continue-button"
+                type="submit"
+                disabled={loading || !canBook}
+              >
                 {loading ? "Submitting..." : "Continue →"}
               </button>
               {travellers > capacity && (
                 <p style={{ color: "red", marginTop: "8px" }}>
-                  Only {capacity} place{capacity !== 1 ? "s" : ""} remaining, please adjust the
-                  number of travellers.
+                  Only {capacity} place{capacity !== 1 ? "s" : ""} remaining,
+                  please adjust the number of travellers.
                 </p>
               )}
             </div>
@@ -375,7 +402,10 @@ export default function Payment1() {
                 </p>
               </div>
 
-              <div className="price-header" onClick={() => setShowTravellerDropdown(!showTravellerDropdown)}>
+              <div
+                className="price-header"
+                onClick={() => setShowTravellerDropdown(!showTravellerDropdown)}
+              >
                 <p>Trip</p>
                 <p>
                   <FaChevronDown />
@@ -385,8 +415,13 @@ export default function Payment1() {
               {showTravellerDropdown && (
                 <div className="dropdown-content">
                   <p>
-                    Total for {travellers} traveller{travellers > 1 ? "s" : ""}: USD $
-                    {(parseFloat(dateOptionData.discounted_price.replace("€", "").trim()) * travellers).toFixed(2)}
+                    Total for {travellers} traveller{travellers > 1 ? "s" : ""}:
+                    USD $
+                    {(
+                      parseFloat(
+                        dateOptionData.discounted_price.replace("€", "").trim()
+                      ) * travellers
+                    ).toFixed(2)}
                   </p>
                 </div>
               )}
@@ -394,9 +429,16 @@ export default function Payment1() {
               <hr />
               <h4>
                 Total USD $
-                {(parseFloat(dateOptionData.discounted_price.replace("€", "").trim()) * travellers).toFixed(2)}
+                {(
+                  parseFloat(
+                    dateOptionData.discounted_price.replace("€", "").trim()
+                  ) * travellers
+                ).toFixed(2)}
               </h4>
-              <p className="credit-info" onClick={() => setShowCreditModal(true)}>
+              <p
+                className="credit-info"
+                onClick={() => setShowCreditModal(true)}
+              >
                 ⓘ How to redeem credit
               </p>
             </div>
@@ -410,7 +452,10 @@ export default function Payment1() {
         <div className="modal">
           <div className="modal-content">
             <h4>Why do we need this?</h4>
-            <p>This helps us ensure names match official travel documents for booking accuracy.</p>
+            <p>
+              This helps us ensure names match official travel documents for
+              booking accuracy.
+            </p>
             <button onClick={() => setShowWhyModal(false)}>Close</button>
           </div>
         </div>
@@ -420,7 +465,10 @@ export default function Payment1() {
         <div className="modal">
           <div className="modal-content">
             <h4>How to redeem credit</h4>
-            <p>You can redeem travel credit on the payment page by selecting “Use Credit”.</p>
+            <p>
+              You can redeem travel credit on the payment page by selecting “Use
+              Credit”.
+            </p>
             <button onClick={() => setShowCreditModal(false)}>Close</button>
           </div>
         </div>
