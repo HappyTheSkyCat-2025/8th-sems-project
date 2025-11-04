@@ -2,13 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
-import {
-  FaUser,
-  FaEnvelope,
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-} from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { GoogleLogin } from "@react-oauth/google";
 import "../styles/register.css";
 import registerImg from "../assets/register.png";
@@ -26,7 +20,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agree, setAgree] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -38,35 +32,41 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match");
+    const { username, email, password, confirmPassword } = formData;
+
+    if (!username || !email || !password) {
+      toast.error("All fields are required.");
       return;
     }
 
-    if (!agreeTerms) {
-      toast.error("You must agree to the terms first.");
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
+
+    if (!agree) {
+      toast.error("Please agree to the terms first.");
       return;
     }
 
     setLoading(true);
     try {
       await axiosInstance.post("/accounts/register/", {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        password2: formData.confirmPassword,
+        username,
+        email,
+        password,
+        password2: confirmPassword,
       });
 
-      // Save email as registered_email so VerifyOTP can find it on register mode
-      localStorage.setItem("registered_email", formData.email);
+      localStorage.setItem("registered_email", email);
       toast.success("Registration successful! Check your email for OTP.");
-      setFormData({ username: "", email: "", password: "", confirmPassword: "" });
-      setTimeout(() => navigate("/verify-otp?mode=register"), 2000);
+      navigate("/verify-otp?mode=register");
     } catch (error) {
-      const msgs = error.response?.data
-        ? Object.values(error.response.data).flat().join(" ")
-        : "An error occurred during registration.";
-      toast.error(`Registration failed: ${msgs}`);
+      const msg =
+        error.response?.data
+          ? Object.values(error.response.data).flat().join(" ")
+          : "Registration failed.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -94,137 +94,116 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-wrapper">
-        <div className="register-image">
-          <img src={registerImg} alt="Register Visual" />
+    <div className="reg-container">
+      <div className="reg-wrapper">
+        <div className="reg-image">
+          <img src={registerImg} alt="Register" />
         </div>
 
-        <div className="register-form">
+        <div className="reg-form">
           <h2>Golden Leaf Travels</h2>
-          <p className="sub-text">Join us today</p>
+          <p className="reg-sub">Join us today</p>
 
-          <div className="google-signup">
+          <div className="reg-google">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => toast.error("Google signup failed")}
             />
           </div>
 
-          <div className="or-separator">or</div>
+          <div className="reg-separator">or</div>
 
-          <form onSubmit={handleSubmit} noValidate>
-            {/* Full Name */}
-            <div className="form-group">
-              <FaUser className="input-icon-fullname" />
+          <form onSubmit={handleSubmit}>
+            <div className="reg-input-group">
+              <FaUser className="reg-icon" />
               <input
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder=" "
                 required
-                className="fullname-input"
+                placeholder="Username"
               />
-              <label className="label-fullname">Username</label>
             </div>
 
-            {/* Email */}
-            <div className="form-group">
-              <FaEnvelope className="input-icon-standard" />
+            <div className="reg-input-group">
+              <FaEnvelope className="reg-icon" />
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder=" "
                 required
-                className="form-input"
+                placeholder="Email Address"
               />
-              <label className="label-standard">Email Address</label>
             </div>
 
-            {/* Password */}
-            <div className="form-group">
-              <FaLock className="input-icon-standard" />
+            <div className="reg-input-group">
+              <FaLock className="reg-icon" />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder=" "
                 required
-                className="form-input"
+                placeholder="Password"
               />
-              <label className="label-standard">Password</label>
               <button
                 type="button"
-                className="toggle-eye"
+                className="reg-eye"
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
 
-            {/* Confirm Password */}
-            <div className="form-group">
-              <FaLock className="input-icon-standard" />
+            <div className="reg-input-group">
+              <FaLock className="reg-icon" />
               <input
                 type={showConfirm ? "text" : "password"}
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                placeholder=" "
                 required
-                className="form-input"
+                placeholder="Confirm Password"
               />
-              <label className="label-standard">Confirm Password</label>
               <button
                 type="button"
-                className="toggle-eye"
+                className="reg-eye"
                 onClick={() => setShowConfirm(!showConfirm)}
               >
                 {showConfirm ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
 
-            {/* Terms Checkbox */}
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
+            {/* ✅ Terms and Privacy */}
+            <div className="reg-terms">
               <input
                 type="checkbox"
-                id="terms"
-                checked={agreeTerms}
-                onChange={() => setAgreeTerms(!agreeTerms)}
-                style={{ marginRight: "10px" }}
+                checked={agree}
+                onChange={() => setAgree(!agree)}
+                id="agreeTerms"
+                className="reg-checkbox"
               />
-              <label htmlFor="terms" style={{ fontSize: "0.9rem", color: "#555" }}>
+              <label htmlFor="agreeTerms" className="reg-terms-text">
                 I agree to the{" "}
-                <a
-                  href="#"
-                  style={{ color: "var(--primary-dark)", textDecoration: "none" }}
-                >
+                <a href="#" className="reg-link">
                   Terms of Service
                 </a>{" "}
                 and{" "}
-                <a
-                  href="#"
-                  style={{ color: "var(--primary-dark)", textDecoration: "none" }}
-                >
+                <a href="#" className="reg-link">
                   Privacy Policy
                 </a>
+                .
               </label>
             </div>
 
-            <button
-              type="submit"
-              className="create-account-btn"
-              disabled={loading || !agreeTerms}
-            >
+            <button type="submit" disabled={loading || !agree} className="reg-btn">
               {loading ? "Registering..." : "Create Account"}
             </button>
           </form>
 
-          <p className="bottom-text">
+          <p className="reg-bottom">
             Already have an account? <Link to="/login">Sign in</Link>
           </p>
         </div>

@@ -6,20 +6,18 @@ import "../payment/payment2.css";
 
 export default function Payment2() {
   const navigate = useNavigate();
-  const { id } = useParams(); // booking ID from URL
+  const { id } = useParams();
 
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Extras state (camelCase for frontend)
   const [roomOption, setRoomOption] = useState("");
   const [addTransfer, setAddTransfer] = useState(false);
   const [addNights, setAddNights] = useState(false);
   const [flightHelp, setFlightHelp] = useState(false);
   const [donation, setDonation] = useState(false);
 
-  // Modal states 
   const [showLateModal, setShowLateModal] = useState(false);
   const [showCreditModal, setShowCreditModal] = useState(false);
 
@@ -31,7 +29,6 @@ export default function Payment2() {
         const resp = await axiosInstance.get(`/payments/bookings/${id}/`);
         setBooking(resp.data);
 
-        // Convert snake_case to camelCase for frontend state:
         setRoomOption(resp.data.room_option || "shared");
         setAddTransfer(resp.data.add_transfer || false);
         setAddNights(resp.data.add_nights || false);
@@ -48,7 +45,6 @@ export default function Payment2() {
 
   const handleContinue = async () => {
     try {
-      // Prepare snake_case data for backend update
       const updateData = {
         room_option: roomOption,
         add_transfer: addTransfer,
@@ -59,7 +55,6 @@ export default function Payment2() {
 
       await axiosInstance.patch(`/payments/bookings/${id}/update/`, updateData);
 
-      // Pass camelCase keys in navigation state (frontend)
       const extrasForState = {
         roomOption,
         addTransfer,
@@ -93,9 +88,8 @@ export default function Payment2() {
 
   const travelDeal = booking?.travel_deal || {};
   const dateOption = booking?.date_option || {};
-  const numTravellers = booking?.travellers || 1; // Make sure backend returns this
+  const numTravellers = booking?.travellers || 1;
 
-  // Calculate total price
   const tripCost = parseFloat(dateOption.discounted_price) || 0;
   const roomPricePerTraveller = 345;
   const roomCost = roomOption === "private" ? roomPricePerTraveller * numTravellers : 0;
@@ -115,8 +109,6 @@ export default function Payment2() {
             role="button"
             tabIndex={0}
             onClick={() => setShowLateModal(true)}
-            onKeyDown={(e) => e.key === "Enter" && setShowLateModal(true)}
-            aria-label="Late request information"
           >
             <div className="icon">i</div>
             <div className="notice-content">
@@ -134,35 +126,32 @@ export default function Payment2() {
             </div>
           </div>
 
-          {/* REMOVED selling-fast notice here */}
-
           <div className="room-options">
             <h3>Room options</h3>
-            <form className="room-radio-group">
-              <label className="room-radio-label">
+            <form className="option-group">
+              <label className="option-label">
                 <input
                   type="radio"
                   name="room"
                   value="private"
                   checked={roomOption === "private"}
                   onChange={(e) => setRoomOption(e.target.value)}
-                  aria-checked={roomOption === "private"}
                 />
-                <span className="room-option">
+                <span className="option-text">
                   Private room ({numTravellers} traveller{numTravellers > 1 ? "s" : ""}) (+$
                   {(roomPricePerTraveller * numTravellers).toFixed(2)})
                 </span>
               </label>
-              <label className="room-radio-label">
+
+              <label className="option-label">
                 <input
                   type="radio"
                   name="room"
                   value="shared"
                   checked={roomOption === "shared"}
                   onChange={(e) => setRoomOption(e.target.value)}
-                  aria-checked={roomOption === "shared"}
                 />
-                <span className="room-option">Shared (no extra cost)</span>
+                <span className="option-text">Shared (no extra cost)</span>
               </label>
             </form>
           </div>
@@ -172,7 +161,6 @@ export default function Payment2() {
             <button
               className="extras-btn"
               type="button"
-              aria-pressed={addTransfer}
               onClick={() => setAddTransfer((prev) => !prev)}
             >
               🚌 {addTransfer ? "✔" : ""} Add transfers
@@ -180,7 +168,6 @@ export default function Payment2() {
             <button
               className="extras-btn"
               type="button"
-              aria-pressed={addNights}
               onClick={() => setAddNights((prev) => !prev)}
             >
               🏨 {addNights ? "✔" : ""} Add extra nights
@@ -188,36 +175,36 @@ export default function Payment2() {
           </div>
 
           <div className="additional-services">
-            <label className="checkbox-label">
+            <label className="option-label">
               <input
                 type="checkbox"
                 checked={flightHelp}
                 onChange={(e) => setFlightHelp(e.target.checked)}
-                aria-checked={flightHelp}
-              />{" "}
-              Contact me about flights
+              />
+              <span className="option-text">Contact me about flights</span>
             </label>
           </div>
 
           <div className="donation-box">
-            <label className="checkbox-label">
+            <label className="option-label">
               <input
                 type="checkbox"
                 checked={donation}
                 onChange={(e) => setDonation(e.target.checked)}
-                aria-checked={donation}
-              />{" "}
-              Yes, add $23 donation
+              />
+              <span className="option-text">Yes, add $23 donation</span>
             </label>
           </div>
         </div>
 
         {/* RIGHT SIDE */}
         <div className="right-column">
-          <div className="booking-summary" aria-label="Booking Summary">
+          <div className="booking-summary">
             <h3>Booking Summary</h3>
             <div className="trip-name">{travelDeal.title || "Trip name"}</div>
-            <div className="duration">{travelDeal.days ? `${travelDeal.days} days` : ""}</div>
+            <div className="duration">
+              {travelDeal.days ? `${travelDeal.days} days` : ""}
+            </div>
             <div className="details">
               <p>
                 <strong>Start</strong>
@@ -265,11 +252,7 @@ export default function Payment2() {
             </div>
             <div
               className="how-to-credit"
-              role="button"
-              tabIndex={0}
               onClick={() => setShowCreditModal(true)}
-              onKeyDown={(e) => e.key === "Enter" && setShowCreditModal(true)}
-              aria-label="How to redeem credit information"
             >
               ⓘ How to redeem credit
             </div>
@@ -286,29 +269,22 @@ export default function Payment2() {
           type="button"
           disabled={loading}
           onClick={handleContinue}
-          aria-disabled={loading}
         >
           Continue →
         </button>
       </div>
 
-      <footer className="footer-links" aria-label="Footer Links">
+      <footer className="footer-links">
         <span>Privacy</span>
         <span>Booking conditions</span>
         <span>Data collection notice</span>
       </footer>
 
-      {/* Modals */}
+      {/* LATE MODAL */}
       {showLateModal && (
-        <div
-          className="modal"
-          onClick={() => setShowLateModal(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="lateModalTitle"
-        >
+        <div className="modal" onClick={() => setShowLateModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h4 id="lateModalTitle">Late request</h4>
+            <h4>Late request</h4>
             <p>
               For bookings close to departure date, full payment is required to
               request your place with our local operators. This usually takes 2
@@ -324,16 +300,12 @@ export default function Payment2() {
           </div>
         </div>
       )}
+
+      {/* CREDIT MODAL */}
       {showCreditModal && (
-        <div
-          className="modal"
-          onClick={() => setShowCreditModal(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="creditModalTitle"
-        >
+        <div className="modal" onClick={() => setShowCreditModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h4 id="creditModalTitle">How to redeem credit</h4>
+            <h4>How to redeem credit</h4>
             <p>Select “Use Credit” on payment page before finalizing payment.</p>
             <button type="button" onClick={() => setShowCreditModal(false)}>
               Close
