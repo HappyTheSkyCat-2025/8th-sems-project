@@ -139,3 +139,58 @@
     margin-right: 0;
   }
 }
+
+/* Modal Styles */
+.blog-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.blog-modal {
+  background: #fff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.blog-modal h3 {
+  margin-bottom: 15px;
+}
+
+.blog-modal input, 
+.blog-modal select {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.blog-modal button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.blog-modal .save-btn {
+  background: #28a745;
+  color: #fff;
+}
+
+.blog-modal .cancel-btn {
+  background: #ff4d4f;
+  color: #fff;
+}

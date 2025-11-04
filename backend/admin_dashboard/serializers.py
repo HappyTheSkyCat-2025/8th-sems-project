@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import User
+from accounts.models import User, NewsletterSubscriber
 from contacts.models import ContactMessage
 from blogs.models import Category, Blog, Comment, Story
 from destinations.models import (
@@ -79,6 +79,12 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         model = ContactMessage
         fields = ['id', 'full_name', 'email', 'phone', 'subject', 'message', 'created_at']
         read_only_fields = ['created_at']
+
+
+class NewsletterSubscriberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ['id', 'email', 'subscribed_at']
 
 
 # ----------------------

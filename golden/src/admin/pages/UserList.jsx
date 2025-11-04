@@ -1,41 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../utils/axiosInstance";
 import "./user.css";
 
-const initialUsers = [
-  {
-    id: 1,
-    email: "john@example.com",
-    username: "john123",
-    phone: "1234567890",
-    nationality: "USA",
-    profile_image: "https://via.placeholder.com/50"
-  },
-  {
-    id: 2,
-    email: "emma@example.com",
-    username: "emma98",
-    phone: "9876543210",
-    nationality: "UK",
-    profile_image: "https://via.placeholder.com/50"
-  },
-  {
-    id: 3,
-    email: "liam@example.com",
-    username: "liam007",
-    phone: "5554443333",
-    nationality: "Canada",
-    profile_image: "https://via.placeholder.com/50"
-  }
-];
-
 const UserList = () => {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleDelete = (id) => {
+  const API_URL = "admin-dashboard/users/";
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get(API_URL);
+        const data = Array.isArray(response.data)
+          ? response.data
+          : response.data.results || [];
+        setUsers(data);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        setError("Failed to load users. Make sure you are logged in as admin.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
-      setUsers(users.filter((user) => user.id !== id));
+      try {
+        await axiosInstance.delete(`${API_URL}${id}/`);
+        setUsers(users.filter((user) => user.id !== id));
+      } catch (err) {
+        console.error("Error deleting user:", err);
+        alert("Failed to delete user.");
+      }
     }
   };
 
@@ -43,6 +47,10 @@ const UserList = () => {
     setSelectedUser(user);
     setShowDetails(true);
   };
+
+  if (loading) return <p>Loading users...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!users.length) return <p>No users found.</p>;
 
   return (
     <div className="user-container">
@@ -67,7 +75,9 @@ const UserList = () => {
               <td className="desktop-only">{u.phone}</td>
               <td className="desktop-only">{u.nationality}</td>
               <td className="desktop-only">
-                <img src={u.profile_image} alt="profile" className="profile-img" />
+                {u.profile_image && (
+                  <img src={u.profile_image} alt="profile" className="profile-img" />
+                )}
               </td>
               <td>
                 <button onClick={() => handleDetails(u)} className="details-btn">
@@ -91,11 +101,9 @@ const UserList = () => {
             <p><strong>Username:</strong> {selectedUser.username}</p>
             <p><strong>Phone:</strong> {selectedUser.phone}</p>
             <p><strong>Nationality:</strong> {selectedUser.nationality}</p>
-            <img
-              src={selectedUser.profile_image}
-              alt="profile"
-              className="profile-img-modal"
-            />
+            {selectedUser.profile_image && (
+              <img src={selectedUser.profile_image} alt="profile" className="profile-img-modal" />
+            )}
             <button className="cancel-btn" onClick={() => setShowDetails(false)}>Close</button>
           </div>
         </div>

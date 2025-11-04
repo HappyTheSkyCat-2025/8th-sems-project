@@ -1,18 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../utils/axiosInstance";
 
 const Newsletter = () => {
-  const [subscribers, setSubscribers] = useState([
-    { id: 1, email: "john@example.com", date: "2025-11-03", time: "10:15 AM" },
-    { id: 2, email: "jane@example.com", date: "2025-11-02", time: "03:45 PM" },
-    { id: 3, email: "bob@example.com", date: "2025-11-01", time: "11:30 AM" },
-    { id: 4, email: "alice@example.com", date: "2025-10-31", time: "09:00 AM" },
-  ]);
+  const [subscribers, setSubscribers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleDelete = (id) => {
+  const API_URL = "admin-dashboard/newsletters/";
+
+  // Fetch all subscribers
+  useEffect(() => {
+    const fetchSubscribers = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get(API_URL);
+        const data = Array.isArray(response.data)
+          ? response.data
+          : response.data.results || [];
+        setSubscribers(data);
+      } catch (err) {
+        console.error("Error fetching subscribers:", err);
+        setError("Failed to load subscribers. Check if you're logged in as admin.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSubscribers();
+  }, []);
+
+  // Delete a subscriber
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this subscriber?")) {
-      setSubscribers(subscribers.filter((sub) => sub.id !== id));
+      try {
+        await axiosInstance.delete(`${API_URL}${id}/`);
+        setSubscribers((prev) => prev.filter((s) => s.id !== id));
+      } catch (err) {
+        console.error("Error deleting subscriber:", err);
+        alert("Failed to delete subscriber.");
+      }
     }
   };
+
+  if (loading) return <p>Loading subscribers...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="newsletter-container">
@@ -29,19 +60,36 @@ const Newsletter = () => {
             </tr>
           </thead>
           <tbody>
-            {subscribers.map((sub) => (
-              <tr key={sub.id}>
-                <td data-label="Email">{sub.email}</td>
-                <td data-label="Date">{sub.date}</td>
-                <td data-label="Time">{sub.time}</td>
-                <td data-label="Actions">
-                  <button className="delete-btn" onClick={() => handleDelete(sub.id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {subscribers.length === 0 && (
+            {subscribers.length > 0 ? (
+              subscribers.map((sub) => {
+                const created = new Date(sub.created_at);
+                const date = created.toLocaleDateString();
+                const time = created.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                return (
+                  <tr key={sub.id}>
+                    <td data-label="Email">{sub.email}</td>
+                    <td data-label="Date">
+                      {new Date(sub.subscribed_at).toLocaleDateString() || "-"}
+                    </td>
+                    <td data-label="Time">
+                      {new Date(sub.subscribed_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) || "-"}
+                    </td>
+                    <td data-label="Actions">
+                      <button
+                        className="delete-btn"
+                        onClick={() => handleDelete(sub.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
               <tr>
                 <td colSpan="4" style={{ textAlign: "center" }}>
                   No subscribers found.
@@ -94,7 +142,6 @@ const Newsletter = () => {
           background-color: #c81e1e;
         }
 
-        /* Mobile Responsive */
         @media (max-width: 768px) {
           .newsletter-table thead {
             display: none;

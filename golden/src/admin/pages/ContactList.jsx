@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Trash2, X, MessageCircle } from "lucide-react";
+import axiosInstance from "../../utils/axiosInstance";
 import "./contact.css";
 
 // --- Confirmation Modal ---
@@ -11,12 +12,18 @@ const ConfirmationModal = ({ isOpen, onConfirm, onCancel, message }) => {
       <div className="bc-modal-content">
         <div className="bc-modal-header">
           <h3>Confirm Deletion</h3>
-          <button className="bc-close-btn" onClick={onCancel}><X size={20} /></button>
+          <button className="bc-close-btn" onClick={onCancel}>
+            <X size={20} />
+          </button>
         </div>
         <p>{message}</p>
         <div className="bc-modal-actions">
-          <button className="bc-btn-cancel" onClick={onCancel}>Cancel</button>
-          <button className="bc-btn-confirm" onClick={onConfirm}>Delete</button>
+          <button className="bc-btn-cancel" onClick={onCancel}>
+            Cancel
+          </button>
+          <button className="bc-btn-confirm" onClick={onConfirm}>
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -25,24 +32,51 @@ const ConfirmationModal = ({ isOpen, onConfirm, onCancel, message }) => {
 
 // --- Main Component ---
 const BetterContactList = () => {
-  const [messages, setMessages] = useState([
-    { id: 1, full_name: "John Doe", email: "john@example.com", phone: "1234567890", subject: "Inquiry", message: "Hello, I have a question about booking procedures for international flights." },
-    { id: 2, full_name: "Jane Smith", email: "jane@example.com", phone: "9876543210", subject: "Support", message: "Need immediate help with my booking ID #TRV901 as the dates seem incorrect." },
-    { id: 3, full_name: "Alice Brown", email: "alice@example.com", phone: "5551234567", subject: "Feedback", message: "Great website design! Very easy to navigate and find the travel deals." },
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState(null);
 
+  const CONTACT_API = "admin-dashboard/contact-messages/";
+
+  // Fetch messages from backend
+  useEffect(() => {
+    const fetchMessages = async () => {
+      setLoading(true);
+      try {
+        const res = await axiosInstance.get(CONTACT_API);
+        const data = res.data.results || res.data; // handle pagination or non-paginated
+        setMessages(data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load messages. Are you an admin?");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, []);
+
+  // Delete
   const handleDeleteClick = (id) => {
     setMessageToDelete(id);
     setIsModalOpen(true);
   };
 
-  const confirmDelete = () => {
-    setMessages(messages.filter((m) => m.id !== messageToDelete));
-    setIsModalOpen(false);
-    setMessageToDelete(null);
+  const confirmDelete = async () => {
+    try {
+      await axiosInstance.delete(`${CONTACT_API}${messageToDelete}/`);
+      setMessages(messages.filter((m) => m.id !== messageToDelete));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete message.");
+    } finally {
+      setIsModalOpen(false);
+      setMessageToDelete(null);
+    }
   };
 
   const cancelDelete = () => {
@@ -50,10 +84,15 @@ const BetterContactList = () => {
     setMessageToDelete(null);
   };
 
+  if (loading) return <p>Loading messages...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
   return (
     <div className="bc-container">
       <header className="bc-header">
-        <h1><MessageCircle size={28} /> Contact Messages</h1>
+        <h1>
+          <MessageCircle size={28} /> Contact Messages
+        </h1>
         <p>View and manage messages sent by users efficiently.</p>
       </header>
 
@@ -70,23 +109,30 @@ const BetterContactList = () => {
             </tr>
           </thead>
           <tbody>
-            {messages.map((m) => (
-              <tr key={m.id}>
-                <td data-label="Name">{m.full_name}</td>
-                <td data-label="Email">{m.email}</td>
-                <td data-label="Phone">{m.phone}</td>
-                <td data-label="Subject">{m.subject}</td>
-                <td data-label="Message">{m.message}</td>
-                <td data-label="Actions">
-                  <button className="bc-delete-btn" onClick={() => handleDeleteClick(m.id)}>
-                    <Trash2 size={16} /> Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {messages.length === 0 && (
+            {messages.length > 0 ? (
+              messages.map((m) => (
+                <tr key={m.id}>
+                  <td data-label="Name">{m.full_name}</td>
+                  <td data-label="Email">{m.email}</td>
+                  <td data-label="Phone">{m.phone}</td>
+                  <td data-label="Subject">{m.subject}</td>
+                  <td data-label="Message">{m.message}</td>
+                  <td data-label="Actions">
+                    <button
+                      className="bc-delete-btn"
+                      onClick={() => handleDeleteClick(m.id)}
+                    >
+                      <Trash2 size={16} /> Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
-                <td colSpan="6" style={{ textAlign: "center", padding: "20px", color: "#6b7280" }}>
+                <td
+                  colSpan="6"
+                  style={{ textAlign: "center", padding: "20px", color: "#6b7280" }}
+                >
                   🎉 No messages found!
                 </td>
               </tr>

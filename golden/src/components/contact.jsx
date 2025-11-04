@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axiosInstance from "../utils/axiosInstance"; // Adjust path as needed
 import "../styles/contactus.css";
 
 const SUBJECTS = [
@@ -29,15 +30,42 @@ export default function Contact() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     if (!form.name.trim() || !form.email.trim() || !form.message.trim() || !form.consent) {
       setError("Please fill all required fields and accept the privacy policy.");
       return;
     }
-    // Here you would send the form data to your backend or email service
-    setSubmitted(true);
+
+    // Prepare payload matching backend model fields
+    const payload = {
+      full_name: form.name,
+      email: form.email,
+      phone: form.phone,
+      subject: form.subject,
+      message: form.message
+    };
+
+    try {
+      const response = await axiosInstance.post("contacts/messages/", payload);
+      if (response.status === 201) {
+        setSubmitted(true);
+      } else {
+        setError("Something went wrong. Please try again later.");
+      }
+    } catch (err) {
+      // If backend returns validation errors, display them
+      if (err.response?.data) {
+        const errors = err.response.data;
+        // Extract first error message
+        const firstError = Object.values(errors)[0];
+        setError(Array.isArray(firstError) ? firstError[0] : firstError);
+      } else {
+        setError("Network error. Please try again later.");
+      }
+    }
   };
 
   if (submitted) {

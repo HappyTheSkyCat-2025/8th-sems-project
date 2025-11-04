@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
-from accounts.models import User
+from accounts.models import User, NewsletterSubscriber
 from blogs.models import Category, Blog, Comment, Story
 from contacts.models import ContactMessage
 from destinations.models import (
@@ -13,6 +13,7 @@ from destinations.models import (
 from payments.models import Booking, BookingLocation
 
 from .serializers import (
+    NewsletterSubscriberSerializer,
     UserSerializer,
     CategorySerializer, BlogSerializer, CommentSerializer, StorySerializer,
     ContactMessageSerializer,
@@ -75,6 +76,10 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
     serializer_class = ContactMessageSerializer
     permission_classes = [permissions.IsAdminUser]
 
+class NewsletterViewSet(viewsets.ModelViewSet):
+    queryset = NewsletterSubscriber.objects.all()
+    serializer_class = NewsletterSubscriberSerializer
+    permission_classes = [permissions.IsAdminUser]
 
 # --------------------------
 # Destination & Travel Related ViewSets

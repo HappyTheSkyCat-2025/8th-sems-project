@@ -6,6 +6,7 @@ import UserList from "../pages/UserList";
 import Newsletter from "../pages/Newsletter";
 import Story from "../pages/story";
 import BlogList from "../pages/BlogList";
+import BookingList from "../pages/BookingList";
 import ContactList from "../pages/ContactList";
 
 /* Payments */
@@ -36,6 +37,7 @@ const AdminRoutes = () => {
         <Route path="newsletter" element={<Newsletter />} />
         <Route path="stories" element={<Story />} />
         <Route path="blogs" element={<BlogList />} />
+        <Route path="bookings" element={<BookingList />} />
         <Route path="contacts" element={<ContactList />} />
 
         {/* Payments */}

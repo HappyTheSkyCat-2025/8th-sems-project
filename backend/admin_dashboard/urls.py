@@ -3,9 +3,10 @@ from rest_framework.routers import DefaultRouter
 
 # Import all viewsets
 from .views import (
+    NewsletterViewSet,
     UserViewSet,
     CategoryViewSet, BlogViewSet, CommentViewSet, StoryViewSet,
-    ContactMessageViewSet,
+    ContactMessageViewSet, 
     RegionViewSet, CountryViewSet, TravelTypeViewSet, TravelOptionViewSet,
     DealCategoryViewSet, DealOfferViewSet, PlaceViewSet, TravelDealViewSet,
     TravelImageViewSet, ItineraryDayViewSet, WishlistItemViewSet, ReviewViewSet,
@@ -27,6 +28,7 @@ router.register(r'stories', StoryViewSet, basename='story')
 
 # Contact Messages
 router.register(r'contact-messages', ContactMessageViewSet, basename='contactmessage')
+router.register(r'newsletters', NewsletterViewSet, basename='newsletter')
 
 # Destinations & Travel
 router.register(r'regions', RegionViewSet)
