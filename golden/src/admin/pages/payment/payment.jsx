@@ -1,29 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../../utils/axiosInstance";
 import "./payment.css";
 
 const Payment = () => {
-  const [payments, setPayments] = useState([
-    {
-      id: 1,
-      name: "Dipesh Thapa",
-      status: "Completed",
-      method: "Credit Card",
-      transactionId: "TXN123456",
-      date: "2025-11-02",
-    },
-    {
-      id: 2,
-      name: "Sita Gurung",
-      status: "Pending",
-      method: "PayPal",
-      transactionId: "TXN987654",
-      date: "2025-11-01",
-    },
-  ]);
-
+  const [payments, setPayments] = useState([]);
   const [selected, setSelected] = useState(null);
 
-  const handleDelete = (id) => setPayments(payments.filter((p) => p.id !== id));
+  // Fetch bookings/payments
+  useEffect(() => {
+    fetchPayments();
+  }, []);
+
+  const fetchPayments = async () => {
+    try {
+      const res = await axiosInstance.get("/admin-dashboard/bookings/");
+      // Map backend fields to match your table display
+      const data = (Array.isArray(res.data) ? res.data : res.data.results || []).map(
+        (b) => ({
+          id: b.id,
+          name: b.full_name || `${b.user?.first_name} ${b.user?.last_name}` || "—",
+          status: b.payment_status || "Pending",
+          method: b.payment_method || "N/A",
+          transactionId: b.transaction_id || "—",
+          date: b.payment_date || b.created_at?.split("T")[0] || "—",
+        })
+      );
+      setPayments(data);
+    } catch (error) {
+      console.error("Failed to fetch payments:", error);
+      setPayments([]);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this payment?")) return;
+    try {
+      await axiosInstance.delete(`/admin-dashboard/bookings/${id}/`);
+      fetchPayments();
+    } catch (error) {
+      console.error("Failed to delete payment:", error);
+    }
+  };
+
   const handleDetails = (payment) => setSelected(payment);
   const closeModal = () => setSelected(null);
 
@@ -45,39 +63,47 @@ const Payment = () => {
             </tr>
           </thead>
           <tbody>
-            {payments.map((item) => (
-              <tr key={item.id}>
-                <td>{item.name}</td>
-                <td>
-                  <span
-                    className={`status-badge ${
-                      item.status === "Completed"
-                        ? "status-completed"
-                        : "status-pending"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                </td>
-                <td>{item.method}</td>
-                <td>{item.transactionId}</td>
-                <td>{item.date}</td>
-                <td>
-                  <button
-                    className="btn-action btn-details me-2"
-                    onClick={() => handleDetails(item)}
-                  >
-                    Details
-                  </button>
-                  <button
-                    className="btn-action btn-delete"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    Delete
-                  </button>
+            {Array.isArray(payments) && payments.length ? (
+              payments.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.name}</td>
+                  <td>
+                    <span
+                      className={`status-badge ${
+                        item.status === "Completed"
+                          ? "status-completed"
+                          : "status-pending"
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
+                  <td>{item.method}</td>
+                  <td>{item.transactionId}</td>
+                  <td>{item.date}</td>
+                  <td>
+                    <button
+                      className="btn-action btn-details me-2"
+                      onClick={() => handleDetails(item)}
+                    >
+                      Details
+                    </button>
+                    <button
+                      className="btn-action btn-delete"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  No payments found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -88,9 +114,7 @@ const Payment = () => {
           <div className="modal-box" onClick={(e) => e.stopPropagation()}>
             <h4>Payment Details</h4>
             <hr />
-            <p>
-              <strong>Name:</strong> {selected.name}
-            </p>
+            <p><strong>Name:</strong> {selected.name}</p>
             <p>
               <strong>Status:</strong>{" "}
               <span
@@ -103,15 +127,9 @@ const Payment = () => {
                 {selected.status}
               </span>
             </p>
-            <p>
-              <strong>Method:</strong> {selected.method}
-            </p>
-            <p>
-              <strong>Transaction ID:</strong> {selected.transactionId}
-            </p>
-            <p>
-              <strong>Date:</strong> {selected.date}
-            </p>
+            <p><strong>Method:</strong> {selected.method}</p>
+            <p><strong>Transaction ID:</strong> {selected.transactionId}</p>
+            <p><strong>Date:</strong> {selected.date}</p>
             <button className="btn-action btn-details mt-2" onClick={closeModal}>
               Close
             </button>

@@ -1,45 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../../utils/axiosInstance";
 import "./userstat.css";
 
 const UserStatus = () => {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "Dipesh Thapa Magar",
-      email: "dipesh@example.com",
-      phone: "+977-9800000000",
-      address1: "123 Main Street",
-      address2: "Apt 5B",
-      state: "Bagmati",
-      postalCode: "44600",
-      country: "Nepal",
-    },
-    {
-      id: 2,
-      name: "Yadap Thapa",
-      email: "yadap@example.com",
-      phone: "+977-9811111111",
-      address1: "456 Lakeside Road",
-      address2: "Suite 210",
-      state: "Gandaki",
-      postalCode: "33700",
-      country: "Nepal",
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
+  // Fetch users from backend
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await axiosInstance.get("/admin-dashboard/bookings/");
+      const data = (Array.isArray(res.data) ? res.data : res.data.results || []).map(
+        (b) => ({
+          id: b.id,
+          name: b.full_name || `${b.user?.first_name} ${b.user?.last_name}` || "—",
+          email: b.email || b.user?.email || "—",
+          phone: b.phone || "—",
+          address1: b.address_line1 || "—",
+          address2: b.address_line2 || "—",
+          state: b.state || "—",
+          postalCode: b.postcode || "—",
+          country: b.country || "—",
+        })
+      );
+      setUsers(data);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      setUsers([]);
+    }
   };
 
-  const handleDetails = (user) => {
-    setSelectedUser(user);
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await axiosInstance.delete(`/admin-dashboard/bookings/${id}/`);
+      fetchUsers(); // refresh list
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
   };
 
-  const closeDetails = () => {
-    setSelectedUser(null);
-  };
+  const handleDetails = (user) => setSelectedUser(user);
+  const closeDetails = () => setSelectedUser(null);
 
   return (
     <div className="userstat-container">
@@ -63,37 +69,44 @@ const UserStatus = () => {
           </thead>
 
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td className="hide-mobile">{user.email}</td>
-                <td className="hide-mobile">{user.phone}</td>
-                <td className="hide-mobile">{user.address1}</td>
-                <td className="hide-mobile">{user.address2}</td>
-                <td className="hide-mobile">{user.state}</td>
-                <td className="hide-mobile">{user.postalCode}</td>
-                <td className="hide-mobile">{user.country}</td>
-                <td>
-                  <button
-                    className="btn-details"
-                    onClick={() => handleDetails(user)}
-                  >
-                    Details
-                  </button>
-                  <button
-                    className="btn-delete"
-                    onClick={() => handleDelete(user.id)}
-                  >
-                    Delete
-                  </button>
+            {users.length ? (
+              users.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.name}</td>
+                  <td className="hide-mobile">{user.email}</td>
+                  <td className="hide-mobile">{user.phone}</td>
+                  <td className="hide-mobile">{user.address1}</td>
+                  <td className="hide-mobile">{user.address2}</td>
+                  <td className="hide-mobile">{user.state}</td>
+                  <td className="hide-mobile">{user.postalCode}</td>
+                  <td className="hide-mobile">{user.country}</td>
+                  <td>
+                    <button
+                      className="btn-details"
+                      onClick={() => handleDetails(user)}
+                    >
+                      Details
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="9" style={{ textAlign: "center" }}>
+                  No users found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Details Modal */}
       {selectedUser && (
         <div className="userstat-modal-overlay" onClick={closeDetails}>
           <div
