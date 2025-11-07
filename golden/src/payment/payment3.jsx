@@ -12,7 +12,7 @@ import "./payment3.css";
 
 export default function Payment3() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); 
   const location = useLocation();
 
   // Extras from navigation state (camelCase keys)
