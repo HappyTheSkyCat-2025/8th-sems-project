@@ -1,43 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../../utils/axiosInstance"; // your axios setup
 import "./review.css";
 
 const Reviews = () => {
-  const [reviews, setReviews] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      title: "Beautiful Experience in Italy",
-      deal: "Summer Getaway",
-      content: "Amazing trip! The food, culture, and scenery were unforgettable.",
-      date: "2025-06-12",
-    },
-    {
-      id: 2,
-      name: "Emily Smith",
-      title: "Adventure in Nepal",
-      deal: "Himalayan Explorer",
-      content: "Loved the trekking routes and the friendly people!",
-      date: "2025-07-20",
-    },
-  ]);
-
+  const [reviews, setReviews] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [current, setCurrent] = useState({
     id: null,
     name: "",
     title: "",
-    deal: "",
+    rating: "",
     content: "",
-    date: "",
+    travel_date: "",
   });
 
+  // Fetch reviews on mount
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const fetchReviews = async () => {
+    try {
+      const res = await axiosInstance.get("/admin-dashboard/reviews/");
+      const data = Array.isArray(res.data) ? res.data : res.data.results;
+      setReviews(data || []);
+    } catch (error) {
+      console.error("Failed to load reviews:", error);
+      setReviews([]);
+    }
+  };
+
   const openAddModal = () => {
-    setCurrent({ id: null, name: "", title: "", deal: "", content: "", date: "" });
+    setCurrent({ id: null, name: "", title: "", rating: "", content: "", travel_date: "" });
     setModalOpen(true);
   };
 
-  const openEditModal = (item) => {
-    setCurrent(item);
+  const openEditModal = (review) => {
+    setCurrent({
+      id: review.id,
+      name: review.name,
+      title: review.title,
+      rating: review.rating,
+      content: review.content,
+      travel_date: review.travel_date,
+    });
     setModalOpen(true);
   };
 
@@ -48,17 +54,28 @@ const Reviews = () => {
     setCurrent((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    if (current.id) {
-      setReviews((prev) => prev.map((r) => (r.id === current.id ? current : r)));
-    } else {
-      setReviews((prev) => [...prev, { ...current, id: Date.now() }]);
+  const handleSave = async () => {
+    try {
+      if (current.id) {
+        await axiosInstance.put(`/admin-dashboard/reviews/${current.id}/`, current);
+      } else {
+        await axiosInstance.post("/admin-dashboard/reviews/", current);
+      }
+      setModalOpen(false);
+      fetchReviews();
+    } catch (error) {
+      console.error("Failed to save review:", error.response?.data || error);
     }
-    setModalOpen(false);
   };
 
-  const handleDelete = (id) => {
-    setReviews(reviews.filter((r) => r.id !== id));
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this review?")) return;
+    try {
+      await axiosInstance.delete(`/admin-dashboard/reviews/${id}/`);
+      fetchReviews();
+    } catch (error) {
+      console.error("Failed to delete review:", error);
+    }
   };
 
   return (
@@ -74,7 +91,7 @@ const Reviews = () => {
           <tr>
             <th>Name</th>
             <th>Title</th>
-            <th>Travel Deal</th>
+            <th>Rating</th>
             <th>Content</th>
             <th>Travel Date</th>
             <th>Action</th>
@@ -85,9 +102,9 @@ const Reviews = () => {
             <tr key={r.id}>
               <td>{r.name}</td>
               <td>{r.title}</td>
-              <td>{r.deal}</td>
+              <td>{r.rating}</td>
               <td>{r.content}</td>
-              <td>{r.date}</td>
+              <td>{r.travel_date}</td>
               <td>
                 <button className="edit-btn" onClick={() => openEditModal(r)}>Edit</button>
                 <button className="delete-btn" onClick={() => handleDelete(r.id)}>Delete</button>
@@ -103,59 +120,27 @@ const Reviews = () => {
             <h3>{current.id ? "Edit Review" : "Add Review"}</h3>
 
             <div className="form-group">
-              <input
-                type="text"
-                name="name"
-                value={current.name}
-                onChange={handleChange}
-                placeholder=" "
-                required
-              />
+              <input type="text" name="name" value={current.name} onChange={handleChange} placeholder=" " required />
               <label>Name</label>
             </div>
 
             <div className="form-group">
-              <input
-                type="text"
-                name="title"
-                value={current.title}
-                onChange={handleChange}
-                placeholder=" "
-                required
-              />
+              <input type="text" name="title" value={current.title} onChange={handleChange} placeholder=" " required />
               <label>Title</label>
             </div>
 
             <div className="form-group">
-              <input
-                type="text"
-                name="deal"
-                value={current.deal}
-                onChange={handleChange}
-                placeholder=" "
-              />
-              <label>Travel Deal</label>
+              <input type="number" name="rating" value={current.rating} onChange={handleChange} placeholder=" " min="1" max="5" />
+              <label>Rating (1-5)</label>
             </div>
 
             <div className="form-group">
-              <textarea
-                name="content"
-                value={current.content}
-                onChange={handleChange}
-                placeholder=" "
-                required
-              ></textarea>
+              <textarea name="content" value={current.content} onChange={handleChange} placeholder=" " required />
               <label>Content</label>
             </div>
 
             <div className="form-group">
-              <input
-                type="date"
-                name="date"
-                value={current.date}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" name="travel_date" value={current.travel_date} onChange={handleChange} required />
               <label className="date-label">Travel Date</label>
             </div>
 

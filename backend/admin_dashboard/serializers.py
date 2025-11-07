@@ -161,8 +161,18 @@ class ItineraryDaySerializer(serializers.ModelSerializer):
 
 class TravelDealSerializer(serializers.ModelSerializer):
     country = CountrySerializer(read_only=True)
+    country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), write_only=True, source='country'
+    )
     category = DealCategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=DealCategory.objects.all(), write_only=True, source='category'
+    )
     places = PlaceSerializer(many=True, read_only=True)
+    place_ids = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Place.objects.all(), write_only=True, source='places'
+    )
+
     days = serializers.IntegerField(required=False)
     gallery = TravelImageSerializer(many=True, required=False)
     itinerary = ItineraryDaySerializer(many=True, required=False)
@@ -170,12 +180,13 @@ class TravelDealSerializer(serializers.ModelSerializer):
     class Meta:
         model = TravelDeal
         fields = [
-            'id', 'title', 'subtitle', 'slug', 'days', 'price', 'image', 'themes', 'tag', 'style',
-            'description', 'on_sale', 'last_minute', 'discount_percent',
+            'id', 'title', 'subtitle', 'slug', 'days', 'price', 'image', 'themes',
+            'tag', 'style', 'description', 'on_sale', 'last_minute', 'discount_percent',
             'included', 'not_included',
             'country', 'country_id',
             'category', 'category_id',
-            'places', 'gallery', 'itinerary', 'city', 'map_zoom'
+            'places', 'place_ids',
+            'gallery', 'itinerary', 'city', 'map_zoom'
         ]
         extra_kwargs = {
             'days': {'required': False},
@@ -200,30 +211,59 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class ArticleSerializer(serializers.ModelSerializer):
+    country = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all()
+    )
+
     class Meta:
         model = Article
-        fields = ['id', 'title', 'location', 'description', 'image', 'is_inspirational', 'is_suggested']
+        fields = [
+            'id', 'title', 'location', 'description', 
+            'image', 'is_inspirational', 'is_suggested', 'country'
+        ]
 
 
 class FAQSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+    country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), source='country', write_only=True
+    )
+
     class Meta:
         model = FAQ
-        fields = ['id', 'question', 'answer']
+        fields = ['id', 'country', 'country_id', 'question', 'answer']
 
 
 class CountryOverviewSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+    country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), source='country', write_only=True
+    )
+
     class Meta:
         model = CountryOverview
         fields = [
-            'id', 'capital', 'population', 'currency', 'language',
-            'timezone', 'calling_code', 'electricity'
+            'id',
+            'country', 'country_id',  # include both for GET + POST/PUT
+            'capital',
+            'population',
+            'currency',
+            'language',
+            'timezone',
+            'calling_code',
+            'electricity',
         ]
 
 
 class CountryLearnMoreTopicSerializer(serializers.ModelSerializer):
+    country = CountrySerializer(read_only=True)
+    country_id = serializers.PrimaryKeyRelatedField(
+        queryset=Country.objects.all(), source='country', write_only=True
+    )
+
     class Meta:
         model = CountryLearnMoreTopic
-        fields = ['id', 'title', 'description', 'image', 'order']
+        fields = ['id', 'title', 'description', 'image', 'order', 'country', 'country_id']
 
 
 class TravelDealDateSerializer(serializers.ModelSerializer):
