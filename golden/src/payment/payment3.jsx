@@ -12,14 +12,14 @@ import "./payment3.css";
 
 export default function Payment3() {
   const navigate = useNavigate();
-  const { id } = useParams(); 
+  const { id } = useParams();
   const location = useLocation();
 
   // Extras from navigation state (camelCase keys)
   const extras = location.state?.extras || {};
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const [paying, setPaying] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [showTrip, setShowTrip] = useState(false);
@@ -54,7 +54,8 @@ export default function Payment3() {
   const tripCost = parseFloat(date_option.discounted_price) || 0;
 
   // Use travellers count passed via extras; default to 1 if missing or invalid
-  const travellersCount = Number(extras.numTravellers) > 0 ? Number(extras.numTravellers) : 1;
+  const travellersCount =
+    Number(extras.numTravellers) > 0 ? Number(extras.numTravellers) : 1;
 
   const roomCost = extras.roomOption === "private" ? 345 * travellersCount : 0;
   const donationCost = extras.donation ? 23 : 0;
@@ -72,18 +73,17 @@ export default function Payment3() {
     }
     setPaying(true);
     try {
-      await axiosInstance.put(
-        `/payments/bookings/${id}/update-payment/`,
-        {
-          payment_method: "manual",
-          payment_amount: amount,
-          transaction_id: null,
-        }
-      );
+      await axiosInstance.put(`/payments/bookings/${id}/update-payment/`, {
+        payment_method: "manual",
+        payment_amount: amount,
+        transaction_id: null,
+      });
       toast.success("Cash payment confirmed!");
       setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500); // Redirect with success param
     } catch (err) {
-      toast.error("Payment failed: " + (err.response?.data?.detail || "Unknown error"));
+      toast.error(
+        "Payment failed: " + (err.response?.data?.detail || "Unknown error")
+      );
     } finally {
       setPaying(false);
     }
@@ -91,35 +91,35 @@ export default function Payment3() {
 
   const onStripeSuccess = async (chargeId) => {
     try {
-      await axiosInstance.put(
-        `/payments/bookings/${id}/update-payment/`,
-        {
-          payment_method: "stripe",
-          payment_amount: amount,
-          transaction_id: chargeId,
-        }
-      );
+      await axiosInstance.put(`/payments/bookings/${id}/update-payment/`, {
+        payment_method: "stripe",
+        payment_amount: amount,
+        transaction_id: chargeId,
+      });
       toast.success("Stripe payment confirmed!");
       setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500);
     } catch (err) {
-      toast.error("Stripe update failed: " + (err.response?.data?.detail || "Unknown error"));
+      toast.error(
+        "Stripe update failed: " +
+          (err.response?.data?.detail || "Unknown error")
+      );
     }
   };
 
   const onPayPalSuccess = async (paypalTransactionId) => {
     try {
-      await axiosInstance.put(
-        `/payments/bookings/${id}/update-payment/`,
-        {
-          payment_method: "paypal",
-          payment_amount: amount,
-          transaction_id: paypalTransactionId,
-        }
-      );
+      await axiosInstance.put(`/payments/bookings/${id}/update-payment/`, {
+        payment_method: "paypal",
+        payment_amount: amount,
+        transaction_id: paypalTransactionId,
+      });
       toast.success("PayPal payment confirmed!");
       setTimeout(() => navigate(`/bookings/${id}?success=true`), 1500);
     } catch (err) {
-      toast.error("PayPal update failed: " + (err.response?.data?.detail || "Unknown error"));
+      toast.error(
+        "PayPal update failed: " +
+          (err.response?.data?.detail || "Unknown error")
+      );
     }
   };
 
@@ -131,7 +131,10 @@ export default function Payment3() {
 
   return (
     <div className="payment3-container">
-      <StepIndicator current={2} steps={["Your details", "Trip extras", "Payment"]} />
+      <StepIndicator
+        current={2}
+        steps={["Your details", "Trip extras", "Payment"]}
+      />
       <h2 className="payment-title">Payment</h2>
 
       {/* Late request alert */}
@@ -140,10 +143,14 @@ export default function Payment3() {
         <div className="notice-text">
           <strong>Late request</strong>
           <p>
-            For bookings close to departure date, full payment is required to request your place with our local
-            operators. This usually takes 2 to 4 business days, but may take longer due to high demand.
+            For bookings close to departure date, full payment is required to
+            request your place with our local operators. This usually takes 2 to
+            4 business days, but may take longer due to high demand.
           </p>
-          <p>Please wait for confirmation before booking flights or non-refundable travel arrangements.</p>
+          <p>
+            Please wait for confirmation before booking flights or
+            non-refundable travel arrangements.
+          </p>
         </div>
       </div>
 
@@ -151,8 +158,8 @@ export default function Payment3() {
         {/* LEFT */}
         <div className="payment-left">
           <div className="review-box">
-            Have you reviewed the details in the booking summary? If something isn’t correct, you can adjust your
-            details in the previous steps.
+            Have you reviewed the details in the booking summary? If something
+            isn’t correct, you can adjust your details in the previous steps.
           </div>
 
           {/* --- TERMS AND AGREEMENTS --- */}
@@ -163,26 +170,38 @@ export default function Payment3() {
                 type="checkbox"
                 checked={agreedTerms}
                 onChange={(e) => setAgreedTerms(e.target.checked)}
-              />{" "}
-              I agree to the <a href="#">terms and conditions</a> and
-              <a href="#"> privacy policy</a> <span className="required">*</span>
+              />
+              <span>
+                I agree to the <a href="#">terms and conditions</a> and
+                <a href="#"> privacy policy.</a>
+                <span className="required">*</span>
+              </span>
             </label>
+
             <label className="terms-checkbox-label">
               <input
                 type="checkbox"
                 checked={agreedInfo}
                 onChange={(e) => setAgreedInfo(e.target.checked)}
-              />{" "}
-              I have read the <a href="#">Essential Trip Information</a> and will follow
-              <a href="#"> community guidelines</a> <span className="required">*</span>
+              />
+              <span>
+                I have read the <a href="#">Essential Trip Information</a> and
+                will follow
+                <a href="#"> community guidelines.</a>
+                <span className="required">*</span>
+              </span>
             </label>
+
             <label className="terms-checkbox-label">
               <input
                 type="checkbox"
                 checked={optInEmails}
                 onChange={(e) => setOptInEmails(e.target.checked)}
-              />{" "}
-              I would like to receive offers and regular updates from Intrepid Travel via email
+              />
+              <span>
+                I would like to receive offers and regular updates from Intrepid
+                Travel via email.
+              </span>
             </label>
           </div>
 
@@ -202,7 +221,9 @@ export default function Payment3() {
             {paymentOptions.map((opt) => (
               <button
                 key={opt.id}
-                className={`payment-option-btn ${paymentMethod === opt.id ? "selected" : ""}`}
+                className={`payment-option-btn ${
+                  paymentMethod === opt.id ? "selected" : ""
+                }`}
                 onClick={() => setPaymentMethod(opt.id)}
                 type="button"
               >
@@ -228,7 +249,10 @@ export default function Payment3() {
                 disabled={paying || !canPay}
                 aria-disabled={paying || !canPay}
               >
-                <span role="img" aria-label="cash">💵</span> {paying ? "Processing..." : "Confirm Cash Payment"}
+                <span role="img" aria-label="cash">
+                  💵
+                </span>{" "}
+                {paying ? "Processing..." : "Confirm Cash Payment"}
               </button>
             </>
           )}
@@ -254,7 +278,9 @@ export default function Payment3() {
         <div className="booking-summary">
           <h3>Booking summary</h3>
           <div className="trip-name">{travel_deal.title || "Trip Name"}</div>
-          <div className="duration">{travel_deal.days ? `${travel_deal.days} days` : ""}</div>
+          <div className="duration">
+            {travel_deal.days ? `${travel_deal.days} days` : ""}
+          </div>
 
           <div className="details">
             <p>
@@ -277,13 +303,29 @@ export default function Payment3() {
             </p>
           </div>
 
-          <div className="summary-dropdown" onClick={() => setShowTrip(!showTrip)} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && setShowTrip(!showTrip)}>
+          <div
+            className="summary-dropdown"
+            onClick={() => setShowTrip(!showTrip)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && setShowTrip(!showTrip)}
+          >
             <span>Trip</span>
             <span>{showTrip ? "▲" : "▼"}</span>
           </div>
-          {showTrip && <div className="dropdown-content">Trip amount: USD ${tripCost.toFixed(2)}</div>}
+          {showTrip && (
+            <div className="dropdown-content">
+              Trip amount: USD ${tripCost.toFixed(2)}
+            </div>
+          )}
 
-          <div className="summary-dropdown" onClick={() => setShowRooms(!showRooms)} role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && setShowRooms(!showRooms)}>
+          <div
+            className="summary-dropdown"
+            onClick={() => setShowRooms(!showRooms)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && setShowRooms(!showRooms)}
+          >
             <span>Room options</span>
             <span>{showRooms ? "▲" : "▼"}</span>
           </div>
@@ -301,7 +343,18 @@ export default function Payment3() {
             <strong>USD ${amount}</strong>
           </div>
 
-          <div className="how-to-credit" title="How to redeem credit" tabIndex={0} role="button" onKeyDown={e => e.key === "Enter" && alert("Select “Use Credit” on payment page before finalizing payment.")}>
+          <div
+            className="how-to-credit"
+            title="How to redeem credit"
+            tabIndex={0}
+            role="button"
+            onKeyDown={(e) =>
+              e.key === "Enter" &&
+              alert(
+                "Select “Use Credit” on payment page before finalizing payment."
+              )
+            }
+          >
             <span>ⓘ</span> How to redeem credit
           </div>
         </div>
@@ -311,7 +364,10 @@ export default function Payment3() {
       <div className="info-boxes">
         <div>
           <strong>💳 Paying deposit?</strong>
-          <p>Pay the rest of your payments later as you like. We’ll remind you before full payment is due.</p>
+          <p>
+            Pay the rest of your payments later as you like. We’ll remind you
+            before full payment is due.
+          </p>
         </div>
         <div>
           <strong>🔒 Lock in your price</strong>
