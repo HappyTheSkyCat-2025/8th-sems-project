@@ -11,7 +11,7 @@ import {
 import { IoLanguageOutline } from "react-icons/io5";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Divide as Hamburger } from "hamburger-react";
-import axiosInstance from "../utils/axiosInstance"; // Assuming this is set up correctly
+import axiosInstance from "../utils/axiosInstance";
 import logo from "../assets/logo1.png";
 import baliImage from "../assets/bali.jpg";
 import "../styles/Navbar.css";
@@ -37,18 +37,13 @@ export default function Navbar() {
   const [showProfile, setShowProfile] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [showSearchIcon, setShowSearchIcon] = useState(false);
-  
-  // NEW STATE FOR SEARCH INPUT
-  const [searchTerm, setSearchTerm] = useState("");
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mobileView, setMobileView] = useState("main");
   const [mobileActiveRegion, setMobileActiveRegion] = useState(null);
   const [activeCountry, setActiveCountry] = useState(null);
-  // Removed unused 'move' state
-
+  const [move, setMove] = useState(false);
   useEffect(() => {
-    // --- Data Fetching ---
     axiosInstance.get("destinations/").then((res) => {
       const regionList = res.data.regions.map((r) => r.region_name);
       const map = {};
@@ -100,13 +95,16 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
+      // Selects all elements with the class 'dropdown', which now includes the profile dropdown.
       const dropdowns = document.querySelectorAll(".dropdown");
+
       // If the click target is NOT inside any of the dropdown elements, close them all.
       if (![...dropdowns].some((el) => el.contains(e.target))) {
         setShowDestinations(false);
         setShowWaysToTravel(false);
         setShowDeals(false);
-        setShowProfile(false);
+        // Ensure profile menu is closed on outside click
+        setShowProfile(false); 
       }
     };
 
@@ -118,7 +116,7 @@ export default function Navbar() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     setIsAuthenticated(false);
-    setShowProfile(false);
+    setShowProfile(false); // Close profile menu after logout
     navigate("/login");
   };
 
@@ -134,44 +132,6 @@ export default function Navbar() {
     if (mobileView === "countries") setMobileView("destinations");
     else setMobileView("main");
   };
-
-  /**
-   * Universal function to navigate to the search page with a specific payload.
-   * @param {string} type - The type of search (region, country, travel, deal, text).
-   * @param {string} value - The primary value/key to search for.
-   * @param {string} [slug] - Optional slug for routing/details.
-   */
-  const handleSearchNavigation = (type, value, slug = "") => {
-    setShowDestinations(false);
-    setShowWaysToTravel(false);
-    setShowDeals(false);
-    setShowSearchBar(false);
-    setIsMobileMenuOpen(false); // Close mobile menu on navigate
-
-    navigate("/search", {
-      state: {
-        searchType: type,
-        searchTerm: value,
-        searchSlug: slug,
-      },
-    });
-  };
-
-  const handleTextSearch = (e) => {
-    if (e.key === 'Enter' || e.type === 'click') {
-        if (searchTerm.trim()) {
-            handleSearchNavigation('text', searchTerm.trim());
-        }
-    }
-  };
-
-
-  // Helper function to handle country/link clicks inside mega menus
-  const handleMegaMenuLinkClick = (type, value, slug) => (e) => {
-    // e.preventDefault(); // Uncomment if you want to prevent default Link behavior
-    handleSearchNavigation(type, value, slug);
-  };
-
 
   return (
     <>
@@ -205,7 +165,7 @@ export default function Navbar() {
                 setShowDestinations(!showDestinations);
                 setShowWaysToTravel(false);
                 setShowDeals(false);
-                setShowProfile(false);
+                setShowProfile(false); // Also close profile menu
               }}
             >
               <span className="link-item">
@@ -223,7 +183,6 @@ export default function Navbar() {
                             onClick={() => {
                               setActiveRegion(r);
                               setActiveCountry(null);
-                              // We don't navigate on region click, just update the panel view
                             }}
                             className={
                               activeRegion === r ? "region-active" : ""
@@ -248,11 +207,13 @@ export default function Navbar() {
                               <ul>
                                 {firstCol.map((c) => (
                                   <li key={c.slug}>
-                                    {/* UPDATED: Link navigates to /search */}
                                     <Link
-                                      to="/search"
+                                      to={`/destinations/${c.slug}`}
                                       className="plain-link"
-                                      onClick={handleMegaMenuLinkClick('country', c.name, c.slug)}
+                                      onClick={(e) => {
+                                        setActiveCountry(c);
+                                        setShowDestinations(false);
+                                      }}
                                     >
                                       {c.name}
                                     </Link>
@@ -262,11 +223,13 @@ export default function Navbar() {
                               <ul>
                                 {secondCol.map((c) => (
                                   <li key={c.slug}>
-                                    {/* UPDATED: Link navigates to /search */}
                                     <Link
-                                      to="/search"
+                                      to={`/destinations/${c.slug}`}
                                       className="plain-link"
-                                      onClick={handleMegaMenuLinkClick('country', c.name, c.slug)}
+                                      onClick={(e) => {
+                                        setActiveCountry(c);
+                                        setShowDestinations(false);
+                                      }}
                                     >
                                       {c.name}
                                     </Link>
@@ -277,10 +240,17 @@ export default function Navbar() {
                           );
                         })()}
                       </div>
-                      {/* UPDATED: "View all" button navigates to /search */}
                       <button
-                        className="view-all-region-btn"
-                        onClick={() => handleSearchNavigation('region', activeRegion, activeRegion.toLowerCase())}
+                        className={`view-all-region-btn ${
+                          move ? "move-right" : ""
+                        }`}
+                        onClick={() => {
+                          setMove(true);
+                          setShowDestinations(false);
+                          navigate(
+                            `/destinations/${activeRegion.toLowerCase()}`
+                          );
+                        }}
                       >
                         View all {activeRegion}
                       </button>
@@ -297,23 +267,19 @@ export default function Navbar() {
                             className="featured-image"
                           />
                           <div className="featured-overlay">
-                            <div className="featured-title">
-                              {activeCountry ? activeCountry.name : activeRegion}
-                            </div>
+                            <div className="featured-title">{activeRegion}</div>
                             <div className="featured-desc">
                               {activeCountry
                                 ? `Explore ${activeCountry.name} with all our heart and money.`
                                 : `Discover unforgettable journeys in ${activeRegion}.`}
                             </div>
-                            {/* UPDATED: "View Trip" button navigates to /search */}
                             <Link
-                              to="/search"
+                              to={
+                                activeCountry
+                                  ? `/destinations/${activeCountry.slug}`
+                                  : `/destinations/${activeRegion.toLowerCase()}`
+                              }
                               className="featured-btn"
-                              onClick={handleMegaMenuLinkClick(
-                                activeCountry ? 'country' : 'region',
-                                activeCountry ? activeCountry.name : activeRegion,
-                                activeCountry ? activeCountry.slug : activeRegion.toLowerCase()
-                              )}
                             >
                               View Trip
                             </Link>
@@ -333,7 +299,7 @@ export default function Navbar() {
                 setShowWaysToTravel(!showWaysToTravel);
                 setShowDestinations(false);
                 setShowDeals(false);
-                setShowProfile(false);
+                setShowProfile(false); // Also close profile menu
               }}
             >
               <span className="link-item">
@@ -357,11 +323,8 @@ export default function Navbar() {
                     </div>
                     <div className="column">
                       <ul>
-                        {/* Option links use generic search navigation */}
                         {(travelOptions[activeTravelType] || []).map((o) => (
-                          <li key={o} onClick={() => handleSearchNavigation('travel_option', o)}>
-                            {o}
-                          </li>
+                          <li key={o}>{o}</li>
                         ))}
                       </ul>
                     </div>
@@ -371,11 +334,9 @@ export default function Navbar() {
                         Discover flexible adventures with{" "}
                         <strong>{activeTravelType}</strong> style.
                       </p>
-                      {/* UPDATED: "Explore More" button navigates to /search */}
                       <Link
-                        to="/search"
+                        to={`/ways-to-travel/${activeTravelType.toLowerCase()}`}
                         className="read-more-btn"
-                        onClick={handleMegaMenuLinkClick('travel_type', activeTravelType, activeTravelType.toLowerCase())}
                       >
                         Explore More
                       </Link>
@@ -392,7 +353,7 @@ export default function Navbar() {
                 setShowDeals(!showDeals);
                 setShowWaysToTravel(false);
                 setShowDestinations(false);
-                setShowProfile(false);
+                setShowProfile(false); // Also close profile menu
               }}
             >
               <span className="link-item">
@@ -416,11 +377,8 @@ export default function Navbar() {
                     </div>
                     <div className="column">
                       <ul>
-                        {/* Deal item links use generic search navigation */}
                         {(dealItems[activeDealCategory] || []).map((o) => (
-                          <li key={o} onClick={() => handleSearchNavigation('deal_item', o)}>
-                            {o}
-                          </li>
+                          <li key={o}>{o}</li>
                         ))}
                       </ul>
                     </div>
@@ -430,11 +388,9 @@ export default function Navbar() {
                         Grab hot deals in <strong>{activeDealCategory}</strong>{" "}
                         now!
                       </p>
-                      {/* UPDATED: "View Offers" button navigates to /search */}
                       <Link
-                        to="/search"
+                        to={`/deals/${activeDealCategory.toLowerCase()}`}
                         className="read-more-btn"
-                        onClick={handleMegaMenuLinkClick('deal_category', activeDealCategory, activeDealCategory.toLowerCase())}
                       >
                         View Offers
                       </Link>
@@ -444,28 +400,28 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* About Us (Existing links unchanged) */}
+            {/* About Us */}
             <div className="dropdown link-item">
               <span className="dropdown-toggle">About Us</span>
               <div className="dropdown-menu">
                 <Link 
                   to="/about" 
                   className="dropdown-link" 
-                  onClick={() => setShowProfile(false)}
+                  onClick={() => setShowProfile(false)} // Close if other dropdowns are active
                 >
                   Our Stories
                 </Link>
                 <Link 
                   to="/blogs" 
                   className="dropdown-link"
-                  onClick={() => setShowProfile(false)}
+                  onClick={() => setShowProfile(false)} // Close if other dropdowns are active
                 >
                   Blogs
                 </Link>
                 <Link 
                   to="/write" 
                   className="dropdown-link"
-                  onClick={() => setShowProfile(false)}
+                  onClick={() => setShowProfile(false)} // Close if other dropdowns are active
                 >
                   Write for us
                 </Link>
@@ -491,10 +447,11 @@ export default function Navbar() {
               to="/profile"
               state={{ tab: "favourites" }}
               className="wishlist-icon"
-              onClick={() => setShowProfile(false)}
+              onClick={() => setShowProfile(false)} // Close profile menu when navigating to wishlist
             >
               <Heart size={18} />
             </Link>
+            {/* ADDED 'dropdown' CLASS HERE */}
             <div className="profile-dropdown dropdown">
               <User
                 size={18}
@@ -502,6 +459,7 @@ export default function Navbar() {
                 onClick={() => {
                   if (isAuthenticated) {
                     setShowProfile(!showProfile);
+                    // Close other mega menus when toggling profile for a cleaner UX
                     setShowDestinations(false);
                     setShowWaysToTravel(false);
                     setShowDeals(false);
@@ -513,13 +471,14 @@ export default function Navbar() {
                   <Link 
                     to="/profile" 
                     className="profile-item"
-                    onClick={() => setShowProfile(false)}
+                    onClick={() => setShowProfile(false)} // 👈 ADDED CLOSING HERE
                   >
                     My Profile
                   </Link>
                   <span 
                     onClick={handleLogout} 
                     className="profile-item"
+                    // handleLogout already calls setShowProfile(false), but this emphasizes the intent:
                   >
                     Logout
                   </span>
@@ -530,7 +489,7 @@ export default function Navbar() {
               to="/contact" 
               className="contact-btn" 
               tabIndex={0}
-              onClick={() => setShowProfile(false)}
+              onClick={() => setShowProfile(false)} // Close profile menu when clicking contact
             >
               Contact Us
             </Link>
@@ -544,21 +503,9 @@ export default function Navbar() {
               type="text"
               placeholder="Search destinations, deals..."
               autoFocus
-              value={searchTerm} // Bind value to state
-              onChange={(e) => setSearchTerm(e.target.value)} // Update state on change
-              onKeyDown={handleTextSearch} // Handle search on Enter
             />
-            {/* Added search icon button for explicit search trigger */}
             <button
-              onClick={handleTextSearch}
-              className="search-icon"
-              style={{ padding: '0', background: 'transparent', border: 'none' }}
-              disabled={!searchTerm.trim()}
-            >
-              <Search size={18} />
-            </button>
-            <button
-              onClick={() => {setShowSearchBar(false); setSearchTerm('');}}
+              onClick={() => setShowSearchBar(false)}
               className="search-close-btn"
             >
               ×
@@ -670,27 +617,16 @@ export default function Navbar() {
           <>
             <h2 className="mobile-subtitle">{mobileActiveRegion}</h2>
             <ul className="mobile-menu-list sub">
-              {/* UPDATED: Link navigates to /search for countries */}
               {(countriesByRegion[mobileActiveRegion] || []).map((c) => (
                 <li key={c.slug}>
                   <Link
-                    to="/search"
-                    onClick={handleMegaMenuLinkClick('country', c.name, c.slug)}
+                    to={`/destinations/${c.slug}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {c.name}
                   </Link>
                 </li>
               ))}
-              {/* Added a mobile "View All" link */}
-              <li key="view-all-mobile">
-                  <Link
-                      to="/search"
-                      onClick={() => handleSearchNavigation('region', mobileActiveRegion, mobileActiveRegion.toLowerCase())}
-                      style={{ fontWeight: 'bold', color: 'var(--primary-color)' }}
-                  >
-                      View all {mobileActiveRegion}
-                  </Link>
-              </li>
             </ul>
           </>
         )}
@@ -699,12 +635,11 @@ export default function Navbar() {
           <>
             <h2 className="mobile-subtitle">Ways to Travel</h2>
             <ul className="mobile-menu-list sub">
-              {/* UPDATED: Link navigates to /search for travel types */}
               {travelTypes.map((t) => (
                 <li key={t}>
                   <Link
-                    to="/search"
-                    onClick={handleMegaMenuLinkClick('travel_type', t, t.toLowerCase())}
+                    to={`/ways-to-travel/${t.toLowerCase()}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {t}
                   </Link>
@@ -718,12 +653,11 @@ export default function Navbar() {
           <>
             <h2 className="mobile-subtitle">Deals</h2>
             <ul className="mobile-menu-list sub">
-              {/* UPDATED: Link navigates to /search for deal categories */}
               {dealCategories.map((d) => (
                 <li key={d}>
                   <Link
-                    to="/search"
-                    onClick={handleMegaMenuLinkClick('deal_category', d, d.toLowerCase())}
+                    to={`/deals/${d.toLowerCase()}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {d}
                   </Link>
