@@ -94,14 +94,20 @@ export default function Desc({ data, onViewDatesClick }) {
       <div className="trip-header">
         <h1>{data.title}</h1>
         <p>
-          <strong>{data.days} days</strong> · {renderStars(rating)}{" "}
-          <span className="review-count">
-            {rating.toFixed(1)} ({data.review_count || 0} reviews)
-          </span>{" "}
+          <strong>{data.days} days</strong>
+          <div className="rating-row">
+            {renderStars(rating)}
+            <span className="review-count">
+              {rating.toFixed(1)} ({data.review_count || 0} reviews)
+            </span>
+            <button
+              className="leave-review-btn"
+              onClick={scrollToReviewSection}
+            >
+              Leave a Review
+            </button>
+          </div>
           · {data.country?.name || "Unknown"}
-          <button className="leave-review-btn" onClick={scrollToReviewSection}>
-            Leave a Review
-          </button>
         </p>
       </div>
 

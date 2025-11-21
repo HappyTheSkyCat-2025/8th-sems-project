@@ -4,7 +4,6 @@
   margin: 0 auto;
   padding: 40px 20px;
   animation: fadeIn 0.8s ease-in-out;
-
 }
 
 /* Header */
@@ -19,6 +18,14 @@
   font-size: 1rem;
 }
 
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
 .review-count {
   color: #e63946;
   text-decoration: underline;
@@ -27,7 +34,26 @@
 
 .star {
   color: var(--hightlight-color, #f9c74f);
-  margin: 0 4px;
+  margin: 0 2px;
+}
+
+/* Leave a Review Button */
+.leave-review-btn {
+  margin-left: 12px;
+  padding: 6px 14px;
+  background: #fff;
+  border: 1px solid black;
+  color: black;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-size: 1rem;
+}
+
+.leave-review-btn:hover {
+  background: #ddb148;;
+  color: white;
 }
 
 /* Flex container for gallery + booking */
@@ -38,7 +64,7 @@
   flex-wrap: wrap;
 }
 
-/* Left side - Gallery takes more space */
+/* Left side - Gallery */
 .trip-gallery {
   flex: 2;
   display: flex;
@@ -212,5 +238,60 @@
 
   .trip-icons {
     grid-template-columns: 1fr;
+  }
+
+  .trip-header h1 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .trip-header p {
+    font-size: 0.9rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rating-row {
+    justify-content: center;
+  }
+
+  .leave-review-btn {
+    margin-left: 0;
+    width: max-content;
+    align-self: center;
+  }
+
+  .trip-info-box {
+    width: 100%;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .trip-header p {
+    font-size: 0.85rem;
+  }
+
+  .top-gallery img {
+    height: 120px;
+  }
+
+  .bottom-imgs img {
+    height: 150px;
+  }
+
+  .leave-review-btn {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+
+  .trip-icons {
+    grid-template-columns: 1fr 1fr;
   }
 }

@@ -26,6 +26,7 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .filter-dropdown,
@@ -48,6 +49,8 @@
   box-shadow: var(--shadow-light);
   margin-bottom: 20px;
   animation: fadeIn 0.4s ease;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .date-left {
@@ -55,6 +58,7 @@
   flex-direction: column;
   gap: 12px;
   flex: 1;
+  min-width: 220px;
 }
 
 .date-range {
@@ -62,6 +66,7 @@
   gap: 20px;
   font-size: 14px;
   color: #6c757d;
+  flex-wrap: wrap;
 }
 
 .date-range strong {
@@ -102,6 +107,7 @@
   gap: 10px;
   flex: 1;
   max-width: 280px;
+  min-width: 180px;
 }
 
 .discount-badge-wrapper {
@@ -195,23 +201,95 @@
   }
 }
 
+/* Redesigned notice for selling fast */
 .notice-box.selling-fast {
   background: #fff4e5;
   border: 1px solid #ffa500;
-  padding: 0.5rem;
-  border-radius: 5px;
-  margin: 0.5rem 0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   font-size: 0.9rem;
+  gap: 6px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  animation: fadeIn 0.3s ease-in;
 }
+
 .notice-box .icon {
   font-weight: bold;
-  margin-right: 0.5rem;
   color: #ff8c00;
+  background: #fff0d6;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
 }
+
 .sold-out-text {
   color: red;
-  font-weight: bold;
+  font-weight: 700;
   margin-top: 1rem;
+  font-size: 14px;
+  text-align: center;
+  padding: 6px 12px;
+  border: 1px solid #e74c3c;
+  border-radius: 6px;
+  background-color: #fff0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .date-card {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .date-left,
+  .date-right {
+    flex: 1 1 100%;
+    max-width: 100%;
+    align-items: flex-start;
+  }
+
+  .date-right {
+    align-items: flex-start;
+  }
+
+  .notice-box.selling-fast {
+    justify-content: flex-start;
+  }
+
+  .sold-out-text {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .date-range {
+    gap: 12px;
+  }
+
+  .date-range strong {
+    font-size: 16px;
+  }
+
+  .discount-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
+  .discounted-price {
+    font-size: 18px;
+  }
+
+  .confirm-btn {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 0.9rem;
+  }
 }
