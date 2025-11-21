@@ -1,4 +1,3 @@
-
 .navbar {
   background-color: var(--bg-color);
   padding: var(--spacing) 2vw;
@@ -36,7 +35,6 @@
   font-weight: 400;
 }
 
-/* Nav Links */
 .navbar-links {
   display: flex;
   gap: 30px;
@@ -62,8 +60,6 @@
   position: relative;
 }
 
-
-/* === Mega Menu Common === */
 .mega-menu-dest,
 .mega-menu-ways,
 .mega-menu-deals {
@@ -107,27 +103,25 @@
   border-radius: 0 0 20px 20px;
   overflow: hidden;
 }
- 
-/* === Mega Menu Columns === */
+  
 .column {
   flex: 1;
   padding: 20px;
   border-left: 1px solid #ddd;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
-/* Region active/hover styles */
 .column ul li.region-active,
-.column ul li:hover {
-  background: #777;
-  color: #fff !important;
-  font-weight: bold;
-  border-radius: 8px;
-  transition: background 0.2s, color 0.2s;
+.column ul li.active {
+  color: var(--primary-dark) !important;
+  font-weight: 600;
+  background: #f0f0f0;
+  border-radius: 6px;
 }
 
-/* === Featured Card Styles === */
+/* === FEATURED CARD STYLES (THIRD COLUMN) === */
 .featured-card {
   position: relative;
   width: 100%;
@@ -136,7 +130,14 @@
   align-items: flex-end;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2); 
+  transition: transform 0.3s ease-in-out; 
+  cursor: pointer;
+}
+
+.featured-card:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 12px 35px rgba(0,0,0,0.3); 
 }
 
 .featured-image-wrapper {
@@ -150,50 +151,67 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.4s ease;
 }
 
+/* --- REMOVED: Zoom in/out effect on hover --- */
+/* .featured-card:hover .featured-image {
+    transform: scale(1.02); 
+} */
+
+/* ENHANCED FEATURED OVERLAY DESIGN */
 .featured-overlay {
   position: absolute;
   left: 0;
   bottom: 0;
   width: 100%;
-  padding: 32px 24px 24px 24px;
-  background: linear-gradient(0deg, rgba(0,0,0,0.75) 70%, rgba(0,0,0,0.1) 100%);
+  padding: 20px 20px; /* Adjusted padding slightly */
+  /* --- REDUCED VINTAGE DARK FADE COLOR (less opaque background) --- */
+  background: linear-gradient(0deg, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0) 100%); 
   color: #fff;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .featured-title {
-  font-size: 2rem;
+  /* --- DECREASED FONT SIZE --- */
+  font-size: 1.5rem; 
   font-weight: 700;
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  letter-spacing: 0.5px; /* Adjusted letter spacing */
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
 .featured-desc {
-  font-size: 1.1rem;
-  margin-bottom: 12px;
-  color: #f3f3f3;
+  /* --- DECREASED FONT SIZE --- */
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  color: #e0e0e0;
   line-height: 1.4;
 }
 
 .featured-btn {
   display: inline-block;
-  padding: 10px 22px;
+  padding: 10px 22px; 
   background: var(--highlight-color);
   color: white;
   border: none;
   border-radius: 24px;
-  font-size: 1rem;
+  font-size: 1rem; 
   font-weight: 600;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: background 0.2s, color 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: background 0.2s, transform 0.2s; 
   cursor: pointer;
+  align-self: flex-start;
 }
 
+.featured-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+}
+/* END FEATURED CARD STYLES */
 
 .mega-columns .column:first-child {
   border-left: none;
@@ -203,31 +221,57 @@
   list-style: none;
   padding: 0;
   margin: 0;
-  flex-grow: 1;
-  overflow-y: auto;
 }
 
 .column ul li {
   margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #eee;
+  padding: 8px 10px;
+  border-bottom: none;
   color: var(--text-color);
   cursor: pointer;
-  transition: color 0.2s;
   user-select: none;
   font-size: 14px;
+  position: relative;
+  transition: all 0.25s ease-out;
+  display: flex;
+  align-items: center;
 }
+
 .column ul li:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
-.column ul li:hover,
-.column ul li.active {
-  color: var(--primary-color);
-  font-weight: bold;
+.column ul li:hover {
+  color: var(--primary-dark) !important;
+  background: #f0f0f0;
+  border-radius: 6px;
+  transform: translateX(4px);
 }
 
-/* === Mega Menu Image Column === */
+.column ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 3px;
+  height: 80%;
+  background-color: var(--primary-dark);
+  border-radius: 0 4px 4px 0;
+  transition: transform 0.3s ease;
+}
+
+.column ul li:hover::before,
+.column ul li.region-active::before,
+.column ul li.active::before {
+  transform: translateY(-50%) scaleY(1);
+}
+
+.column ul li:hover .plain-link {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
 .image-column {
   display: flex;
   flex-direction: column;
@@ -235,6 +279,36 @@
   padding-left: 20px;
   border-left: 1px solid #ddd;
 }
+
+/* Countries column adjustment for button position */
+.countries-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.view-all-region-btn {
+  margin-bottom: 10px;
+  padding: 8px 18px;
+  background: var(--highlight-color);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 15px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+/* --- Ensured hover color is primary-dark --- */
+.view-all-region-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
 
 .image-column img {
   width: 100%;
@@ -260,8 +334,12 @@
   border-radius: var(--radius);
   cursor: pointer;
   align-self: flex-start;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s;
   text-decoration: none;
+}
+
+.read-more-btn:hover {
+    transform: translateY(-2px);
 }
 
 .plain-link {
@@ -272,7 +350,6 @@
   font-family: inherit;
 }
 
-/* Navbar Icons */
 .navbar-icons {
   display: flex;
   align-items: center;
@@ -306,8 +383,6 @@
   padding: 4px;
 }
 
-
-/* Profile */
 .profile-dropdown {
   position: relative;
   display: flex;
@@ -332,12 +407,13 @@
   text-decoration: none;
   color: #333;
   font-size: 14px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 .profile-item:hover {
-  background-color: #f5f5f5;
+  background-color: #f0f0f0;
+  transform: translateX(2px);
 }
 
-/* Contact */
 .contact-btn {
   background-color: var(--highlight-color);
   color: white;
@@ -347,16 +423,17 @@
   font-size: 14px;
   cursor: pointer;
   text-decoration: none;
+  transition: background-color 0.2s; /* Ensure transition exists */
 }
+/* --- Ensured hover color is primary-dark --- */
 .contact-btn:hover {
   background-color: var(--primary-dark);
 }
-/*about us*/
+
 .dropdown {
   position: relative;
 }
 
-/* Toggle with Icon */
 .dropdown-toggle {
   display: flex;
   align-items: center;
@@ -368,7 +445,6 @@
   transition: color 0.3s ease;
 }
 
-/* Dropdown Menu Styling */
 .dropdown-menu {
   position: absolute;
   top: 100%;
@@ -383,23 +459,23 @@
   z-index: 1001;
 }
 
-/* Show on Hover */
 .dropdown:hover .dropdown-menu {
   display: block;
 }
 
-/* Dropdown Link Items */
 .dropdown-link {
   display: block;
   padding: 10px 16px;
   font-size: 0.9rem; 
   color: #333;
   text-decoration: none;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.dropdown-link:hover {
+  background-color: #f0f0f0;
+  transform: translateX(2px);
 }
 
-
-/* Search */
 .search-icon {
   background: transparent;
   border: none;
@@ -458,7 +534,6 @@
   opacity: 1;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -480,7 +555,6 @@
   }
 }
 
-/* Mobile Hamburger icon wrapper */
 .hamburger-wrapper {
   display: none;
 } 
@@ -553,7 +627,13 @@
   }
 }
 
-/* Ultra‑wide */
+@media (max-width: 480px) {
+  .navbar-links,
+  .navbar-icons {
+    display: none;
+  }
+}
+
 @media (min-width: 2500px) {
   .navbar-container {
     max-width: 1800px;
@@ -567,8 +647,6 @@
     width: 1000px;
   }
 }
-
-/* ================= NEW SIDEDRAWER STYLES ============================= */
 
 .mobile-menu-overlay {
   position: fixed;
@@ -695,12 +773,6 @@
   padding-left: 24px;
 }
 
-.countries-column {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
 .countries-subcolumns {
   display: flex;
   gap: 32px;
@@ -712,23 +784,24 @@
   margin: 0;
   min-width: 120px;
 }
-.view-all-region-btn {
-  margin-top: 8px;
-  padding: 8px 18px;
-  background: var(--highlight-color);
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+
+.countries-subcolumns ul li {
+  font-size: 14px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  position: relative;
+  transition: all 0.2s ease-in-out;
 }
 
-/* hide desktop nav & icons on very small screens (redundant safety) */
-@media (max-width: 480px) {
-  .navbar-links,
-  .navbar-icons {
-    display: none;
-  }
+.countries-subcolumns ul li:hover {
+  color: var(--primary-dark) !important;
+  background: #f5f5f5;
+  transform: translateX(2px);
+  border-radius: 4px;
+}
+
+.countries-subcolumns ul li a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
 }

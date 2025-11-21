@@ -6,6 +6,7 @@ import { MapPin, Calendar, Search as SearchIcon, AlertCircle } from "lucide-reac
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/search.css";
 
+// Helper function to create URL-friendly slugs
 const slugify = (str) =>
   str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
@@ -33,12 +34,13 @@ export default function Search() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Read query params on mount & populate states
+  // --- Core Search Initialization from URL ---
+  // Reads 'query' (from general search bar) and 'region' (from region links like 'Central Asia')
   useEffect(() => {
     const sd = searchParams.get("start_date");
     const ed = searchParams.get("end_date");
-    const q = searchParams.get("query");
-    const r = searchParams.get("region");
+    const q = searchParams.get("query"); // <-- Initializes text search
+    const r = searchParams.get("region"); // <-- Initializes region filter
 
     if (sd) setStartDate(new Date(sd));
     if (ed) setEndDate(new Date(ed));
@@ -51,6 +53,7 @@ export default function Search() {
 
   const fetchRegionName = async (id) => {
     try {
+      // Assuming your API endpoint to fetch region details is /api/regions/{id}/
       const res = await axiosInstance.get(`/api/regions/${id}/`);
       setRegionName(res.data.name);
     } catch (err) {
@@ -59,6 +62,7 @@ export default function Search() {
     }
   };
 
+  // Determines if a search needs to be executed based on any active criteria
   const shouldSearch =
     searchQuery.trim() ||
     startDate ||
@@ -70,9 +74,9 @@ export default function Search() {
     filters.sale ||
     filters.styles.length > 0 ||
     filters.themes.length > 0 ||
-    regionId; // include region in shouldSearch
+    regionId; // regionId ensures regional searches are executed
 
-  // Fetch deals data
+  // Fetch deals data from the API, sending all current search criteria
   const fetchDeals = async () => {
     const params = {
       start_date: startDate?.toISOString().split("T")[0],
@@ -85,29 +89,33 @@ export default function Search() {
       style: filters.styles,
       theme: filters.themes,
       query: searchQuery.trim() || undefined,
-      region: regionId || undefined,
+      region: regionId || undefined, // <-- Sent to API for region-specific filtering
     };
 
     try {
       const res = await axiosInstance.get("/destinations/search-deals/", { params });
       setResults(res.data.results || res.data);
-      setPage(1);
+      setPage(1); // Reset page on new API results
     } catch (err) {
       console.error("Failed to fetch deals:", err);
       setResults([]);
     }
   };
 
+  // Effect to trigger API fetch whenever primary search states change
   useEffect(() => {
     if (shouldSearch) {
       fetchDeals();
     } else {
       setResults([]);
     }
-  }, [startDate, endDate, filters, searchQuery, regionId]);
+    // Dependency list ensures API call updates when any main search param changes
+  }, [startDate, endDate, filters.sale, filters.styles.length, filters.themes.length, searchQuery, regionId]); 
 
+  // Helper to normalize filter values
   const norm = (v = "") => v.toLowerCase().trim();
 
+  // Memoize available styles and themes for filter display
   const { styleList, styleCount, themeList, themeCount } = useMemo(() => {
     const sC = {};
     const tC = {};
@@ -128,8 +136,9 @@ export default function Search() {
     };
   }, [results]);
 
+  // Handle filter updates and reset pagination
   const updateFilter = (type, value) => {
-    setPage(1);
+    setPage(1); 
     if (type === "styles" || type === "themes") {
       setFilters((prev) => {
         const updated = prev[type].includes(value)
@@ -144,6 +153,7 @@ export default function Search() {
     }
   };
 
+  // Apply client-side filters (price, duration, sale, styles, themes)
   const filteredResults = useMemo(() => {
     return results.filter((d) => {
       const priceNum = Number(d.price);
@@ -166,8 +176,10 @@ export default function Search() {
     });
   }, [results, filters]);
 
+  // Apply pagination
   const paginatedResults = filteredResults.slice((page - 1) * perPage, page * perPage);
 
+  // Date picker change handlers with validation
   const onStartDateChange = (date) => {
     setStartDate(date);
     setEndDateError("");
@@ -193,6 +205,7 @@ export default function Search() {
     if (!startDate) setEndDateError("Please select start date first");
   };
 
+  // Truncate function for descriptions
   const truncateText = (text, maxLength = 100) => {
     if (!text) return "";
     return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
@@ -211,13 +224,14 @@ export default function Search() {
         {regionName ? `in ${regionName}` : "matching your search"}
       </h2>
 
+      {/* --- Main Search Bar --- */}
       <div className="search-bar-wrapper1">
         <div className="search-bar-container1">
           <div className="search-box1">
             <MapPin size={18} className="icon" />
             <input
               type="text"
-              placeholder="Search"
+              placeholder="Search destination, trip name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -267,9 +281,11 @@ export default function Search() {
         )}
       </div>
 
+      {/* --- Search Layout: Filters (Aside) and Results (Grid) --- */}
       <div className="search-layout">
         <aside className="search-filters">
-          <h5>Duration</h5>
+          {/* Duration Filters */}
+          <h5>Duration (Days)</h5>
           <div className="range-row">
             <input
               type="number"
@@ -287,6 +303,7 @@ export default function Search() {
             />
           </div>
 
+          {/* Price Filters */}
           <h5>Price</h5>
           <div className="range-row">
             <input
@@ -305,8 +322,9 @@ export default function Search() {
             />
           </div>
 
+          {/* Sale Filter */}
           <h5>Travel Deals</h5>
-          <label>
+          <label className="checkbox-label">
             <input
               type="checkbox"
               checked={filters.sale}
@@ -315,36 +333,39 @@ export default function Search() {
             Trips on sale
           </label>
 
-          <h5>Styles</h5>
+          {/* Styles Filters (Dynamically generated from results) */}
+          {styleList.length > 0 && <h5>Styles</h5>}
           {styleList.map((style) => (
-            <label key={style}>
+            <label key={style} className="checkbox-label">
               <input
                 type="checkbox"
                 checked={filters.styles.includes(style)}
                 onChange={() => updateFilter("styles", style)}
               />
               {style.charAt(0).toUpperCase() + style.slice(1)}{" "}
-              <span className="count">{styleCount[style]}</span>
+              <span className="count">({styleCount[style]})</span>
             </label>
           ))}
 
-          <h5>Themes</h5>
+          {/* Themes Filters (Dynamically generated from results) */}
+          {themeList.length > 0 && <h5>Themes</h5>}
           {themeList.map((theme) => (
-            <label key={theme}>
+            <label key={theme} className="checkbox-label">
               <input
                 type="checkbox"
                 checked={filters.themes.includes(theme)}
                 onChange={() => updateFilter("themes", theme)}
               />
               {theme.charAt(0).toUpperCase() + theme.slice(1)}{" "}
-              <span className="count">{themeCount[theme]}</span>
+              <span className="count">({themeCount[theme]})</span>
             </label>
           ))}
         </aside>
 
+        {/* --- Search Results Grid --- */}
         <div className="search-grid">
           {!shouldSearch ? (
-            <p className="search-placeholder">Start typing to search for trips or destinations.</p>
+            <p className="search-placeholder">Start typing or select a region to search for trips.</p>
           ) : paginatedResults.length > 0 ? (
             paginatedResults.map((result) => (
               <div className="search-card" key={result.id}>
@@ -364,6 +385,7 @@ export default function Search() {
                       className="details-btn"
                       onClick={() =>
                         navigate(
+                          // Example route: /destinations/country-slug/deal/trip-title-slug
                           `/destinations/${result.country?.slug || "unknown"}/deal/${slugify(
                             result.title
                           )}`
@@ -373,6 +395,7 @@ export default function Search() {
                       See Details
                     </button>
                     <div className="price-info">
+                      {/* Placeholder logic for old price/discount */}
                       <span className="old-price">${Number(result.price) + 400}</span>
                       <span className="new-price">${result.price}</span>
                     </div>
@@ -381,36 +404,39 @@ export default function Search() {
               </div>
             ))
           ) : (
-            <p>No trips found.</p>
+            <p className="no-results">No trips found matching your criteria.</p>
           )}
         </div>
       </div>
 
-      <div className="search-pagination">
-        <button
-          className="icon-btn"
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          aria-label="Previous page"
-        >
-          ◀
-        </button>
-        <span>
-          Page {page} of {Math.ceil(filteredResults.length / perPage) || 1}
-        </span>
-        <button
-          className="icon-btn"
-          onClick={() =>
-            setPage((p) =>
-              Math.min(Math.ceil(filteredResults.length / perPage), p + 1)
-            )
-          }
-          disabled={page === Math.ceil(filteredResults.length / perPage)}
-          aria-label="Next page"
-        >
-          ▶
-        </button>
-      </div>
+      {/* --- Pagination Controls --- */}
+      {filteredResults.length > 0 && (
+        <div className="search-pagination">
+          <button
+            className="icon-btn"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            aria-label="Previous page"
+          >
+            ◀
+          </button>
+          <span>
+            Page {page} of {Math.ceil(filteredResults.length / perPage) || 1}
+          </span>
+          <button
+            className="icon-btn"
+            onClick={() =>
+              setPage((p) =>
+                Math.min(Math.ceil(filteredResults.length / perPage), p + 1)
+              )
+            }
+            disabled={page >= Math.ceil(filteredResults.length / perPage)}
+            aria-label="Next page"
+          >
+            ▶
+          </button>
+        </div>
+      )}
     </section>
   );
 }
