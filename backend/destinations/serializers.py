@@ -221,7 +221,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
-        read_only_fields = ['travel_deal', 'submitted_on']
+        read_only_fields = ['travel_deal', 'submitted_on', 'moderated_by', 'moderated_on']
 
 
 # -------------------------

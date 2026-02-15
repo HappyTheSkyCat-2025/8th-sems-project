@@ -1,0 +1,6 @@
+#!/home/shankar/Documents/VScode/8th-sems-project/.venv/bin/python
+import sys
+from rsa.cli import sign
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(sign())

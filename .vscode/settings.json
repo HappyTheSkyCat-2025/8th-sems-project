@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": ".venv/bin/python",
+  "python.pythonPath": ".venv/bin/python",
+  "python.analysis.extraPaths": ["backend"],
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoSearchPaths": true
+}

@@ -23,6 +23,7 @@ from .serializers import (
     PlaceSerializer, TravelDealIncludedSerializer
 )
 from .permissions import IsSuperUserOrReadOnly
+from django.utils import timezone
 
 # ================================
 # Region Views
@@ -156,14 +157,24 @@ class ReviewListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         deal_slug = self.kwargs.get('deal_slug')
+        user = self.request.user
+        is_admin = getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False)
         if deal_slug:
-            return Review.objects.filter(travel_deal__slug=deal_slug)
-        return Review.objects.all()
+            qs = Review.objects.filter(travel_deal__slug=deal_slug)
+        else:
+            qs = Review.objects.all()
+
+        # Public consumers see only approved reviews; admins see all
+        if not is_admin:
+            qs = qs.filter(is_approved=True)
+
+        return qs
 
     def perform_create(self, serializer):
         deal_slug = self.kwargs.get('deal_slug')
         deal = TravelDeal.objects.get(slug=deal_slug)
-        serializer.save(travel_deal=deal)
+        # Ensure new reviews are not auto-approved and moderation fields are cleared
+        serializer.save(travel_deal=deal, is_approved=False, is_flagged=False, flagged_reason=None)
 
 class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ReviewSerializer
@@ -171,6 +182,54 @@ class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Review.objects.all()
+
+
+# ================================
+# Review Moderation (Admin)
+# ================================
+class ReviewModerationListAPIView(generics.ListAPIView):
+    """List reviews that need moderation: pending or flagged."""
+    serializer_class = ReviewSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        status = self.request.query_params.get('status', 'pending')
+        qs = Review.objects.all()
+        if status == 'pending':
+            return qs.filter(is_approved=False).order_by('-submitted_on')
+        if status == 'flagged':
+            return qs.filter(is_flagged=True).order_by('-submitted_on')
+        return qs.order_by('-submitted_on')
+
+
+class ReviewModerationUpdateAPIView(APIView):
+    """Admin endpoint to approve/flag/unflag a review and add moderator notes."""
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        try:
+            review = Review.objects.get(pk=pk)
+        except Review.DoesNotExist:
+            raise NotFound("Review not found")
+
+        approve = request.data.get('is_approved')
+        flag = request.data.get('is_flagged')
+        reason = request.data.get('flagged_reason')
+
+        if approve is not None:
+            review.is_approved = bool(approve)
+
+        if flag is not None:
+            review.is_flagged = bool(flag)
+
+        if reason is not None:
+            review.flagged_reason = reason
+
+        review.moderated_by = request.user
+        review.moderated_on = timezone.now()
+        review.save()
+
+        return Response(ReviewSerializer(review).data)
 
 # ================================
 # Article Views

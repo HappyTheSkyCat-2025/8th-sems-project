@@ -59,6 +59,9 @@ urlpatterns = [
     # -----------------------------
     path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/', views.ReviewListCreateAPIView.as_view(), name='review-list'),
     path('countries/<slug:country_slug>/travel-deals/<slug:deal_slug>/reviews/<int:pk>/', views.ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
+    # Admin moderation endpoints
+    path('reviews/moderation/', views.ReviewModerationListAPIView.as_view(), name='review-moderation-list'),
+    path('reviews/<int:pk>/moderate/', views.ReviewModerationUpdateAPIView.as_view(), name='review-moderation-update'),
 
     # -----------------------------
     # Articles CRUD

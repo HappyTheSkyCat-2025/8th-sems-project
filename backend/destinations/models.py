@@ -193,6 +193,12 @@ class Review(models.Model):
     content = models.TextField()
     travel_date = models.CharField(max_length=50)
     submitted_on = models.DateField(auto_now_add=True)
+    # Moderation fields
+    is_approved = models.BooleanField(default=False, help_text="Whether an admin approved this review for public display")
+    is_flagged = models.BooleanField(default=False, help_text="Whether this review was flagged for moderation")
+    flagged_reason = models.TextField(blank=True, null=True)
+    moderated_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name='moderated_reviews')
+    moderated_on = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Review by {self.name} on {self.travel_deal.title} - {self.rating}/5"
