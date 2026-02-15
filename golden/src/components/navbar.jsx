@@ -14,7 +14,7 @@ import { Divide as Hamburger } from "hamburger-react";
 import axiosInstance from "../utils/axiosInstance";
 import logo from "../assets/logo1.png";
 import baliImage from "../assets/bali.jpg";
-import "../styles/Navbar.css";
+import "../styles/navbar.css";
 
 export default function Navbar() {
   const location = useLocation();

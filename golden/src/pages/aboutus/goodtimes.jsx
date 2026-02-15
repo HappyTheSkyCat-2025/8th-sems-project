@@ -2,7 +2,7 @@ import React from "react";
 import img1 from "../../assets/bali.jpg";
 import img2 from "../../assets/bali.jpg";
 import img3 from "../../assets/img2.jpg";
-import "../../pagescss/goodtimes.css";
+import "../../pagescss/goodTimes.css";
 
 const Card = ({ image, title, country }) => (
   <div className="good-card">

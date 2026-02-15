@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaStar } from "react-icons/fa";
-import ReviewModal from "../../components/ReviewModal";
+import ReviewModal from "../../components/reviewmodal";
 import { toast } from "react-toastify";
 import "../../pagescss/review.css";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import "../../pagescss/ourpurpose.css";
+import "../../pagescss/ourPurpose.css";
 import bali from "../../assets/bali.jpg";
 import img2 from "../../assets/img2.jpg";
 

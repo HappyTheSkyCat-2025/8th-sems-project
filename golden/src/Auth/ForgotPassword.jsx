@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { toast } from "react-toastify";
-import "../styles/forgetpassword.css";
+import "../styles/forgetPassword.css";
 import beachImage from "../assets/forgetpassword.jpg";
 
 const ForgotPassword = () => {

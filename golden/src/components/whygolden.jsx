@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/Whygolden.css";
+import "../styles/whyGolden.css";
 import img2 from "../assets/217870.jpg";
 import { useNavigate } from "react-router-dom";
 

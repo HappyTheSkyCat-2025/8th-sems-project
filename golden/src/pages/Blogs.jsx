@@ -5,7 +5,7 @@ import { IoIosArrowForward } from "react-icons/io";
 import axiosInstance from "../utils/axiosInstance";  // use your custom axiosInstance here
 import bali from "../assets/bali.jpg";
 import img2 from "../assets/img2.jpg";
-import "../styles/blogs.css";
+import "../styles/blogS.css";
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);

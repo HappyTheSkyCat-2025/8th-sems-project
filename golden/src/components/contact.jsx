@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axiosInstance from "../utils/axiosInstance"; // Adjust path as needed
-import "../styles/contactus.css";
+import "../styles/contactUs.css";
 
 const SUBJECTS = [
   "General Inquiry",

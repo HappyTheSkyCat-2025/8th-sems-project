@@ -7,7 +7,7 @@ import OurStory from "./aboutus/ourstory";
 import Why from "./aboutus/why";
 import Guides from "./aboutus/guides";
 import GoodTimes from "./aboutus/goodtimes"; 
-import Foot from "../pages/foot";
+import Foot from "./Foot";
 
 import heroImg from "../assets/bali.jpg";
 

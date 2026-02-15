@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-import StepIndicator from "../components/StepIndicator";
+import StepIndicator from "../components/stepindicator";
 import "../payment/payment2.css";
 
 export default function Payment2() {

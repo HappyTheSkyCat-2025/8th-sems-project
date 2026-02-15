@@ -8,29 +8,29 @@ import {
 } from "react-router-dom";
 
 // Layout components
-import Navbar from "./components/Navbar";
+import Navbar from "./components/navbar";
 import Footer from "./components/footer";
-import ScrollToTop from "./components/ScrollToTop";
+import ScrollToTop from "./components/scrolltotop";
 import ChatBot from "./components/chatbot";
-import Contact from "./components/Contact";
+import Contact from "./components/contact";
 
 // Auth pages
-import Login from "./Auth/login";
+import Login from "./Auth/Login";
 import Register from "./Auth/Register";
 import VerifyOTP from "./Auth/VerifyOTP";
 import ForgotPassword from "./Auth/ForgotPassword";
 import ResetPassword from "./Auth/ResetPassword";
-import Profile from "./Auth/profile";
+import Profile from "./Auth/Profile";
 import ChangePassword from "./Auth/ChangePassword";
 import BookingDetail from "./Auth/BookingDetail";
-import FavouritePackages from "./Auth/fav";
-import MyBookings from "./Auth/booking";
+import FavouritePackages from "./Auth/Fav";
+import MyBookings from "./Auth/Booking";
 
 // Home page sections
 import Home from "./components/Home";
 import Readsection3rd from "./components/readsection3rd";
 import Journey from "./components/journey";
-import Whygolden from "./components/Whygolden";
+import Whygolden from "./components/whygolden";
 import Stories from "./components/stories";
 import Trending from "./components/trending";
 import Roof from "./components/roof";
@@ -40,12 +40,13 @@ import Journal from "./components/journal";
 
 // Pages
 import AboutUs from "./pages/Aboutus";
-import AllDestinations from "./pages/AllDestinations";
-import DestinationPage from "./pages/DestinationPage";
-import DestDescription from "./pages/destdescription";
-import Blogs from "./pages/blogs";
-import BlogDetail from "./pages/BlogDetail";
-import Write from "./pages/write";
+import AllDestinations from "./pages/Alldestinations";
+import DestinationPage from "./pages/Destinationpage";
+import DestDescription from "./pages/Destdescription";
+import Blogs from "./pages/Blogs";
+import BlogDetail from "./pages/Blogdetail";
+import Write from "./pages/Write";
+
 
 // Search Page
 import Search from "./components/search";

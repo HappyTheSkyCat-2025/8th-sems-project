@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaCommentDots, FaPaperPlane } from "react-icons/fa";
 import axiosInstance from "../utils/axiosInstance";
-import "../styles/chatbot.css";
+import "../styles/chatBot.css";
 
 export default function Chatbot() {
   const [chatOpen, setChatOpen] = useState(false);

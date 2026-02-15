@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { SiPaypal, SiCashapp, SiStripe } from "react-icons/si";
 import "react-toastify/dist/ReactToastify.css";
 
-import StepIndicator from "../components/StepIndicator";
+import StepIndicator from "../components/stepindicator";
 import StripePayment from "./StripePayment";
 import PayPalPayment from "./PayPalPayment";
 import axiosInstance from "../utils/axiosInstance";

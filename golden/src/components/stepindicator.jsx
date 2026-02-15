@@ -1,6 +1,6 @@
 import React from "react";
 import { FaCheck } from "react-icons/fa";
-import "./StepIndicator.css";
+import "./stepIndicator.css";
 
 export default function StepIndicator({ current = 0, steps }) {
   const labels = steps || ["Your details", "Trip extras", "Payment"];

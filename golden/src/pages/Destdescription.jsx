@@ -7,8 +7,8 @@ import Included from "./destdescription/included";
 import Reviewplaces from "./destdescription/reviewplaces";
 import WeatherForecastInline from "./destdescription/WeatherForecastInline";
 import Dates from "./destdescription/dates";
-import Foot from "../pages/foot";
-import "../pagescss/destdescription.css";
+import Foot from "./Foot";
+import "../pagescss/destDescription.css";
 import axiosInstance from "../utils/axiosInstance";
 
 export default function DestDescription() {

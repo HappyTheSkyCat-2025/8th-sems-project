@@ -10,7 +10,7 @@ import TripReviewsSection from "./destinations/TripReviewsSection";
 import ArticlesSection from "./destinations/ArticlesSection";
 import FaqsSection from "./destinations/FaqsSection";
 import VideoSection from "./destinations/VideoSection";
-import Foot from "../pages/foot";
+import Foot from "./Foot";
 
 import CurrencyConverterInline from "./destinations/CurrencyConverterInline";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import "../../pagescss/ourstory.css";
+import "../../pagescss/ourStory.css";
 import monkImage from "../../assets/img2.jpg"; 
 
 export default function OurStory() {

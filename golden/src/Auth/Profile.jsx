@@ -8,9 +8,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useLocation } from "react-router-dom";
 
 // Tab Components
-import MyBookings from "../Auth/booking";
-import Reminders from "../Auth/remainder";
-import FavouritePackages from "../Auth/fav";
+import MyBookings from "./Booking";
+import Reminders from "./Remainder";
+import FavouritePackages from "./Fav";
 
 // Import modals
 import ProfileEditModal from "../Auth/ProfileEditModal";

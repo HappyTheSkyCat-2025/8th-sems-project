@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/AllDestinations.css";
+import "../styles/allDestinations.css";
 import AOS from "aos";
 import "aos/dist/aos.css";
 

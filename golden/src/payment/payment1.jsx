@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { FaChevronDown, FaInfo } from "react-icons/fa";
 import { BsFillPersonFill } from "react-icons/bs";
-import StepIndicator from "../components/StepIndicator";
+import StepIndicator from "../components/stepindicator";
 import Select from "react-select";
 import countryList from "react-select-country-list";
 import "../payment/payment1.css";

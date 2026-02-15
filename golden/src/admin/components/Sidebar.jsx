@@ -13,7 +13,7 @@ import {
   ChevronDown,
   CreditCard,
 } from "lucide-react";
-import "./sidebar.css";
+import "./sideBar.css";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
