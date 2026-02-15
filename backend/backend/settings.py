@@ -140,22 +140,22 @@ EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='noreply@example.com')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 
 # ---------------------------
 # 💰 Payment API Keys
 # ---------------------------
-STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY')
-PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
-PAYPAL_SECRET = config('PAYPAL_SECRET')
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID', default='')
+PAYPAL_SECRET = config('PAYPAL_SECRET', default='')
 
 # ---------------------------
 # 🌦 Weather, Currency APIs
 # ---------------------------
-OPENWEATHER_API_KEY = config('OPENWEATHER_API_KEY')
-EXCHANGE_RATE_API_KEY = config('EXCHANGE_RATE_API_KEY')
+OPENWEATHER_API_KEY = config('OPENWEATHER_API_KEY', default='')
+EXCHANGE_RATE_API_KEY = config('EXCHANGE_RATE_API_KEY', default='')
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
