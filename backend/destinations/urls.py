@@ -1,10 +1,12 @@
 from django.urls import path
 from . import views
+from .views import deal_recommendations
 
 urlpatterns = [
     # -----------------------------
     # Regions CRUD
     # -----------------------------
+    path("recommendations/<int:deal_id>/", deal_recommendations),
     path('regions/', views.RegionListCreateAPIView.as_view(), name='region-list'),
     path('regions/<int:pk>/', views.RegionRetrieveUpdateDestroyAPIView.as_view(), name='region-detail'),
 
@@ -27,6 +29,7 @@ urlpatterns = [
     # -----------------------------
     # Deal Categories CRUD
     # -----------------------------
+
     path('deals/', views.DealCategoryListCreateAPIView.as_view(), name='deal-category-list'),
     path('deals/<int:pk>/', views.DealCategoryRetrieveUpdateDestroyAPIView.as_view(), name='deal-category-detail'),
 

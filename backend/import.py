@@ -5,6 +5,8 @@ import re
 import random
 from datetime import datetime, timedelta
 from django.utils.text import slugify
+from django.core.files.base import ContentFile
+import requests
 
 # Setup Django Environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
@@ -51,13 +53,25 @@ def generate_itinerary(deal, days):
             }
         )
 
+
 def generate_images(deal):
-    """Attaches synthetic/scraped image URLs from Unsplash."""
-    if not deal.travel_image_set.exists():
-        # Using Unsplash source URLs for specific cities
+    """Attaches synthetic image URLs from Unsplash."""
+    if not deal.gallery.exists():
         for i in range(3):
             image_url = f"https://source.unsplash.com/featured/1200x800?{slugify(deal.city)},travel,{i}"
-            TravelImage.objects.create(travel_deal=deal, image_url=image_url)
+            
+            try:
+                response = requests.get(image_url)
+                if response.status_code == 200:
+                    file_name = f"{slugify(deal.city)}_{i}.jpg"
+                    
+                    TravelImage.objects.create(
+                        deal=deal,
+                        image=ContentFile(response.content, name=file_name)
+                    )
+            except:
+                pass
+
 
 def generate_faqs(country_obj):
     """Generates generic FAQs for a country."""

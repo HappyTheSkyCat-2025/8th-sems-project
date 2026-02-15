@@ -7,6 +7,44 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
+from destinations.recommendation_ml import MLRecommendationEngine
+from destinations.models import TravelDeal
+
+
+
+@api_view(["GET"])
+def deal_recommendations(request, deal_id):
+    try:
+        deals = MLRecommendationEngine.get_recommendations(deal_id)
+
+        data = []
+        for deal in deals:
+            # get first image if exists
+            image = None
+            if deal.gallery.exists():
+                image = deal.gallery.first().image.url
+
+            data.append({
+                "id": deal.id,
+                "title": deal.title,
+                "city": deal.city,
+                "country": deal.country.name,
+                "price": deal.price,
+                "image": image
+            })
+
+        return Response({
+            "status": "success",
+            "recommendations": data
+        })
+
+    except Exception as e:
+        return Response({
+            "status": "error",
+            "message": str(e)
+        })
+
+
 
 from .models import (
     Region, Country, TravelDeal, Review, Article, FAQ,

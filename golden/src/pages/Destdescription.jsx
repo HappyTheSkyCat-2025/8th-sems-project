@@ -10,6 +10,8 @@ import Dates from "./destdescription/dates";
 import Foot from "./Foot";
 import "../pagescss/destDescription.css";
 import axiosInstance from "../utils/axiosInstance";
+import Recommendations from "../components/recommendations";
+
 
 export default function DestDescription() {
   const { country, dealId } = useParams(); // Use consistent naming
@@ -99,6 +101,7 @@ export default function DestDescription() {
         <Dates data={dates} dealId={dealData.id} />
       </div>
       <Reviewplaces data={dealData} reviews={reviews} setReviews={setReviews} />
+      <Recommendations dealId={dealData.id} />
       <Foot />
     </div>
   );
