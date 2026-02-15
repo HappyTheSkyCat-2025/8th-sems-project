@@ -1,0 +1,389 @@
+[01;34m.[0m
+├── [01;34maccounts[0m
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── [01;34mmigrations[0m
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_user_phone.py
+│   │   ├── 0003_remove_user_preferences_remove_user_travel_history_and_more.py
+│   │   ├── 0004_remove_user_preferred_season.py
+│   │   ├── 0005_remove_user_budget_range_and_more.py
+│   │   ├── 0006_newslettersubscriber_alter_userotp_expires_at.py
+│   │   ├── __init__.py
+│   │   └── [01;34m__pycache__[0m
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_user_phone.cpython-312.pyc
+│   │       ├── 0003_remove_user_preferences_remove_user_travel_history_and_more.cpython-312.pyc
+│   │       ├── 0004_remove_user_preferred_season.cpython-312.pyc
+│   │       ├── 0005_remove_user_budget_range_and_more.cpython-312.pyc
+│   │       ├── 0006_newslettersubscriber_alter_userotp_expires_at.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── [01;34m__pycache__[0m
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── serializers.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── [01;34madmin_dashboard[0m
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── [01;34mmigrations[0m
+│   │   ├── __init__.py
+│   │   └── [01;34m__pycache__[0m
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── [01;34m__pycache__[0m
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── serializers.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── [01;34mbackend[0m
+│   ├── asgi.py
+│   ├── __init__.py
+│   ├── [01;34m__pycache__[0m
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── settings.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── wsgi.cpython-312.pyc
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── [01;34mblogs[0m
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── [01;34mmigrations[0m
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_blog_latitude_blog_longitude.py
+│   │   ├── 0003_remove_blog_latitude_remove_blog_longitude.py
+│   │   ├── 0004_story.py
+│   │   ├── 0005_alter_blog_slug.py
+│   │   ├── 0006_blog_country.py
+│   │   ├── __init__.py
+│   │   └── [01;34m__pycache__[0m
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_blog_latitude_blog_longitude.cpython-312.pyc
+│   │       ├── 0003_remove_blog_latitude_remove_blog_longitude.cpython-312.pyc
+│   │       ├── 0004_story.cpython-312.pyc
+│   │       ├── 0005_alter_blog_slug.cpython-312.pyc
+│   │       ├── 0006_blog_country.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── [01;34m__pycache__[0m
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── serializers.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── class UserInteraction(models.py
+├── [01;34mcontacts[0m
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── [01;34mmigrations[0m
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_alter_contactmessage_options.py
+│   │   ├── __init__.py
+│   │   └── [01;34m__pycache__[0m
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_alter_contactmessage_options.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── [01;34m__pycache__[0m
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── serializers.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── db.sqlite3
+├── [01;34mdestinations[0m
+│   ├── admin.py
+│   ├── apps.py
+│   ├── __init__.py
+│   ├── [01;34mmigrations[0m
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_dealcategory_traveltype_dealoffer_traveloption.py
+│   │   ├── 0003_alter_article_image_alter_country_image_and_more.py
+│   │   ├── 0004_traveldeal_description.py
+│   │   ├── 0005_traveldeal_last_minute_traveldeal_on_sale.py
+│   │   ├── 0006_countrylearnmoretopic_countryoverview.py
+│   │   ├── 0007_traveldeal_slug.py
+│   │   ├── 0008_remove_review_country_review_travel_deal.py
+│   │   ├── 0009_alter_traveldeal_image_travelimage.py
+│   │   ├── 0010_traveldealdate.py
+│   │   ├── 0011_wishlistitem.py
+│   │   ├── 0012_traveldeal_city_traveldeal_map_zoom.py
+│   │   ├── 0013_article_is_inspirational_article_is_suggested.py
+│   │   ├── 0014_place_traveldeal_places.py
+│   │   ├── 0015_alter_traveldeal_slug.py
+│   │   ├── 0016_traveldeal_subtitle.py
+│   │   ├── 0017_itineraryday.py
+│   │   ├── 0018_alter_itineraryday_options_and_more.py
+│   │   ├── 0019_traveldeal_included_json_and_more.py
+│   │   ├── 0020_traveldealdate_capacity.py
+│   │   ├── 0021_country_code_country_currency_code.py
+│   │   ├── 0022_remove_country_video_url_country_video.py
+│   │   ├── 0023_dealcategory_discount_percent_traveldeal_category_and_more.py
+│   │   ├── 0024_review_flagged_reason_review_is_approved_and_more.py
+│   │   ├── __init__.py
+│   │   └── [01;34m__pycache__[0m
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_dealcategory_traveltype_dealoffer_traveloption.cpython-312.pyc
+│   │       ├── 0003_alter_article_image_alter_country_image_and_more.cpython-312.pyc
+│   │       ├── 0004_traveldeal_description.cpython-312.pyc
+│   │       ├── 0005_traveldeal_last_minute_traveldeal_on_sale.cpython-312.pyc
+│   │       ├── 0006_countrylearnmoretopic_countryoverview.cpython-312.pyc
+│   │       ├── 0007_traveldeal_slug.cpython-312.pyc
+│   │       ├── 0008_remove_review_country_review_travel_deal.cpython-312.pyc
+│   │       ├── 0009_alter_traveldeal_image_travelimage.cpython-312.pyc
+│   │       ├── 0010_traveldealdate.cpython-312.pyc
+│   │       ├── 0011_wishlistitem.cpython-312.pyc
+│   │       ├── 0012_traveldeal_city_traveldeal_map_zoom.cpython-312.pyc
+│   │       ├── 0013_article_is_inspirational_article_is_suggested.cpython-312.pyc
+│   │       ├── 0014_place_traveldeal_places.cpython-312.pyc
+│   │       ├── 0015_alter_traveldeal_slug.cpython-312.pyc
+│   │       ├── 0016_traveldeal_subtitle.cpython-312.pyc
+│   │       ├── 0017_itineraryday.cpython-312.pyc
+│   │       ├── 0018_alter_itineraryday_options_and_more.cpython-312.pyc
+│   │       ├── 0019_traveldeal_included_json_and_more.cpython-312.pyc
+│   │       ├── 0020_traveldealdate_capacity.cpython-312.pyc
+│   │       ├── 0021_country_code_country_currency_code.cpython-312.pyc
+│   │       ├── 0022_remove_country_video_url_country_video.cpython-312.pyc
+│   │       ├── 0023_dealcategory_discount_percent_traveldeal_category_and_more.cpython-312.pyc
+│   │       ├── 0024_review_flagged_reason_review_is_approved_and_more.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── permissions.py
+│   ├── [01;34m__pycache__[0m
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── permissions.cpython-312.pyc
+│   │   ├── serializers.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── import.py
+├── manage.py
+├── [01;34mmedia[0m
+│   ├── [01;34marticles[0m
+│   │   ├── [01;35madventure-4-hour-hike-in-the-amazon-rainforest_CxlER7G.jpg[0m
+│   │   ├── [01;35madventure-4-hour-hike-in-the-amazon-rainforest.jpg[0m
+│   │   ├── [01;35mElly_Clutch_3Ts20RK.jpg[0m
+│   │   ├── [01;35mElly_Clutch.jpg[0m
+│   │   ├── [01;35mElly_Clutch_Xyiv1gV.jpg[0m
+│   │   ├── [01;35mimage_-_7562373_byb2p1i.jpeg[0m
+│   │   ├── [01;35mimage_-_7562373.jpeg[0m
+│   │   ├── [01;35mimage_-_7562373_tFJ2XRY.jpeg[0m
+│   │   ├── [01;35mimage_-_7562373_W20G2q1.jpeg[0m
+│   │   ├── [01;35mque-ver-en-phuket-9.jpg[0m
+│   │   └── [01;35mSalvador.webp[0m
+│   ├── [01;34mblog_thumbnails[0m
+│   │   ├── [01;35m493914321_1371149324036459_3294890765337343131_n.jpg[0m
+│   │   ├── [01;35mBangkok.jpg[0m
+│   │   ├── [01;35mgosaikunda-lake.webp[0m
+│   │   ├── [01;35mItaly-Venice-217.webp[0m
+│   │   ├── [01;35mLove_Untangled_film_poster.jpg[0m
+│   │   ├── [01;35mpolicies-ch-istock-neonovo_djatsyp.jpg[0m
+│   │   ├── [01;35mpolicies-ch-istock-neonovo.jpg[0m
+│   │   ├── [01;35mpolicies-ch-istock-neonovo_NKRveIa.jpg[0m
+│   │   ├── [01;35mpolicies-ch-istock-neonovo_TPFwtFy.jpg[0m
+│   │   ├── [01;35mSahil.jpg[0m
+│   │   ├── [01;35mScreenshot_2025-07-23_130756.png[0m
+│   │   ├── [01;35mshutterstock_296968166-1230x600.jpg[0m
+│   │   ├── [01;35mshutterstock_296968166-1230x600_oRL2Ch4.jpg[0m
+│   │   ├── [01;35msuwat-waterfall.jpg[0m
+│   │   └── [01;35mTokyo-Bar-Hopping-Tour-600x300.jpg[0m
+│   ├── [01;34mcountries[0m
+│   │   ├── [01;35m1000.jpg[0m
+│   │   ├── [01;35mABMovie_RedStanding.webp[0m
+│   │   ├── [01;35mgreat_nature_landscape_pakistan.webp[0m
+│   │   ├── [01;35mjp_-_2022.jpeg[0m
+│   │   ├── [01;35mLove_Untangled_film_poster.jpg[0m
+│   │   ├── [01;35mScreenshot_2025-07-05_223824.png[0m
+│   │   ├── [01;35mThailand_Featured.webp[0m
+│   │   └── [01;35mvenice.webp[0m
+│   ├── [01;34mdeals[0m
+│   │   ├── [01;35mamazon-river-basin.jpg[0m
+│   │   ├── [01;35mamerican-public-power-association.jpg[0m
+│   │   ├── [01;34mcover[0m
+│   │   │   ├── [01;35m6390.jpg[0m
+│   │   │   ├── [01;35mamazon-river-basin.jpg[0m
+│   │   │   ├── [01;35ma-visit-to-a-native-village.jpg[0m
+│   │   │   ├── [01;35mBANGKOK.webp[0m
+│   │   │   ├── [01;35mimage_processing20221214-4-dzpijr.jpg[0m
+│   │   │   ├── [01;35mphi-phi-viewpoint-girls.jpeg[0m
+│   │   │   ├── [01;35mrio-carnival-women.webp[0m
+│   │   │   └── [01;35mScreenshot_2025-07-05_220356.png[0m
+│   │   ├── [01;34mgallery[0m
+│   │   │   ├── [01;35m2cc94a_07e55de318fe41538e17cb9de596cb45mv2.jpg[0m
+│   │   │   ├── [01;35m6390.jpg[0m
+│   │   │   ├── [01;35mamazon-river-basin.jpg[0m
+│   │   │   ├── [01;35ma-visit-to-a-native-village.jpg[0m
+│   │   │   ├── [01;35ma-visit-to-a-native-village_swbN1Wn.jpg[0m
+│   │   │   ├── [01;35mBANGKOK.webp[0m
+│   │   │   ├── [01;35mcom-os-amigos-e-clientes_3iIbOqj.jpg[0m
+│   │   │   ├── [01;35mcom-os-amigos-e-clientes.jpg[0m
+│   │   │   ├── [01;35mGrand-palace-and-Wat-Phra-Keaw-Bangkok.webp[0m
+│   │   │   ├── [01;35mItaly-Venice-217.webp[0m
+│   │   │   ├── [01;35mmap-of-kyoto-japan-travel-scaled.webp[0m
+│   │   │   ├── [01;35mNightlife_in_Bangkok_925ec9912e.png[0m
+│   │   │   ├── [01;35mosaka-dotonbori-iStock-1138049211-1024x683.jpg[0m
+│   │   │   ├── [01;35mpbk-The-Temple-Of-Dawn-1074.jpg[0m
+│   │   │   ├── [01;35mpesca-de-piranha_cTrogf3.jpg[0m
+│   │   │   ├── [01;35mpesca-de-piranha.jpg[0m
+│   │   │   ├── [01;35mphi-phi-viewpoint-girls.jpeg[0m
+│   │   │   ├── [01;35mRoma_in_breve.jpg[0m
+│   │   │   └── [01;35mtokyo.jpg[0m
+│   │   └── [01;35mrio-carnival-women.webp[0m
+│   ├── [01;34mlearn_more_images[0m
+│   │   ├── [01;35mBrazil-teach-fighting-inflation.jpg[0m
+│   │   ├── [01;35mCarnival-parade-Rio-de-Janeiro-2014.webp[0m
+│   │   ├── [01;35mFood-and-drink-in-Brazil.jpg[0m
+│   │   ├── [01;35mFuji.jpg[0m
+│   │   ├── [01;35mGettyImages-1438172458-fc10c26db84048b99a3feaa316701fa3.jpg[0m
+│   │   ├── [01;35mimage_-_7562373.jpeg[0m
+│   │   ├── [01;35mimage_-_7562373_KEKrjmY.jpeg[0m
+│   │   ├── [01;35mitalian-food.webp[0m
+│   │   ├── [01;35mJewelz_Blu.jpg[0m
+│   │   ├── [01;35mshutterstock_331873283-1024x683.jpg[0m
+│   │   ├── [01;35mthailand-sky-lanterns.jpg[0m
+│   │   └── [01;35mWhen-Is-The-Best-Time-To-Visit-Brazil-Amazon-Tours-For-People-With-Dis_fHjjtiH.jpg[0m
+│   ├── [01;34mplaces[0m
+│   │   ├── [01;35m2-10.png[0m
+│   │   ├── [01;35m2cc94a_07e55de318fe41538e17cb9de596cb45mv2.jpg[0m
+│   │   ├── [01;35mA-Guide-To-The-Anavilhanas-Archipelago.jpg[0m
+│   │   ├── [01;35mGrand-palace-and-Wat-Phra-Keaw-Bangkok.webp[0m
+│   │   ├── [01;35mimage_-_7562373.jpeg[0m
+│   │   ├── [01;35mimage_-_7562373_x06hVRu.jpeg[0m
+│   │   ├── [01;35mItaly-Venice-217.webp[0m
+│   │   ├── [01;35mmap-of-kyoto-japan-travel-scaled.webp[0m
+│   │   ├── [01;35mosaka-dotonbori-iStock-1138049211-1024x683.jpg[0m
+│   │   ├── [01;35mPonte_Rio_Negro.jpg[0m
+│   │   ├── [01;35mRoma_in_breve.jpg[0m
+│   │   └── [01;35mtokyo.jpg[0m
+│   ├── [01;34mprofiles[0m
+│   │   ├── [01;35ma.jpg[0m
+│   │   ├── [01;35ma-visit-to-a-native-village.jpg[0m
+│   │   ├── [01;35mc63cf24a-6cf8-4802-aeed-8b79cd048798.jpg[0m
+│   │   ├── [01;35mitalian-food.webp[0m
+│   │   ├── [01;35mSaroj.jpg[0m
+│   │   └── [01;35mthailand-sky-lanterns.jpg[0m
+│   ├── [01;34mstories[0m
+│   │   ├── [01;35m488710241_2107315543085818_8811261643412520153_n.jpg[0m
+│   │   ├── [01;35m493914321_1371149324036459_3294890765337343131_n.jpg[0m
+│   │   ├── [01;35m524152239_3058586601016652_438754149287316999_n.jpg[0m
+│   │   └── [01;35mSano_khalko_la.jpg[0m
+│   └── [01;34mvideos[0m
+│       └── [01;35mTravel_to_Brazil__Cinematic_Video_-_Maor_Benezri_1080p_h264.mp4[0m
+├── [01;34mpayments[0m
+│   ├── admin.py
+│   ├── apps.py
+│   ├── emails.py
+│   ├── __init__.py
+│   ├── [01;34mmigrations[0m
+│   │   ├── 0001_initial.py
+│   │   ├── 0002_booking_add_nights_booking_add_transfer_and_more.py
+│   │   ├── 0003_booking_canceled_at_alter_booking_status.py
+│   │   ├── 0004_booking_latitude_booking_longitude.py
+│   │   ├── 0005_alter_booking_latitude_alter_booking_longitude.py
+│   │   ├── 0006_booking_location_updated_at.py
+│   │   ├── 0007_remove_booking_latitude_and_more.py
+│   │   ├── __init__.py
+│   │   └── [01;34m__pycache__[0m
+│   │       ├── 0001_initial.cpython-312.pyc
+│   │       ├── 0002_booking_add_nights_booking_add_transfer_and_more.cpython-312.pyc
+│   │       ├── 0003_booking_canceled_at_alter_booking_status.cpython-312.pyc
+│   │       ├── 0004_booking_latitude_booking_longitude.cpython-312.pyc
+│   │       ├── 0005_alter_booking_latitude_alter_booking_longitude.cpython-312.pyc
+│   │       ├── 0006_booking_location_updated_at.cpython-312.pyc
+│   │       ├── 0007_remove_booking_latitude_and_more.cpython-312.pyc
+│   │       └── __init__.cpython-312.pyc
+│   ├── models.py
+│   ├── [01;34m__pycache__[0m
+│   │   ├── admin.cpython-312.pyc
+│   │   ├── apps.cpython-312.pyc
+│   │   ├── emails.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   ├── models.cpython-312.pyc
+│   │   ├── serializers.cpython-312.pyc
+│   │   ├── urls.cpython-312.pyc
+│   │   └── views.cpython-312.pyc
+│   ├── serializers.py
+│   ├── tests.py
+│   ├── urls.py
+│   └── views.py
+├── requirements-linux.txt
+├── requirements.txt
+├── settings.py
+├── Travel details dataset.csv
+├── tree.txt
+└── [01;34mutils[0m
+    ├── admin.py
+    ├── apps.py
+    ├── chatbot_views.py
+    ├── __init__.py
+    ├── [01;34mmanagement[0m
+    │   ├── [01;34mcommands[0m
+    │   │   ├── __init__.py
+    │   │   └── train_recommendations.py
+    │   ├── __init__.py
+    │   └── [01;34m__pycache__[0m
+    │       └── __init__.cpython-312.pyc
+    ├── [01;34mmigrations[0m
+    │   ├── __init__.py
+    │   └── [01;34m__pycache__[0m
+    │       └── __init__.cpython-312.pyc
+    ├── ml_recommendations.py
+    ├── models.py
+    ├── [01;34m__pycache__[0m
+    │   ├── admin.cpython-312.pyc
+    │   ├── apps.cpython-312.pyc
+    │   ├── chatbot_views.cpython-312.pyc
+    │   ├── __init__.cpython-312.pyc
+    │   ├── models.cpython-312.pyc
+    │   ├── recommendations.cpython-312.pyc
+    │   ├── recommendation_views.cpython-312.pyc
+    │   ├── signals.cpython-312.pyc
+    │   ├── urls.cpython-312.pyc
+    │   └── views.cpython-312.pyc
+    ├── recommendations.py
+    ├── recommendation_views.py
+    ├── signals.py
+    ├── tests.py
+    ├── urls.py
+    └── views.py
+
+46 directories, 341 files

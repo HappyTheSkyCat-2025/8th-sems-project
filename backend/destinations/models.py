@@ -85,7 +85,39 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+    
+    
+# -------------------------
+# User created Travel Deals 
+# -------------------------
 
+# -------------------------
+# User-Created Travel Plans
+# -------------------------
+
+class UserTrip(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='custom_trips')
+    title = models.CharField(max_length=200, help_text="e.g., 'My Summer in Italy'")
+    countries = models.ManyToManyField(Country, related_name="user_trips")
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    budget_estimate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    is_public = models.BooleanField(default=False, help_text="Allow others to see this plan")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} by {self.user.email}"
+
+class UserPlannedDay(models.Model):
+    trip = models.ForeignKey(UserTrip, related_name='planned_days', on_delete=models.CASCADE)
+    day_number = models.PositiveIntegerField()
+    date = models.DateField(null=True, blank=True)
+    note = models.TextField(blank=True, help_text="User's notes for the day")
+    # Link to existing places in your DB
+    selected_places = models.ManyToManyField(Place, blank=True) 
+
+    class Meta:
+        ordering = ['day_number']
 
 # -------------------------
 # Travel Deal and Related Models

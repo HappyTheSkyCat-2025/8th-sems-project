@@ -1,7 +1,3 @@
-"""
-API Views for Recommendations
-Expose recommendation engine via REST endpoints
-"""
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -95,7 +91,7 @@ class BudgetFriendlyDealsAPIView(APIView):
         max_price = float(request.query_params.get('max_price', 5000))
         limit = int(request.query_params.get('limit', 10))
         deals = RecommendationEngine.get_budget_friendly_deals(
-            max_price=max_price,
+            max_price=int(max_price),
             limit=limit
         )
         serializer = TravelDealSerializer(deals, many=True)
