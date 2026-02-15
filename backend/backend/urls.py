@@ -11,7 +11,8 @@ urlpatterns = [
     # Django Admin
     # ---------------------------
     path('admin/', admin.site.urls),
-
+    #path("api/", include("api.urls")),
+    
     # ---------------------------
     # JWT Authentication
     # ---------------------------
@@ -21,13 +22,13 @@ urlpatterns = [
     # ---------------------------
     # Core Application Routes
     # ---------------------------
-    path('api/accounts/', include('accounts.urls')),
-    path('api/destinations/', include('destinations.urls')),
-    path('api/contacts/', include('contacts.urls')),
-    path('api/blogs/', include('blogs.urls')),
-    path('api/utils/', include('utils.urls')),
-    path('api/payments/', include('payments.urls')),
-    path('api/admin-dashboard/', include('admin_dashboard.urls')),
+    path("api/accounts/", include("accounts.urls")),
+    path("api/destinations/", include("destinations.urls")),
+    path("api/contacts/", include("contacts.urls")),
+    path("api/blogs/", include("blogs.urls")),
+    path("api/utils/", include("utils.urls")),
+    path("api/payments/", include("payments.urls")),
+    path("api/admin-dashboard/", include("admin_dashboard.urls")),
 ]
 
 

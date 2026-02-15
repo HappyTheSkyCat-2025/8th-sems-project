@@ -102,6 +102,7 @@ export default function DestDescription() {
       </div>
       <Reviewplaces data={dealData} reviews={reviews} setReviews={setReviews} />
       <Recommendations dealId={dealData.id} />
+      
       <Foot />
     </div>
   );

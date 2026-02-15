@@ -11,6 +11,7 @@ import ArticlesSection from "./destinations/ArticlesSection";
 import FaqsSection from "./destinations/FaqsSection";
 import VideoSection from "./destinations/VideoSection";
 import Foot from "./Foot";
+import Recommendations from "../components/recommendations";
 
 import CurrencyConverterInline from "./destinations/CurrencyConverterInline";
 

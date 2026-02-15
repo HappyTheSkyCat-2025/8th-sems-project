@@ -12,7 +12,7 @@ const Recommendations = ({ dealId }) => {
       try {
 
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/recommendations/${dealId}/`
+          `http://127.0.0.1:8000/api/recommendations/similar/${dealId}/`
         );
 
         setRecommendations(response.data.recommendations);
