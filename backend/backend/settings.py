@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'payments',       # Stripe / PayPal integration
     'utils',          # Any shared logic
     'admin_dashboard', # Admin dashboard for managing the site
+    'recommendations', # Similar recommendations based on deal attributes
 ]
 
 # ---------------------------

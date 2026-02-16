@@ -5,6 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 
+
 urlpatterns = [
 
     # ---------------------------
@@ -29,6 +30,9 @@ urlpatterns = [
     path("api/utils/", include("utils.urls")),
     path("api/payments/", include("payments.urls")),
     path("api/admin-dashboard/", include("admin_dashboard.urls")),
+    path("api/recommendations/", include("recommendations.urls")),
+    
+    
 ]
 
 

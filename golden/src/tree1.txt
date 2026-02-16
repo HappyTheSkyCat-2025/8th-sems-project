@@ -1,0 +1,263 @@
+[01;34m.[0m
+├── [01;34madmin[0m
+│   ├── admin.css
+│   ├── AdminDashboard.jsx
+│   ├── AdminLayout.jsx
+│   ├── [01;34mapi[0m
+│   │   ├── blogApi.js
+│   │   ├── bookingApi.js
+│   │   ├── contactApi.js
+│   │   ├── countryApi.js
+│   │   ├── countryLearnMoreTopicApi.js
+│   │   ├── countryOverviewApi.js
+│   │   ├── dealCategoryApi.js
+│   │   ├── faqApi.js
+│   │   ├── itineraryDayApi.js
+│   │   ├── regionApi.js
+│   │   ├── travelDealApi.js
+│   │   ├── travelDealDateApi.js
+│   │   ├── travelImageApi.js
+│   │   ├── tree1.txt
+│   │   └── userApi.js
+│   ├── [01;34mcomponents[0m
+│   │   ├── BlogForm.jsx
+│   │   ├── BookingForm.jsx
+│   │   ├── CountryForm.jsx
+│   │   ├── Header.jsx
+│   │   ├── RegionForm.jsx
+│   │   ├── sideBar.css
+│   │   ├── Sidebar.jsx
+│   │   ├── TravelDealDateForm.jsx
+│   │   ├── TravelDealForm.jsx
+│   │   └── UserForm.jsx
+│   ├── [01;34mpages[0m
+│   │   ├── Admin.css
+│   │   ├── AdminDashboard.jsx
+│   │   ├── blog.css
+│   │   ├── BlogList.jsx
+│   │   ├── booking.css
+│   │   ├── BookingList.jsx
+│   │   ├── contact.css
+│   │   ├── ContactList.jsx
+│   │   ├── country.css
+│   │   ├── CountryList.jsx
+│   │   ├── [01;34mdestinations[0m
+│   │   │   ├── article.css
+│   │   │   ├── article.jsx
+│   │   │   ├── countries.css
+│   │   │   ├── countries.jsx
+│   │   │   ├── country.css
+│   │   │   ├── country.jsx
+│   │   │   ├── date.css
+│   │   │   ├── dates.jsx
+│   │   │   ├── deal.jsx
+│   │   │   ├── deals.css
+│   │   │   ├── deals.jsx
+│   │   │   ├── faq.jsx
+│   │   │   ├── learn.jsx
+│   │   │   ├── lern.css
+│   │   │   ├── places.jsx
+│   │   │   ├── region.jsx
+│   │   │   ├── review.css
+│   │   │   └── reviews.jsx
+│   │   ├── Newsletter.jsx
+│   │   ├── [01;34mpayment[0m
+│   │   │   ├── bookin.css
+│   │   │   ├── booking.jsx
+│   │   │   ├── payment.css
+│   │   │   ├── payment.jsx
+│   │   │   ├── userstat.css
+│   │   │   └── userstat.jsx
+│   │   ├── region.css
+│   │   ├── RegionList.jsx
+│   │   ├── story.css
+│   │   ├── story.jsx
+│   │   ├── travelDeal.css
+│   │   ├── travelDealDate.css
+│   │   ├── TravelDealDateList.jsx
+│   │   ├── TravelDealList.jsx
+│   │   ├── user.css
+│   │   └── UserList.jsx
+│   └── [01;34mroutes[0m
+│       └── AdminRoutes.jsx
+├── App.jsx
+├── [01;34massets[0m
+│   ├── [01;35m1300x820.webp[0m
+│   ├── [01;35m217870.jpg[0m
+│   ├── [01;35mbali.jpg[0m
+│   ├── [01;35mcheers-culinary+journeys.jpg[0m
+│   ├── [01;35mconfirm.png[0m
+│   ├── [01;35mforgetpassword.jpg[0m
+│   ├── [01;35mhero-wildebeest.jpg[0m
+│   ├── [01;35mhomevid1.mp4[0m
+│   ├── [01;35mimg2.jpg[0m
+│   ├── [01;35mlogin.jpg[0m
+│   ├── [01;35mlogin.png[0m
+│   ├── [01;35mlogo1.png[0m
+│   ├── [01;35motp.png[0m
+│   ├── [01;35mpeople.jpg[0m
+│   ├── [01;35mPeru.jpg[0m
+│   ├── [01;35mregister.png[0m
+│   ├── [01;35msection-banner.webp[0m
+│   ├── StarUML Setup 7.0.0.exe
+│   ├── [01;35mtst-1.webp[0m
+│   ├── [01;35mtst-2.webp[0m
+│   ├── [01;35mtst-3.webp[0m
+│   ├── [01;35mtst-4.webp[0m
+│   └── [01;35mworld-plane-icon.png[0m
+├── [01;34mAuth[0m
+│   ├── BookingDetail.jsx
+│   ├── Booking.jsx
+│   ├── ChangePassword.jsx
+│   ├── ChangePasswordModal.jsx
+│   ├── Fav.jsx
+│   ├── ForgotPassword.jsx
+│   ├── Login.jsx
+│   ├── Modal.jsx
+│   ├── ProfileEditModal.jsx
+│   ├── Profile.jsx
+│   ├── Register.jsx
+│   ├── Remainder.jsx
+│   ├── ResetPassword.jsx
+│   └── VerifyOTP.jsx
+├── [01;34mcomponents[0m
+│   ├── chatbot.jsx
+│   ├── contact.jsx
+│   ├── footer.jsx
+│   ├── Home.jsx
+│   ├── journal.jsx
+│   ├── journey.jsx
+│   ├── navbar.jsx
+│   ├── readsection3rd.jsx
+│   ├── recommendations.jsx
+│   ├── reviewmodal.jsx
+│   ├── roof.jsx
+│   ├── scrolltotop.jsx
+│   ├── search.jsx
+│   ├── stepIndicator.css
+│   ├── stepindicator.jsx
+│   ├── stories.jsx
+│   ├── trending.jsx
+│   ├── trip.jsx
+│   └── whygolden.jsx
+├── [01;34mdata[0m
+│   ├── article.js
+│   ├── blog.js
+│   ├── dates.js
+│   ├── destinations.js
+│   ├── included.js
+│   ├── itenary.js
+│   ├── journal.js
+│   ├── journey.js
+│   ├── navData.js
+│   ├── questions.js
+│   ├── review.js
+│   ├── stories.js
+│   ├── trending.js
+│   └── trip.js
+├── index.css
+├── index.js
+├── main.jsx
+├── [01;34mpages[0m
+│   ├── [01;34maboutus[0m
+│   │   ├── goodtimes.jsx
+│   │   ├── guides.jsx
+│   │   ├── ourpurpose.jsx
+│   │   ├── ourstory.jsx
+│   │   └── why.jsx
+│   ├── Aboutus.jsx
+│   ├── Alldestinations.jsx
+│   ├── Blogdetail.jsx
+│   ├── Blogs.jsx
+│   ├── [01;34mdestdescription[0m
+│   │   ├── dates.jsx
+│   │   ├── desc.jsx
+│   │   ├── feat.jsx
+│   │   ├── included.jsx
+│   │   ├── places.jsx
+│   │   ├── reviewplaces.jsx
+│   │   └── WeatherForecastInline.jsx
+│   ├── Destdescription.jsx
+│   ├── Destinationpage.jsx
+│   ├── [01;34mdestinations[0m
+│   │   ├── ArticlesSection.jsx
+│   │   ├── CurrencyConverterInline.jsx
+│   │   ├── DealsSection.jsx
+│   │   ├── FaqsSection.jsx
+│   │   ├── OverviewSection.jsx
+│   │   ├── TripReviewsSection.jsx
+│   │   ├── VideoSection.jsx
+│   │   └── VisaCheckerInline.jsx
+│   ├── Foot.jsx
+│   └── Write.jsx
+├── [01;34mpagescss[0m
+│   ├── article.css
+│   ├── blogD.css
+│   ├── dates.css
+│   ├── deals.css
+│   ├── desc.css
+│   ├── destDescription.css
+│   ├── destination.css
+│   ├── feat.css
+│   ├── foot.css
+│   ├── goodTimes.css
+│   ├── guides.css
+│   ├── included.css
+│   ├── ourPurpose.css
+│   ├── ourStory.css
+│   ├── overview.css
+│   ├── places.css
+│   ├── questions.css
+│   ├── review.css
+│   ├── thankYou.css
+│   ├── video.css
+│   └── why.css
+├── [01;34mpayment[0m
+│   ├── payment1.css
+│   ├── payment1.jsx
+│   ├── payment2.css
+│   ├── payment2.jsx
+│   ├── payment3.css
+│   ├── payment3.jsx
+│   ├── PayPalPayment.jsx
+│   ├── StripePayment.jsx
+│   └── ThankYou.jsx
+├── [01;34mstyles[0m
+│   ├── aboutUs.css
+│   ├── allDestinations.css
+│   ├── blogD.css
+│   ├── blogS.css
+│   ├── booking.css
+│   ├── bookingDetail.css
+│   ├── changePassword.css
+│   ├── chatBot.css
+│   ├── contactUs.css
+│   ├── fav.css
+│   ├── footer.css
+│   ├── forgetPassword.css
+│   ├── global.css
+│   ├── Home.css
+│   ├── journal.css
+│   ├── journey.css
+│   ├── login.css
+│   ├── navbar.css
+│   ├── otp1.css
+│   ├── profile.css
+│   ├── read.css
+│   ├── reamainder.css
+│   ├── register.css
+│   ├── rest.css
+│   ├── reviewModal.css
+│   ├── roof.css
+│   ├── search.css
+│   ├── stories.css
+│   ├── trending.css
+│   ├── trip.css
+│   ├── whyGolden.css
+│   └── write.css
+├── tree1.txt
+└── [01;34mutils[0m
+    ├── axiosInstance.js
+    └── RequireAdmin.jsx
+
+20 directories, 241 files
